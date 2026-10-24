@@ -667,2072 +667,2311 @@
 </head>
 <body>
 
-  <!-- HEADER -->
-  <header class="app-header">
-    <div class="brand-group">
-      <div class="brand-icon" aria-hidden="true">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2">
-          <ellipse cx="12" cy="8" rx="9" ry="3.5" stroke-dasharray="3 2" />
-          <line x1="12" y1="18" x2="12" y2="8" stroke="#fde047" stroke-width="2.2" />
-          <line x1="12" y1="8" x2="19" y2="6.5" stroke="#38bdf8" stroke-width="2.2" />
-          <circle cx="12" cy="18" r="2.5" fill="#fbbf24" />
-          <circle cx="19" cy="6.5" r="3" fill="#38bdf8" />
-        </svg>
+<!-- HEADER -->
+<header class="app-header">
+  <div class="brand-group">
+    <div class="brand-icon" aria-hidden="true">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2">
+        <ellipse cx="12" cy="8" rx="9" ry="3.5" stroke-dasharray="3 2" />
+        <line x1="12" y1="18" x2="12" y2="8" stroke="#fde047" stroke-width="2.2" />
+        <line x1="12" y1="8" x2="19" y2="6.5" stroke="#38bdf8" stroke-width="2.2" />
+        <circle cx="12" cy="18" r="2.5" fill="#fbbf24" />
+        <circle cx="19" cy="6.5" r="3" fill="#38bdf8" />
+      </svg>
+    </div>
+    <div>
+      <div class="brand-title">
+        Dynamics of a Hand-Held Ball-on-a-String
+        <span class="badge-pill">Euler's 2nd Law 3D Lab</span>
       </div>
-      <div>
-        <div class="brand-title">
-          Dynamics of a Hand-Held Ball-on-a-String
-          <span class="badge-pill">Euler's 2nd Law 3D Lab</span>
+      <div class="brand-subtitle">
+        Interactive Companion to the <a href="https://reldb.org/c/index.php/dynamic-analysis-of-a-ball-on-a-string/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-sky); text-decoration: underline; text-underline-offset: 2px;">Paper</a> by <strong>Dave Voorhis</strong> (Derbyshire, UK) &amp; <strong>Google Gemini</strong>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+    <a class="btn btn-primary" href="https://reldb.org/c/index.php/dynamic-analysis-of-a-ball-on-a-string/" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
+      <span>Read Full Paper ↗</span>
+    </a>
+  </div>
+</header>
+
+<!-- 3-COLUMN WORKSPACE -->
+<main class="workspace-grid">
+
+  <!-- ==================== LEFT COLUMN: CONTROLS, PRESETS & PARAMETERS ==================== -->
+  <aside class="panel" style="display: flex; flex-direction: column; gap: 12px;">
+    <div>
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Experiment Presets</div>
+          <div class="panel-subtitle">Select a physical boundary condition</div>
         </div>
-        <div class="brand-subtitle">
-          Interactive Companion to the <a href="https://reldb.org/c/index.php/dynamic-analysis-of-a-ball-on-a-string/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-sky); text-decoration: underline; text-underline-offset: 2px;">Paper</a> by <strong>Dave Voorhis</strong> (Derbyshire, UK) &amp; <strong>Google Gemini</strong>
+        <button class="btn" style="padding: 3px 8px; font-size: 0.68rem;" onclick="applyPreset('paper')">Reset</button>
+      </div>
+
+      <div class="preset-grid">
+        <button id="preset-paper" class="preset-btn active" onclick="applyPreset('paper')">
+          <strong>1. Paper Baseline</strong>
+          Coupled Wobble + Quintic Wrist Brake
+        </button>
+        <button id="preset-zerogrip" class="preset-btn" onclick="applyPreset('zerogrip')">
+          <strong>2. Zero Grip Friction</strong>
+          μ<sub>k</sub> = 0 (Coupled Wrist Brake Only)
+        </button>
+        <button id="preset-fixedpivot" class="preset-btn" onclick="applyPreset('fixedpivot')">
+          <strong>3. Rigid Mechanical Pivot</strong>
+          R<sub>0</sub> = 0, M = 0 (Aero + Grip Only)
+        </button>
+        <button id="preset-ideal" class="preset-btn" onclick="applyPreset('ideal')">
+          <strong>4. Idealized Textbook Limit</strong>
+          τ<sub>net</sub> = 0, R = 0 (ω<sub>f</sub> = ω<sub>i</sub>(r<sub>i</sub>/r<sub>f</sub>)²)
+        </button>
+        <button id="preset-coae" class="preset-btn" style="grid-column: 1 / -1;" onclick="applyPreset('coae')">
+          <strong>5. COAE (Bogus Scenario: ω<sub>f</sub> = ω<sub>i</sub>(r<sub>i</sub>/r<sub>f</sub>))</strong>
+          τ<sub>net</sub> = 0, R = 0, Linear Scaling (v = const, Unexplained 90% L Loss)
+        </button>
+      </div>
+    </div>
+
+    <!-- Parameter Sliders -->
+    <div>
+      <div class="panel-header" style="margin-bottom: 8px;">
+        <div>
+          <div class="panel-title">System Parameters</div>
+          <div class="panel-subtitle">Manipulate Sections 1 &amp; 3 variables</div>
+        </div>
+      </div>
+
+      <div class="tab-row">
+        <button id="tab-btn-kin" class="tab-btn active" onclick="switchParamTab('kin')">1. Pull &amp; Ball</button>
+        <button id="tab-btn-bio" class="tab-btn" onclick="switchParamTab('bio')">2. Hand &amp; Wrist</button>
+        <button id="tab-btn-drag" class="tab-btn" onclick="switchParamTab('drag')">3. Grip &amp; Aero</button>
+      </div>
+
+      <!-- Tab 1: Pull & Ball -->
+      <div id="tab-panel-kin" class="param-group">
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Initial Velocity (ω<sub>i</sub>)</span>
+            <span class="slider-val" id="lbl-omega-i">120 RPM (12.6 rad/s)</span>
+          </div>
+          <input type="range" id="sl-omega-i" min="30" max="300" step="5" value="120" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>30 RPM</span><span>Default: 120 RPM</span><span>300 RPM</span></div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Initial String Radius (r<sub>i</sub>)</span>
+            <span class="slider-val" id="lbl-ri">0.50 m</span>
+          </div>
+          <input type="range" id="sl-ri" min="0.20" max="1.00" step="0.01" value="0.50" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.20 m</span><span>Default: 0.50 m</span><span>1.00 m</span></div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Final String Radius (r<sub>f</sub>)</span>
+            <span class="slider-val" id="lbl-rf">0.050 m (10.0×)</span>
+          </div>
+          <input type="range" id="sl-rf" min="0.02" max="0.25" step="0.005" value="0.05" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.02 m</span><span>Default: 0.05 m</span><span>0.25 m</span></div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Pull Duration (Δt)</span>
+            <span class="slider-val" id="lbl-dt">1.00 s (|dr/dt|=0.45 m/s)</span>
+          </div>
+          <input type="range" id="sl-dt" min="0.20" max="3.00" step="0.05" value="1.00" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.20 s</span><span>Default: 1.00 s</span><span>3.00 s</span></div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Ball Mass (m)</span>
+            <span class="slider-val" id="lbl-m">0.050 kg (50 g)</span>
+          </div>
+          <input type="range" id="sl-m" min="0.010" max="0.200" step="0.005" value="0.050" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>10 g</span><span>Default: 50 g</span><span>200 g</span></div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Ball Diameter (d)</span>
+            <span class="slider-val" id="lbl-d">0.040 m (4.0 cm)</span>
+          </div>
+          <input type="range" id="sl-d" min="0.010" max="0.100" step="0.005" value="0.040" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>1.0 cm</span><span>Default: 4.0 cm</span><span>10.0 cm</span></div>
+        </div>
+      </div>
+
+      <!-- Tab 2: Hand & Wrist Biomechanics -->
+      <div id="tab-panel-bio" class="param-group hidden">
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Co-Orbiting Hand Mass (M)</span>
+            <span class="slider-val" id="lbl-M">1.00 kg</span>
+          </div>
+          <input type="range" id="sl-M" min="0.00" max="2.50" step="0.05" value="1.00" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.0 kg</span><span>Default: 1.00 kg</span><span>2.50 kg</span></div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Baseline Hand Wobble (R<sub>0</sub>)</span>
+            <span class="slider-val" id="lbl-R0">10.0 mm (0.010 m)</span>
+          </div>
+          <input type="range" id="sl-R0" min="0.000" max="0.030" step="0.001" value="0.010" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0 mm</span><span>Default: 10.0 mm</span><span>30 mm</span></div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Wrist Damping (c<sub>wrist</sub>)</span>
+            <span class="slider-val" id="lbl-cwrist">0.100 N·m·s/rad</span>
+          </div>
+          <input type="range" id="sl-cwrist" min="0.000" max="0.300" step="0.005" value="0.100" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.00</span><span>Default: 0.10</span><span>0.30</span></div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Wrist Yield Stiffness (k<sub>wrist</sub>)</span>
+            <span class="slider-val" id="lbl-kwrist">2500 N/m</span>
+          </div>
+          <input type="range" id="sl-kwrist" min="500" max="10000" step="100" value="2500" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>500 N/m</span><span>Default: 2500 N/m</span><span>10000 N/m</span></div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Wrist-to-Pinch Lever (ℓ)</span>
+            <span class="slider-val" id="lbl-ell">0.080 m (8.0 cm)</span>
+          </div>
+          <input type="range" id="sl-ell" min="0.040" max="0.150" step="0.005" value="0.080" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>4.0 cm</span><span>Default: 8.0 cm</span><span>15.0 cm</span></div>
+        </div>
+      </div>
+
+      <!-- Tab 3: Grip Friction & Aerodynamic Drag -->
+      <div id="tab-panel-drag" class="param-group hidden">
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Skin Friction Coeff (μ<sub>k</sub>)</span>
+            <span class="slider-val" id="lbl-muk">0.80</span>
+          </div>
+          <input type="range" id="sl-muk" min="0.00" max="1.50" step="0.05" value="0.80" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.00</span><span>Dry Skin: 0.80</span><span>1.50</span></div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Pinch Guide Radius (r<sub>grip</sub>)</span>
+            <span class="slider-val" id="lbl-rgrip">2.0 mm (0.002 m)</span>
+          </div>
+          <input type="range" id="sl-rgrip" min="0.000" max="0.010" step="0.0005" value="0.002" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.0 mm</span><span>Default: 2.0 mm</span><span>10.0 mm</span></div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Air Density (ρ)</span>
+            <span class="slider-val" id="lbl-rho">1.225 kg/m³</span>
+          </div>
+          <input type="range" id="sl-rho" min="0.000" max="2.000" step="0.025" value="1.225" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.00 (Vacuum)</span><span>Sea Level: 1.225</span><span>2.00</span></div>
         </div>
       </div>
     </div>
 
-    <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-      <a class="btn btn-primary" href="https://reldb.org/c/index.php/dynamic-analysis-of-a-ball-on-a-string/" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
-        <span>Read Full Paper ↗</span>
-      </a>
+    <!-- Paper Table 1 Summary Scorecard -->
+    <div style="border-top: 1px solid var(--border-subtle); padding-top: 10px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+        <span class="panel-title" style="font-size: 0.72rem;">Table 1 Comparison @ r = r<sub>f</sub></span>
+        <span style="font-family: var(--font-mono); font-size: 0.64rem; color: var(--accent-emerald);">dL/dt = τ<sub>net</sub></span>
+      </div>
+      <table class="comp-table">
+        <thead>
+        <tr>
+          <th>Metric</th>
+          <th style="color: var(--accent-amber);">Ideal</th>
+          <th style="color: var(--accent-purple);">Bound</th>
+          <th style="color: var(--accent-sky); text-align: right;">Sim Peak</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+          <td>Peak ω<sub>f</sub></td>
+          <td class="mono" id="tbl-ideal-rpm" style="color: var(--accent-amber);">12,000</td>
+          <td class="mono" id="tbl-bound-rpm" style="color: var(--accent-purple);">427 RPM</td>
+          <td class="mono" id="tbl-sim-rpm" style="color: var(--accent-sky); font-weight: 700; text-align: right;">378 RPM</td>
+        </tr>
+        <tr>
+          <td>Tension F<sub>c</sub></td>
+          <td class="mono" id="tbl-ideal-fc" style="color: var(--accent-amber);">3,948 N</td>
+          <td class="mono" id="tbl-bound-fc" style="color: var(--accent-purple);">5.0 N</td>
+          <td class="mono" id="tbl-sim-fc" style="color: var(--accent-rose); font-weight: 700; text-align: right;">3.9 N</td>
+        </tr>
+        <tr>
+          <td>Wobble R<sub>eq</sub></td>
+          <td class="mono" style="color: var(--text-dim);">0.0 mm</td>
+          <td class="mono" id="tbl-bound-R" style="color: var(--accent-purple);">12.0 mm</td>
+          <td class="mono" id="tbl-sim-R" style="color: var(--accent-amber); font-weight: 700; text-align: right;">11.6 mm</td>
+        </tr>
+        <tr>
+          <td>L<sub>sys</sub> Retained</td>
+          <td class="mono" style="color: var(--accent-amber);">100%</td>
+          <td class="mono" id="tbl-bound-lsys" style="color: var(--accent-purple);">7.6%</td>
+          <td class="mono" id="tbl-sim-lsys" style="color: var(--accent-emerald); font-weight: 700; text-align: right;">6.5%</td>
+        </tr>
+        <tr>
+          <td>L<sub>ball</sub> Retained</td>
+          <td class="mono" style="color: var(--accent-amber);">100%</td>
+          <td class="mono" id="tbl-bound-lball" style="color: var(--accent-purple);">3.56%</td>
+          <td class="mono" id="tbl-sim-lball" style="color: var(--accent-sky); font-weight: 700; text-align: right;">3.14%</td>
+        </tr>
+        </tbody>
+      </table>
     </div>
-  </header>
+  </aside>
 
-  <!-- 3-COLUMN WORKSPACE -->
-  <main class="workspace-grid">
+  <!-- ==================== CENTER COLUMN: TRANSPORT, 3D VIEWPORT & 2D CHARTS ==================== -->
+  <section class="col-center">
 
-    <!-- ==================== LEFT COLUMN: CONTROLS, PRESETS & PARAMETERS ==================== -->
-    <aside class="panel" style="display: flex; flex-direction: column; gap: 12px;">
-      <div>
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Experiment Presets</div>
-            <div class="panel-subtitle">Select a physical boundary condition</div>
-          </div>
-          <button class="btn" style="padding: 3px 8px; font-size: 0.68rem;" onclick="applyPreset('paper')">Reset</button>
-        </div>
+    <!-- TOP TRANSPORT & CAMERA CONTROLS BAR -->
+    <div class="transport-bar">
+      <div class="transport-group">
+        <button id="btn-play-pause" class="btn btn-primary" onclick="togglePlayPause()">
+          <span id="play-pause-text">Pause</span>
+        </button>
+        <button class="btn" onclick="stepSimulation()">
+          Step +0.05s
+        </button>
+        <button class="btn btn-amber" onclick="jumpToPeakPull()" title="Jump to end of inward pull (t = Δt)">
+          Peak @ r<sub>f</sub>
+        </button>
 
-        <div class="preset-grid">
-          <button id="preset-paper" class="preset-btn active" onclick="applyPreset('paper')">
-            <strong>1. Paper Baseline</strong>
-            Coupled Wobble + Quintic Wrist Brake
-          </button>
-          <button id="preset-zerogrip" class="preset-btn" onclick="applyPreset('zerogrip')">
-            <strong>2. Zero Grip Friction</strong>
-            μ<sub>k</sub> = 0 (Coupled Wrist Brake Only)
-          </button>
-          <button id="preset-fixedpivot" class="preset-btn" onclick="applyPreset('fixedpivot')">
-            <strong>3. Rigid Mechanical Pivot</strong>
-            R<sub>0</sub> = 0, M = 0 (Aero + Grip Only)
-          </button>
-          <button id="preset-ideal" class="preset-btn" onclick="applyPreset('ideal')">
-            <strong>4. Idealized Textbook Limit</strong>
-            τ<sub>net</sub> = 0, R = 0 (Zero-Torque Limit)
-          </button>
-        </div>
+        <div class="divider-vert"></div>
+
+        <span style="font-size: 0.7rem; color: var(--text-muted);">Speed:</span>
+        <button id="spd-025" class="btn" style="padding: 4px 8px;" onclick="setPlaybackSpeed(0.25)">0.25×</button>
+        <button id="spd-050" class="btn" style="padding: 4px 8px;" onclick="setPlaybackSpeed(0.5)">0.5×</button>
+        <button id="spd-100" class="btn btn-active" style="padding: 4px 8px;" onclick="setPlaybackSpeed(1.0)">1×</button>
       </div>
 
-      <!-- Parameter Sliders -->
-      <div>
-        <div class="panel-header" style="margin-bottom: 8px;">
-          <div>
-            <div class="panel-title">System Parameters</div>
-            <div class="panel-subtitle">Manipulate Sections 1 &amp; 3 variables</div>
-          </div>
-        </div>
-
-        <div class="tab-row">
-          <button id="tab-btn-kin" class="tab-btn active" onclick="switchParamTab('kin')">1. Pull &amp; Ball</button>
-          <button id="tab-btn-bio" class="tab-btn" onclick="switchParamTab('bio')">2. Hand &amp; Wrist</button>
-          <button id="tab-btn-drag" class="tab-btn" onclick="switchParamTab('drag')">3. Grip &amp; Aero</button>
-        </div>
-
-        <!-- Tab 1: Pull & Ball -->
-        <div id="tab-panel-kin" class="param-group">
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Initial Velocity (ω<sub>i</sub>)</span>
-              <span class="slider-val" id="lbl-omega-i">120 RPM (12.6 rad/s)</span>
-            </div>
-            <input type="range" id="sl-omega-i" min="30" max="300" step="5" value="120" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>30 RPM</span><span>Default: 120 RPM</span><span>300 RPM</span></div>
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Initial String Radius (r<sub>i</sub>)</span>
-              <span class="slider-val" id="lbl-ri">0.50 m</span>
-            </div>
-            <input type="range" id="sl-ri" min="0.20" max="1.00" step="0.01" value="0.50" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>0.20 m</span><span>Default: 0.50 m</span><span>1.00 m</span></div>
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Final String Radius (r<sub>f</sub>)</span>
-              <span class="slider-val" id="lbl-rf">0.050 m (10.0×)</span>
-            </div>
-            <input type="range" id="sl-rf" min="0.02" max="0.25" step="0.005" value="0.05" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>0.02 m</span><span>Default: 0.05 m</span><span>0.25 m</span></div>
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Pull Duration (Δt)</span>
-              <span class="slider-val" id="lbl-dt">1.00 s (|dr/dt|=0.45 m/s)</span>
-            </div>
-            <input type="range" id="sl-dt" min="0.20" max="3.00" step="0.05" value="1.00" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>0.20 s</span><span>Default: 1.00 s</span><span>3.00 s</span></div>
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Ball Mass (m)</span>
-              <span class="slider-val" id="lbl-m">0.050 kg (50 g)</span>
-            </div>
-            <input type="range" id="sl-m" min="0.010" max="0.200" step="0.005" value="0.050" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>10 g</span><span>Default: 50 g</span><span>200 g</span></div>
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Ball Diameter (d)</span>
-              <span class="slider-val" id="lbl-d">0.040 m (4.0 cm)</span>
-            </div>
-            <input type="range" id="sl-d" min="0.010" max="0.100" step="0.005" value="0.040" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>1.0 cm</span><span>Default: 4.0 cm</span><span>10.0 cm</span></div>
-          </div>
-        </div>
-
-        <!-- Tab 2: Hand & Wrist Biomechanics -->
-        <div id="tab-panel-bio" class="param-group hidden">
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Co-Orbiting Hand Mass (M)</span>
-              <span class="slider-val" id="lbl-M">1.00 kg</span>
-            </div>
-            <input type="range" id="sl-M" min="0.00" max="2.50" step="0.05" value="1.00" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>0.0 kg</span><span>Default: 1.00 kg</span><span>2.50 kg</span></div>
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Baseline Hand Wobble (R<sub>0</sub>)</span>
-              <span class="slider-val" id="lbl-R0">10.0 mm (0.010 m)</span>
-            </div>
-            <input type="range" id="sl-R0" min="0.000" max="0.030" step="0.001" value="0.010" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>0 mm</span><span>Default: 10.0 mm</span><span>30 mm</span></div>
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Wrist Damping (c<sub>wrist</sub>)</span>
-              <span class="slider-val" id="lbl-cwrist">0.100 N·m·s/rad</span>
-            </div>
-            <input type="range" id="sl-cwrist" min="0.000" max="0.300" step="0.005" value="0.100" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>0.00</span><span>Default: 0.10</span><span>0.30</span></div>
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Wrist Yield Stiffness (k<sub>wrist</sub>)</span>
-              <span class="slider-val" id="lbl-kwrist">2500 N/m</span>
-            </div>
-            <input type="range" id="sl-kwrist" min="500" max="10000" step="100" value="2500" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>500 N/m</span><span>Default: 2500 N/m</span><span>10000 N/m</span></div>
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Wrist-to-Pinch Lever (ℓ)</span>
-              <span class="slider-val" id="lbl-ell">0.080 m (8.0 cm)</span>
-            </div>
-            <input type="range" id="sl-ell" min="0.040" max="0.150" step="0.005" value="0.080" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>4.0 cm</span><span>Default: 8.0 cm</span><span>15.0 cm</span></div>
-          </div>
-        </div>
-
-        <!-- Tab 3: Grip Friction & Aerodynamic Drag -->
-        <div id="tab-panel-drag" class="param-group hidden">
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Skin Friction Coeff (μ<sub>k</sub>)</span>
-              <span class="slider-val" id="lbl-muk">0.80</span>
-            </div>
-            <input type="range" id="sl-muk" min="0.00" max="1.50" step="0.05" value="0.80" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>0.00</span><span>Dry Skin: 0.80</span><span>1.50</span></div>
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Pinch Guide Radius (r<sub>grip</sub>)</span>
-              <span class="slider-val" id="lbl-rgrip">2.0 mm (0.002 m)</span>
-            </div>
-            <input type="range" id="sl-rgrip" min="0.000" max="0.010" step="0.0005" value="0.002" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>0.0 mm</span><span>Default: 2.0 mm</span><span>10.0 mm</span></div>
-          </div>
-
-          <div class="slider-item">
-            <div class="slider-top">
-              <span class="slider-label">Air Density (ρ)</span>
-              <span class="slider-val" id="lbl-rho">1.225 kg/m³</span>
-            </div>
-            <input type="range" id="sl-rho" min="0.000" max="2.000" step="0.025" value="1.225" oninput="onSliderChange()" />
-            <div class="slider-minmax"><span>0.00 (Vacuum)</span><span>Sea Level: 1.225</span><span>2.00</span></div>
-          </div>
-        </div>
+      <div class="transport-group">
+        <button class="btn" onclick="setCameraView('perspective')">Perspective</button>
+        <button class="btn" onclick="setCameraView('top')">Top-Down Wobble View</button>
+        <button class="btn" onclick="setCameraView('side')">Side Elevation View</button>
+        <button id="btn-wobble-mag" class="btn btn-active" onclick="toggleWobbleMagnification()">
+          Wobble Magnification 5×: ON
+        </button>
       </div>
 
-      <!-- Paper Table 1 Summary Scorecard -->
-      <div style="border-top: 1px solid var(--border-subtle); padding-top: 10px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <span class="panel-title" style="font-size: 0.72rem;">Table 1 Comparison @ r = r<sub>f</sub></span>
-          <span style="font-family: var(--font-mono); font-size: 0.64rem; color: var(--accent-emerald);">dL/dt = τ<sub>net</sub></span>
-        </div>
-        <table class="comp-table">
-          <thead>
-            <tr>
-              <th>Metric</th>
-              <th style="color: var(--accent-amber);">Ideal</th>
-              <th style="color: var(--accent-purple);">Bound</th>
-              <th style="color: var(--accent-sky); text-align: right;">Sim Peak</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Peak ω<sub>f</sub></td>
-              <td class="mono" id="tbl-ideal-rpm" style="color: var(--accent-amber);">12,000</td>
-              <td class="mono" id="tbl-bound-rpm" style="color: var(--accent-purple);">427 RPM</td>
-              <td class="mono" id="tbl-sim-rpm" style="color: var(--accent-sky); font-weight: 700; text-align: right;">378 RPM</td>
-            </tr>
-            <tr>
-              <td>Tension F<sub>c</sub></td>
-              <td class="mono" id="tbl-ideal-fc" style="color: var(--accent-amber);">3,948 N</td>
-              <td class="mono" id="tbl-bound-fc" style="color: var(--accent-purple);">5.0 N</td>
-              <td class="mono" id="tbl-sim-fc" style="color: var(--accent-rose); font-weight: 700; text-align: right;">3.9 N</td>
-            </tr>
-            <tr>
-              <td>Wobble R<sub>eq</sub></td>
-              <td class="mono" style="color: var(--text-dim);">0.0 mm</td>
-              <td class="mono" id="tbl-bound-R" style="color: var(--accent-purple);">12.0 mm</td>
-              <td class="mono" id="tbl-sim-R" style="color: var(--accent-amber); font-weight: 700; text-align: right;">11.6 mm</td>
-            </tr>
-            <tr>
-              <td>L<sub>sys</sub> Retained</td>
-              <td class="mono" style="color: var(--accent-amber);">100%</td>
-              <td class="mono" id="tbl-bound-lsys" style="color: var(--accent-purple);">7.6%</td>
-              <td class="mono" id="tbl-sim-lsys" style="color: var(--accent-emerald); font-weight: 700; text-align: right;">6.5%</td>
-            </tr>
-            <tr>
-              <td>L<sub>ball</sub> Retained</td>
-              <td class="mono" style="color: var(--accent-amber);">100%</td>
-              <td class="mono" id="tbl-bound-lball" style="color: var(--accent-purple);">3.56%</td>
-              <td class="mono" id="tbl-sim-lball" style="color: var(--accent-sky); font-weight: 700; text-align: right;">3.14%</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </aside>
-
-    <!-- ==================== CENTER COLUMN: TRANSPORT, 3D VIEWPORT & 2D CHARTS ==================== -->
-    <section class="col-center">
-
-      <!-- TOP TRANSPORT & CAMERA CONTROLS BAR -->
-      <div class="transport-bar">
-        <div class="transport-group">
-          <button id="btn-play-pause" class="btn btn-primary" onclick="togglePlayPause()">
-            <span id="play-pause-text">Pause</span>
-          </button>
-          <button class="btn" onclick="stepSimulation()">
-            Step +0.05s
-          </button>
-          <button class="btn btn-amber" onclick="jumpToPeakPull()" title="Jump to end of inward pull (t = Δt)">
-            Peak @ r<sub>f</sub>
-          </button>
-
-          <div class="divider-vert"></div>
-
-          <span style="font-size: 0.7rem; color: var(--text-muted);">Speed:</span>
-          <button id="spd-025" class="btn" style="padding: 4px 8px;" onclick="setPlaybackSpeed(0.25)">0.25×</button>
-          <button id="spd-050" class="btn" style="padding: 4px 8px;" onclick="setPlaybackSpeed(0.5)">0.5×</button>
-          <button id="spd-100" class="btn btn-active" style="padding: 4px 8px;" onclick="setPlaybackSpeed(1.0)">1×</button>
-        </div>
-
-        <div class="transport-group">
-          <button class="btn" onclick="setCameraView('perspective')">Perspective</button>
-          <button class="btn" onclick="setCameraView('top')">Top-Down Wobble View</button>
-          <button class="btn" onclick="setCameraView('side')">Side Elevation View</button>
-          <button id="btn-wobble-mag" class="btn btn-active" onclick="toggleWobbleMagnification()">
-            Wobble Magnification 5×: ON
-          </button>
-        </div>
-
-        <!-- Timeline Scrubber Row -->
-        <div class="scrubber-row">
+      <!-- Timeline Scrubber Row -->
+      <div class="scrubber-row">
           <span style="font-family: var(--font-mono); font-size: 0.75rem; color: var(--accent-sky); min-width: 78px;">
             t = <strong id="lbl-sim-time">0.00</strong> s
           </span>
-          <input type="range" id="scrubber-slider" min="0" max="5" step="0.01" value="0" oninput="onScrubTime(this.value)" />
-          <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); white-space: nowrap;">
+        <input type="range" id="scrubber-slider" min="0" max="5" step="0.01" value="0" oninput="onScrubTime(this.value)" />
+        <span style="font-family: var(--font-mono); font-size: 0.68rem; color: var(--text-muted); white-space: nowrap;">
             Pull: 0→<span id="lbl-pull-end">1.0</span>s | Stop: <span id="lbl-stop-time">4.2</span>s
           </span>
-        </div>
+      </div>
+    </div>
+
+    <!-- MIDDLE: UNOBSTRUCTED 3D WEBGL VIEWPORT -->
+    <div class="viewport-wrapper">
+      <div id="webgl-container"></div>
+
+      <!-- Tiny Unobtrusive Top-Left Phase Badge -->
+      <div class="phase-overlay-badge">
+        <span id="phase-dot" class="status-dot"></span>
+        <span id="phase-text">PHASE 1: INWARD PULL (0 ≤ t ≤ Δt)</span>
       </div>
 
-      <!-- MIDDLE: UNOBSTRUCTED 3D WEBGL VIEWPORT -->
-      <div class="viewport-wrapper">
-        <div id="webgl-container"></div>
-
-        <!-- Tiny Unobtrusive Top-Left Phase Badge -->
-        <div class="phase-overlay-badge">
-          <span id="phase-dot" class="status-dot"></span>
-          <span id="phase-text">PHASE 1: INWARD PULL (0 ≤ t ≤ Δt)</span>
-        </div>
-
-        <!-- Subtle Bottom Legend & Camera Controls Hint -->
-        <div class="viewport-legend">
-          <span><i class="legend-dot" style="background: #38bdf8;"></i>Ball &amp; Trail</span>
-          <span><i class="legend-dot" style="background: #fbbf24;"></i>Pinch Wobble R(r,ω) at y=0</span>
-          <span><i class="legend-dot" style="background: #f43f5e;"></i>Centripetal F<sub>c</sub> &amp; Wrist Heat</span>
-          <span><i class="legend-dot" style="background: #34d399;"></i>Tangential v⃗</span>
-        </div>
-        <div class="viewport-hint">
-          Drag: Orbit 3D | Right-Drag / Shift-Drag: Pan | Scroll: Zoom
-        </div>
+      <!-- Subtle Bottom Legend & Camera Controls Hint -->
+      <div class="viewport-legend">
+        <span><i class="legend-dot" style="background: #38bdf8;"></i>Ball &amp; Trail</span>
+        <span><i class="legend-dot" style="background: #fbbf24;"></i>Pinch Wobble R(r,ω) at y=0</span>
+        <span><i class="legend-dot" style="background: #f43f5e;"></i>Centripetal F<sub>c</sub> &amp; Wrist Heat</span>
+        <span><i class="legend-dot" style="background: #34d399;"></i>Tangential v⃗</span>
       </div>
+      <div class="viewport-hint">
+        Drag: Orbit 3D | Right-Drag / Shift-Drag: Pan | Scroll: Zoom
+      </div>
+    </div>
 
-      <!-- BOTTOM OF CENTER COLUMN: 3 REAL-TIME 2D CANVAS TIME-SERIES CHARTS -->
-      <div class="panel" style="padding: 10px 12px;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+    <!-- BOTTOM OF CENTER COLUMN: 3 REAL-TIME 2D CANVAS TIME-SERIES CHARTS -->
+    <div class="panel" style="padding: 10px 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <span class="panel-title" style="font-size: 0.74rem;">
             Real-Time Trajectory &amp; Post-Pull Coast-Down Plots (Click or Drag Any Plot to Scrub Time)
           </span>
-          <span style="font-size: 0.68rem; color: var(--text-muted);">
+        <span style="font-size: 0.68rem; color: var(--text-muted);">
             Shaded Cyan = Inward Pull (0 ≤ t ≤ Δt) | Right of Dashed Line = Post-Pull Decay &amp; Stop (t &gt; Δt)
           </span>
+      </div>
+
+      <div class="charts-grid">
+        <!-- Plot 1: Angular Velocity omega(t) in RPM -->
+        <div class="chart-box">
+          <div class="chart-box-header">
+            <span>1. Angular Velocity ω(t) [RPM]</span>
+            <span style="font-family: var(--font-mono); color: var(--accent-sky);" id="chart-lbl-rpm">120 RPM</span>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="canvas-chart-omega"></canvas>
+          </div>
         </div>
 
-        <div class="charts-grid">
-          <!-- Plot 1: Angular Velocity omega(t) in RPM -->
-          <div class="chart-box">
-            <div class="chart-box-header">
-              <span>1. Angular Velocity ω(t) [RPM]</span>
-              <span style="font-family: var(--font-mono); color: var(--accent-sky);" id="chart-lbl-rpm">120 RPM</span>
-            </div>
-            <div class="chart-canvas-wrap">
-              <canvas id="canvas-chart-omega"></canvas>
-            </div>
+        <!-- Plot 2: Wobble Radius R(t) & String Radius r(t) -->
+        <div class="chart-box">
+          <div class="chart-box-header">
+            <span>2. Wobble R(t) [mm] &amp; String r(t) [m]</span>
+            <span style="font-family: var(--font-mono); color: var(--accent-amber);" id="chart-lbl-radii">R=10.8mm, r=0.50m</span>
           </div>
-
-          <!-- Plot 2: Wobble Radius R(t) & String Radius r(t) -->
-          <div class="chart-box">
-            <div class="chart-box-header">
-              <span>2. Wobble R(t) [mm] &amp; String r(t) [m]</span>
-              <span style="font-family: var(--font-mono); color: var(--accent-amber);" id="chart-lbl-radii">R=10.8mm, r=0.50m</span>
-            </div>
-            <div class="chart-canvas-wrap">
-              <canvas id="canvas-chart-radii"></canvas>
-            </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="canvas-chart-radii"></canvas>
           </div>
+        </div>
 
-          <!-- Plot 3: Torque Balance tau_spin-up vs |tau_net| -->
-          <div class="chart-box">
-            <div class="chart-box-header">
-              <span>3. Torque Balance τ<sub>spin-up</sub> vs |τ<sub>net</sub>| [N·m]</span>
-              <span style="font-family: var(--font-mono); color: var(--accent-rose);" id="chart-lbl-torque">τ_net = -0.04 N·m</span>
-            </div>
-            <div class="chart-canvas-wrap">
-              <canvas id="canvas-chart-torque"></canvas>
-            </div>
+        <!-- Plot 3: Torque Balance tau_spin-up vs |tau_net| -->
+        <div class="chart-box">
+          <div class="chart-box-header">
+            <span>3. Torque Balance τ<sub>spin-up</sub> vs |τ<sub>net</sub>| [N·m]</span>
+            <span style="font-family: var(--font-mono); color: var(--accent-rose);" id="chart-lbl-torque">τ_net = -0.04 N·m</span>
+          </div>
+          <div class="chart-canvas-wrap">
+            <canvas id="canvas-chart-torque"></canvas>
           </div>
         </div>
       </div>
+    </div>
 
-    </section>
+  </section>
 
-    <!-- ==================== RIGHT COLUMN: DEDICATED LIVE TELEMETRY PANEL ==================== -->
-    <aside class="col-right">
+  <!-- ==================== RIGHT COLUMN: DEDICATED LIVE TELEMETRY PANEL ==================== -->
+  <aside class="col-right">
 
-      <!-- CARD 1: ANGULAR VELOCITY | RADII | STRING TENSION -->
-      <div class="panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Angular Velocity | Radii | String Tension</div>
-            <div class="panel-subtitle">Live telemetry</div>
-          </div>
-          <span id="tel-time-badge" class="badge-pill">t = 0.00 s</span>
+    <!-- CARD 1: ANGULAR VELOCITY | RADII | STRING TENSION -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Angular Velocity | Radii | String Tension</div>
+          <div class="panel-subtitle">Live telemetry</div>
+        </div>
+        <span id="tel-time-badge" class="badge-pill">t = 0.00 s</span>
+      </div>
+
+      <div class="telemetry-grid-3">
+        <!-- Angular Velocity -->
+        <div class="metric-card">
+          <div class="metric-label">Angular Velocity</div>
+          <div class="metric-primary" style="color: var(--accent-sky);" id="tel-rpm">120.0 <span style="font-size:0.7rem;">RPM</span></div>
+          <div class="metric-sub" id="tel-rads">12.57 rad/s</div>
+          <div class="metric-sub" style="color: var(--accent-amber); margin-top: 2px;" id="tel-ideal-rpm">Ideal: 120 RPM</div>
         </div>
 
-        <div class="telemetry-grid-3">
-          <!-- Angular Velocity -->
-          <div class="metric-card">
-            <div class="metric-label">Angular Velocity</div>
-            <div class="metric-primary" style="color: var(--accent-sky);" id="tel-rpm">120.0 <span style="font-size:0.7rem;">RPM</span></div>
-            <div class="metric-sub" id="tel-rads">12.57 rad/s</div>
-            <div class="metric-sub" style="color: var(--accent-amber); margin-top: 2px;" id="tel-ideal-rpm">Ideal: 120 RPM</div>
-          </div>
+        <!-- Radii (String r & Wobble R) -->
+        <div class="metric-card">
+          <div class="metric-label">Radii (r &amp; R)</div>
+          <div class="metric-primary" style="color: #ffffff;" id="tel-r">0.500 <span style="font-size:0.7rem;">m</span></div>
+          <div class="metric-sub" style="color: var(--accent-amber);" id="tel-R">Wobble R: 10.8 mm</div>
+          <div class="metric-sub" id="tel-dR">Yield ΔR: +0.8 mm</div>
+        </div>
 
-          <!-- Radii (String r & Wobble R) -->
-          <div class="metric-card">
-            <div class="metric-label">Radii (r &amp; R)</div>
-            <div class="metric-primary" style="color: #ffffff;" id="tel-r">0.500 <span style="font-size:0.7rem;">m</span></div>
-            <div class="metric-sub" style="color: var(--accent-amber);" id="tel-R">Wobble R: 10.8 mm</div>
-            <div class="metric-sub" id="tel-dR">Yield ΔR: +0.8 mm</div>
-          </div>
+        <!-- String Tension Fc -->
+        <div class="metric-card">
+          <div class="metric-label">String Tension F<sub>c</sub></div>
+          <div class="metric-primary" style="color: var(--accent-rose);" id="tel-fc">3.95 <span style="font-size:0.7rem;">N</span></div>
+          <div class="metric-sub" id="tel-sag">Droop φ: 14.0°</div>
+          <div class="metric-sub" style="color: var(--accent-amber); margin-top: 2px;" id="tel-ideal-fc">Ideal: 3.95 N</div>
+        </div>
+      </div>
+    </div>
 
-          <!-- String Tension Fc -->
-          <div class="metric-card">
-            <div class="metric-label">String Tension F<sub>c</sub></div>
-            <div class="metric-primary" style="color: var(--accent-rose);" id="tel-fc">3.95 <span style="font-size:0.7rem;">N</span></div>
-            <div class="metric-sub" id="tel-sag">Droop φ: 14.0°</div>
-            <div class="metric-sub" style="color: var(--accent-amber); margin-top: 2px;" id="tel-ideal-fc">Ideal: 3.95 N</div>
-          </div>
+    <!-- CARD 2: ANGULAR MOMENTUM PARTITION (L = I * omega) -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Angular Momentum Partition (L = Iω)</div>
+          <div class="panel-subtitle">Coupled two-mass inertial sink &amp; external bleed</div>
         </div>
       </div>
 
-      <!-- CARD 2: ANGULAR MOMENTUM PARTITION (L = I * omega) -->
-      <div class="panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Angular Momentum Partition (L = Iω)</div>
-            <div class="panel-subtitle">Coupled two-mass inertial sink &amp; external bleed</div>
-          </div>
-        </div>
+      <div style="display: flex; justify-content: space-between; font-size: 0.72rem; margin-bottom: 4px;">
+        <span style="color: var(--text-muted);">Initial System L<sub>sys,i</sub>:</span>
+        <span style="font-family: var(--font-mono); color: #ffffff; font-weight: 600;" id="tel-lsys-init">0.1583 N·m·s</span>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 0.72rem;">
+        <span style="color: var(--text-muted);">Current System Retained:</span>
+        <span style="font-family: var(--font-mono); color: var(--accent-emerald); font-weight: 700;" id="tel-lsys-cur">0.1583 N·m·s (100.0%)</span>
+      </div>
 
-        <div style="display: flex; justify-content: space-between; font-size: 0.72rem; margin-bottom: 4px;">
-          <span style="color: var(--text-muted);">Initial System L<sub>sys,i</sub>:</span>
-          <span style="font-family: var(--font-mono); color: #ffffff; font-weight: 600;" id="tel-lsys-init">0.1583 N·m·s</span>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 0.72rem;">
-          <span style="color: var(--text-muted);">Current System Retained:</span>
-          <span style="font-family: var(--font-mono); color: var(--accent-emerald); font-weight: 700;" id="tel-lsys-cur">0.1583 N·m·s (100.0%)</span>
-        </div>
+      <!-- Visual Progress Bar -->
+      <div class="partition-bar-outer">
+        <div id="bar-l-ball" class="partition-seg" style="width: 99.2%; background: var(--accent-sky);" title="Ball Angular Momentum"></div>
+        <div id="bar-l-hand" class="partition-seg" style="width: 0.8%; background: var(--accent-amber);" title="Co-Orbiting Hand Wobble Angular Momentum"></div>
+        <div id="bar-l-lost" class="partition-seg" style="width: 0.0%; background: rgba(244, 63, 94, 0.75);" title="Dissipated by External Resistive Torques"></div>
+      </div>
 
-        <!-- Visual Progress Bar -->
-        <div class="partition-bar-outer">
-          <div id="bar-l-ball" class="partition-seg" style="width: 99.2%; background: var(--accent-sky);" title="Ball Angular Momentum"></div>
-          <div id="bar-l-hand" class="partition-seg" style="width: 0.8%; background: var(--accent-amber);" title="Co-Orbiting Hand Wobble Angular Momentum"></div>
-          <div id="bar-l-lost" class="partition-seg" style="width: 0.0%; background: rgba(244, 63, 94, 0.75);" title="Dissipated by External Resistive Torques"></div>
+      <div class="kv-list">
+        <div class="kv-row">
+          <span><i class="legend-dot" style="background: var(--accent-sky);"></i>Ball Share L<sub>ball</sub> (m r² ω)</span>
+          <span class="kv-val" style="color: var(--accent-sky);" id="tel-l-ball">0.1571 N·m·s (99.2%)</span>
         </div>
+        <div class="kv-row">
+          <span><i class="legend-dot" style="background: var(--accent-amber);"></i>Hand Wobble Share L<sub>hand</sub> (M R² ω)</span>
+          <span class="kv-val" style="color: var(--accent-amber);" id="tel-l-hand">0.0013 N·m·s (0.8%)</span>
+        </div>
+        <div class="kv-row">
+          <span><i class="legend-dot" style="background: var(--accent-rose);"></i>Bled Off by External Torques (∫τ<sub>net</sub>dt)</span>
+          <span class="kv-val" style="color: var(--accent-rose);" id="tel-l-lost">0.0000 N·m·s (0.0%)</span>
+        </div>
+      </div>
+    </div>
 
-        <div class="kv-list">
-          <div class="kv-row">
-            <span><i class="legend-dot" style="background: var(--accent-sky);"></i>Ball Share L<sub>ball</sub> (m r² ω)</span>
-            <span class="kv-val" style="color: var(--accent-sky);" id="tel-l-ball">0.1571 N·m·s (99.2%)</span>
-          </div>
-          <div class="kv-row">
-            <span><i class="legend-dot" style="background: var(--accent-amber);"></i>Hand Wobble Share L<sub>hand</sub> (M R² ω)</span>
-            <span class="kv-val" style="color: var(--accent-amber);" id="tel-l-hand">0.0013 N·m·s (0.8%)</span>
-          </div>
-          <div class="kv-row">
-            <span><i class="legend-dot" style="background: var(--accent-rose);"></i>Bled Off by External Torques (∫τ<sub>net</sub>dt)</span>
-            <span class="kv-val" style="color: var(--accent-rose);" id="tel-l-lost">0.0000 N·m·s (0.0%)</span>
-          </div>
+    <!-- CARD 3: INSTANTANEOUS TORQUE BALANCE (N*m) -->
+    <div class="panel">
+      <div class="panel-header">
+        <div>
+          <div class="panel-title">Instantaneous Torque Balance (N·m)</div>
+          <div class="panel-subtitle">I<sub>eff</sub> (dω/dt) = τ<sub>spin-up</sub> + τ<sub>net</sub></div>
         </div>
       </div>
 
-      <!-- CARD 3: INSTANTANEOUS TORQUE BALANCE (N*m) -->
-      <div class="panel">
-        <div class="panel-header">
-          <div>
-            <div class="panel-title">Instantaneous Torque Balance (N·m)</div>
-            <div class="panel-subtitle">I<sub>eff</sub> (dω/dt) = τ<sub>spin-up</sub> + τ<sub>net</sub></div>
-          </div>
+      <div class="kv-list">
+        <div class="kv-row">
+          <span style="color: var(--accent-sky);">+ Coriolis Inward Spin-Up (τ<sub>spin-up</sub>)</span>
+          <span class="kv-val" style="color: var(--accent-sky);" id="tel-tau-spin">+0.2827 N·m</span>
         </div>
-
-        <div class="kv-list">
-          <div class="kv-row">
-            <span style="color: var(--accent-sky);">+ Coriolis Inward Spin-Up (τ<sub>spin-up</sub>)</span>
-            <span class="kv-val" style="color: var(--accent-sky);" id="tel-tau-spin">+0.2827 N·m</span>
-          </div>
-          <div class="kv-row">
-            <span style="color: var(--accent-amber);">− Wrist Viscous Damping (τ<sub>damp</sub> ∝ ω⁵)</span>
-            <span class="kv-val" style="color: var(--accent-amber);" id="tel-tau-damp">-0.0229 N·m</span>
-          </div>
-          <div class="kv-row">
-            <span style="color: var(--accent-rose);">− Finger Pinch Skin Friction (τ<sub>fric</sub>)</span>
-            <span class="kv-val" style="color: var(--accent-rose);" id="tel-tau-fric">-0.0063 N·m</span>
-          </div>
-          <div class="kv-row">
-            <span style="color: var(--accent-emerald);">− Aero Drag Ball + String (τ<sub>drag</sub>)</span>
-            <span class="kv-val" style="color: var(--accent-emerald);" id="tel-tau-drag">-0.0102 N·m</span>
-          </div>
-          <div class="kv-row" style="border-top: 1px solid var(--border-subtle); background: rgba(30, 41, 59, 0.7);">
-            <span style="font-weight: 700; color: #ffffff;">Net Resistive Torque (τ<sub>net</sub>)</span>
-            <span class="kv-val" style="color: var(--accent-rose);" id="tel-tau-net">-0.0394 N·m</span>
-          </div>
-          <div class="kv-row" style="background: rgba(30, 41, 59, 0.7);">
-            <span style="font-weight: 700; color: #ffffff;">Wrist Heat Dissipation (P<sub>diss</sub> = |τ<sub>damp</sub>|ω)</span>
-            <span class="kv-val" style="color: var(--accent-amber);" id="tel-p-diss">0.29 W</span>
-          </div>
+        <div class="kv-row">
+          <span style="color: var(--accent-amber);">− Wrist Viscous Damping (τ<sub>damp</sub> ∝ ω⁵)</span>
+          <span class="kv-val" style="color: var(--accent-amber);" id="tel-tau-damp">-0.0229 N·m</span>
+        </div>
+        <div class="kv-row">
+          <span style="color: var(--accent-rose);">− Finger Pinch Skin Friction (τ<sub>fric</sub>)</span>
+          <span class="kv-val" style="color: var(--accent-rose);" id="tel-tau-fric">-0.0063 N·m</span>
+        </div>
+        <div class="kv-row">
+          <span style="color: var(--accent-emerald);">− Aero Drag Ball + String (τ<sub>drag</sub>)</span>
+          <span class="kv-val" style="color: var(--accent-emerald);" id="tel-tau-drag">-0.0102 N·m</span>
+        </div>
+        <div class="kv-row" style="border-top: 1px solid var(--border-subtle); background: rgba(30, 41, 59, 0.7);">
+          <span style="font-weight: 700; color: #ffffff;">Net Resistive Torque (τ<sub>net</sub>)</span>
+          <span class="kv-val" style="color: var(--accent-rose);" id="tel-tau-net">-0.0394 N·m</span>
+        </div>
+        <div class="kv-row" style="background: rgba(30, 41, 59, 0.7);">
+          <span style="font-weight: 700; color: #ffffff;">Wrist Heat Dissipation (P<sub>diss</sub> = |τ<sub>damp</sub>|ω)</span>
+          <span class="kv-val" style="color: var(--accent-amber);" id="tel-p-diss">0.29 W</span>
         </div>
       </div>
+    </div>
 
-    </aside>
+  </aside>
 
-  </main>
+</main>
 
-  <!-- SELF-CONTAINED SIMULATION & 3D ENGINE SCRIPT -->
-  <script>
-    /*************************************************************************
-     * 1. SIMULATION PARAMETERS & STATE (FROM PAPER SECTIONS 1, 3, 4)
-     *************************************************************************/
-    const G_ACCEL = 9.81;
-    const CD_BALL = 0.47;
-    const CD_STRING = 1.0;
-    const W_STRING = 0.002;
+<!-- SELF-CONTAINED SIMULATION & 3D ENGINE SCRIPT -->
+<script>
+  /*************************************************************************
+   * 1. SIMULATION PARAMETERS & STATE (FROM PAPER SECTIONS 1, 3, 4)
+   *************************************************************************/
+  const G_ACCEL = 9.81;
+  const CD_BALL = 0.47;
+  const CD_STRING = 1.0;
+  const W_STRING = 0.002;
 
-    const params = {
-      m: 0.05,          // Ball mass (kg)
-      d: 0.04,          // Ball diameter (m)
-      M: 1.0,           // Co-orbiting hand & distal forearm mass (kg)
-      ri: 0.50,         // Initial string radius (m)
-      rf: 0.05,         // Final string radius (m)
-      R0: 0.01,         // Baseline hand wobble radius (m)
-      rgrip: 0.002,     // Finger pinch guide radius (m)
-      ell: 0.08,        // Wrist-to-pinch lever distance (m)
-      dtPull: 1.0,      // Duration of uniform radial reduction (s)
-      omegaRPM_i: 120,  // Initial angular velocity (RPM)
-      cwrist: 0.10,     // Wrist viscous damping (N*m*s/rad)
-      kwrist: 2500,     // Wrist translational stiffness (N/m)
-      muk: 0.80,        // Skin kinetic friction coefficient
-      rho: 1.225,       // Air density (kg/m^3)
-      wobbleEnabled: true,
-      idealMode: false
-    };
+  const params = {
+    m: 0.05,          // Ball mass (kg)
+    d: 0.04,          // Ball diameter (m)
+    M: 1.0,           // Co-orbiting hand & distal forearm mass (kg)
+    ri: 0.50,         // Initial string radius (m)
+    rf: 0.05,         // Final string radius (m)
+    R0: 0.01,         // Baseline hand wobble radius (m)
+    rgrip: 0.002,     // Finger pinch guide radius (m)
+    ell: 0.08,        // Wrist-to-pinch lever distance (m)
+    dtPull: 1.0,      // Duration of uniform radial reduction (s)
+    omegaRPM_i: 120,  // Initial angular velocity (RPM)
+    cwrist: 0.10,     // Wrist viscous damping (N*m*s/rad)
+    kwrist: 2500,     // Wrist translational stiffness (N/m)
+    muk: 0.80,        // Skin kinetic friction coefficient
+    rho: 1.225,       // Air density (kg/m^3)
+    wobbleEnabled: true,
+    idealMode: false,
+    coaeMode: false
+  };
 
-    const sim = {
-      playing: true,
-      time: 0.0,
-      speed: 1.0,
-      theta: 0.0,
-      magnifyWobble: true,
-      preset: 'paper',
-      trajectory: [],
-      summary: {
-        idealRPM: 12000,
-        idealFc: 3948,
-        boundRPM: 427.1,
-        boundFc: 5.0,
-        boundR_mm: 12.0,
-        boundLsysPct: 7.60,
-        boundLballPct: 3.56,
-        simPeakRPM: 378.0,
-        simPeakFc: 3.92,
-        simPeakR_mm: 11.6,
-        simLsysPct: 6.48,
-        simLballPct: 3.14,
-        L_sys_i: 0.1583,
-        stopTime: 4.2,
-        maxTime: 4.8
-      }
-    };
-
-    /*************************************************************************
-     * 2. RIGOROUS PHYSICS ENGINE (COUPLED RK4 + BIOMECHANICAL GOVERNOR)
-     *************************************************************************/
-    function calcWobbleRadius(r, omega, p) {
-      if (p.idealMode || !p.wobbleEnabled || (p.M === 0 && p.R0 === 0)) {
-        return 0.0;
-      }
-      const Fc = p.m * r * omega * omega;
-      return p.R0 + (Fc / p.kwrist);
+  const sim = {
+    playing: true,
+    time: 0.0,
+    speed: 1.0,
+    theta: 0.0,
+    magnifyWobble: true,
+    preset: 'paper',
+    trajectory: [],
+    summary: {
+      idealRPM: 12000,
+      idealFc: 3948,
+      boundRPM: 427.1,
+      boundFc: 5.0,
+      boundR_mm: 12.0,
+      boundLsysPct: 7.60,
+      boundLballPct: 3.56,
+      simPeakRPM: 378.0,
+      simPeakFc: 3.92,
+      simPeakR_mm: 11.6,
+      simLsysPct: 6.48,
+      simLballPct: 3.14,
+      L_sys_i: 0.1583,
+      stopTime: 4.2,
+      maxTime: 4.8
     }
+  };
 
-    function calcTorques(r, drdt, omega, isPostPull, p) {
-      const drdtAbs = Math.abs(drdt);
-      const tauSpinUp = (drdt < 0 && omega > 0) ? (2.0 * p.m * r * drdtAbs * omega) : 0.0;
+  /*************************************************************************
+   * 2. RIGOROUS PHYSICS ENGINE (COUPLED RK4 + BIOMECHANICAL GOVERNOR)
+   *************************************************************************/
+  function calcWobbleRadius(r, omega, p) {
+    if (p.idealMode || p.coaeMode || !p.wobbleEnabled || (p.M === 0 && p.R0 === 0)) {
+      return 0.0;
+    }
+    const Fc = p.m * r * omega * omega;
+    return p.R0 + (Fc / p.kwrist);
+  }
 
-      if (p.idealMode || omega <= 1e-8) {
-        return {
-          tauSpinUp,
-          tauDragBall: 0.0,
-          tauDragString: 0.0,
-          tauFric: 0.0,
-          tauDamp: 0.0,
-          tauStop: 0.0,
-          tauNet: 0.0
-        };
-      }
+  function calcTorques(r, drdt, omega, isPostPull, p) {
+    const drdtAbs = Math.abs(drdt);
+    const tauSpinUp = (drdt < 0 && omega > 0) ? (2.0 * p.m * r * drdtAbs * omega) : 0.0;
 
-      const rBall = 0.5 * p.d;
-      const areaBall = Math.PI * rBall * rBall;
-      const tauDragBall = -0.5 * p.rho * CD_BALL * areaBall * Math.pow(r, 3) * omega * omega;
-      const tauDragString = -0.125 * p.rho * CD_STRING * W_STRING * Math.pow(r, 4) * omega * omega;
-
-      const Fc = p.m * r * omega * omega;
-      const tauFric = -p.muk * Fc * p.rgrip;
-
-      const R = calcWobbleRadius(r, omega, p);
-      const tauDamp = -p.cwrist * Math.pow(R / p.ell, 2) * omega;
-
-      // Post-pull residual tissue/cord-flexion stopping drag so the ball comes to a realistic complete stop (omega = 0)
-      const hasAnyDissipation = (p.cwrist > 0 || p.muk > 0 || p.rho > 0);
-      const tauStop = (isPostPull && hasAnyDissipation && omega > 0) ? -0.0015 : 0.0;
-
-      const tauNet = tauDragBall + tauDragString + tauFric + tauDamp + tauStop;
+    if (p.idealMode || p.coaeMode || omega <= 1e-8) {
       return {
         tauSpinUp,
-        tauDragBall,
-        tauDragString,
-        tauFric,
-        tauDamp,
-        tauStop,
-        tauNet
+        tauDragBall: 0.0,
+        tauDragString: 0.0,
+        tauFric: 0.0,
+        tauDamp: 0.0,
+        tauStop: 0.0,
+        tauNet: 0.0
       };
     }
 
-    /**
-     * Solves for the instantaneous local equilibrium ceiling omega_eq(r)
-     * where inward spin-up driving torque equals resistive braking: tau_spin-up(r, w) + tau_net(r, w) = 0
-     */
-    function solveLocalEquilibriumOmega(r, drdt, p) {
-      if (p.idealMode || drdt >= 0) return Infinity;
-      const drdtAbs = Math.abs(drdt);
-      const spinFactor = 2.0 * p.m * r * drdtAbs;
+    const rBall = 0.5 * p.d;
+    const areaBall = Math.PI * rBall * rBall;
+    const tauDragBall = -0.5 * p.rho * CD_BALL * areaBall * Math.pow(r, 3) * omega * omega;
+    const tauDragString = -0.125 * p.rho * CD_STRING * W_STRING * Math.pow(r, 4) * omega * omega;
 
-      const rBall = 0.5 * p.d;
-      const areaBall = Math.PI * rBall * rBall;
-      const cBall = 0.5 * p.rho * CD_BALL * areaBall * Math.pow(r, 3);
-      const cStr = 0.125 * p.rho * CD_STRING * W_STRING * Math.pow(r, 4);
-      const cFric = p.muk * p.m * r * p.rgrip;
+    const Fc = p.m * r * omega * omega;
+    const tauFric = -p.muk * Fc * p.rgrip;
 
-      // Check if zero resistive torques exist
-      if (p.cwrist <= 1e-9 && cBall + cStr + cFric <= 1e-12) {
-        return Infinity;
-      }
+    const R = calcWobbleRadius(r, omega, p);
+    const tauDamp = -p.cwrist * Math.pow(R / p.ell, 2) * omega;
 
-      function fRate(w) {
-        const R = calcWobbleRadius(r, w, p);
-        const dampTerm = p.cwrist * Math.pow(R / p.ell, 2);
-        const quadTerm = (cBall + cStr + cFric) * w;
-        return spinFactor - (dampTerm + quadTerm);
-      }
+    // Post-pull residual tissue/cord-flexion stopping drag so the ball comes to a realistic complete stop (omega = 0)
+    const hasAnyDissipation = (p.cwrist > 0 || p.muk > 0 || p.rho > 0);
+    const tauStop = (isPostPull && hasAnyDissipation && omega > 0) ? -0.0015 : 0.0;
 
-      if (fRate(0.001) <= 0) return 0.0;
+    const tauNet = tauDragBall + tauDragString + tauFric + tauDamp + tauStop;
+    return {
+      tauSpinUp,
+      tauDragBall,
+      tauDragString,
+      tauFric,
+      tauDamp,
+      tauStop,
+      tauNet
+    };
+  }
 
-      let lo = 0.001;
-      let hi = 30000.0;
-      for (let iter = 0; iter < 60; iter++) {
-        const mid = 0.5 * (lo + hi);
-        if (fRate(mid) > 0) lo = mid;
-        else hi = mid;
-      }
-      return 0.5 * (lo + hi);
+  /**
+   * Solves for the instantaneous local equilibrium ceiling omega_eq(r)
+   * where inward spin-up driving torque equals resistive braking: tau_spin-up(r, w) + tau_net(r, w) = 0
+   */
+  function solveLocalEquilibriumOmega(r, drdt, p) {
+    if (p.idealMode || p.coaeMode || drdt >= 0) return Infinity;
+    const drdtAbs = Math.abs(drdt);
+    const spinFactor = 2.0 * p.m * r * drdtAbs;
+
+    const rBall = 0.5 * p.d;
+    const areaBall = Math.PI * rBall * rBall;
+    const cBall = 0.5 * p.rho * CD_BALL * areaBall * Math.pow(r, 3);
+    const cStr = 0.125 * p.rho * CD_STRING * W_STRING * Math.pow(r, 4);
+    const cFric = p.muk * p.m * r * p.rgrip;
+
+    // Check if zero resistive torques exist
+    if (p.cwrist <= 1e-9 && cBall + cStr + cFric <= 1e-12) {
+      return Infinity;
     }
 
-    /**
-     * Pre-computes the entire trajectory from t = 0 through the inward pull (0 <= t <= dtPull)
-     * and post-pull decay (t > dtPull) until the ball stops completely (omega = 0).
-     */
-    function recomputePhysicsTrajectory() {
-      const p = params;
-      const omega_i = (p.omegaRPM_i * 2.0 * Math.PI) / 60.0;
-      const drdtPull = (p.rf - p.ri) / p.dtPull; // negative during inward pull
-      const drdtAbs = Math.abs(drdtPull);
+    function fRate(w) {
+      const R = calcWobbleRadius(r, w, p);
+      const dampTerm = p.cwrist * Math.pow(R / p.ell, 2);
+      const quadTerm = (cBall + cStr + cFric) * w;
+      return spinFactor - (dampTerm + quadTerm);
+    }
 
-      // 1. Idealized Zero-Torque Limit at r = r_f (Eq. 1)
-      const omegaIdeal_f = omega_i * Math.pow(p.ri / p.rf, 2);
-      const FcIdeal_f = p.m * p.rf * omegaIdeal_f * omegaIdeal_f;
+    if (fRate(0.001) <= 0) return 0.0;
 
-      // 2. Analytical Upper Bound at r = r_f (Wrist Damping Only, Paper Section 4 Eq. 18-20)
-      let Req_bound = (p.wobbleEnabled && !p.idealMode) ? p.R0 : 0.0;
-      let omegaBound_f = omegaIdeal_f;
-      let FcBound_f = FcIdeal_f;
-      if (!p.idealMode && p.wobbleEnabled && p.cwrist > 1e-6) {
-        Req_bound = p.ell * Math.sqrt((2.0 * p.m * p.rf * drdtAbs) / p.cwrist);
-        if (Req_bound > p.R0) {
-          FcBound_f = p.kwrist * (Req_bound - p.R0);
-          omegaBound_f = Math.sqrt(FcBound_f / (p.m * p.rf));
-        } else {
-          FcBound_f = 0.0;
-          omegaBound_f = 0.0;
-        }
-      }
+    let lo = 0.001;
+    let hi = 30000.0;
+    for (let iter = 0; iter < 60; iter++) {
+      const mid = 0.5 * (lo + hi);
+      if (fRate(mid) > 0) lo = mid;
+      else hi = mid;
+    }
+    return 0.5 * (lo + hi);
+  }
 
-      // Initial system angular momentum L_sys,i at t = 0
-      const R_i = calcWobbleRadius(p.ri, omega_i, p);
-      const I_ball_i = p.m * p.ri * p.ri;
-      const I_hand_i = p.M * R_i * R_i;
-      const L_sys_i = (I_ball_i + I_hand_i) * omega_i;
-      const L_ball_i = I_ball_i * omega_i;
+  /**
+   * Pre-computes the entire trajectory from t = 0 through the inward pull (0 <= t <= dtPull)
+   * and post-pull decay (t > dtPull) until the ball stops completely (omega = 0),
+   * including deterministic orbital phase angle theta(t) for full timeline scrubbing.
+   */
+  function recomputePhysicsTrajectory() {
+    const p = params;
+    const omega_i = (p.omegaRPM_i * 2.0 * Math.PI) / 60.0;
+    const drdtPull = (p.rf - p.ri) / p.dtPull; // negative during inward pull
+    const drdtAbs = Math.abs(drdtPull);
 
-      const dtStep = 0.005; // 5 ms output interval
-      const subSteps = 5;   // 1 ms RK4 sub-step
-      const h = dtStep / subSteps;
+    // 1. Idealized Zero-Torque Limit at r = r_f (Eq. 1)
+    const omegaIdeal_f = omega_i * Math.pow(p.ri / p.rf, 2);
+    const FcIdeal_f = p.m * p.rf * omegaIdeal_f * omegaIdeal_f;
 
-      const traj = [];
-      let t = 0.0;
-      let r = p.ri;
-      let omega = omega_i;
-
-      function pushSnapshot(timeVal, radVal, wVal, phaseName) {
-        const isPost = timeVal > p.dtPull + 1e-6;
-        const curDrdt = isPost ? 0.0 : drdtPull;
-        const R = calcWobbleRadius(radVal, wVal, p);
-        const Fc = p.m * radVal * wVal * wVal;
-
-        const rRatio = p.ri / radVal;
-        const wIdeal = omega_i * rRatio * rRatio;
-        const FcIdeal = p.m * radVal * wIdeal * wIdeal;
-
-        const I_ball = p.m * radVal * radVal;
-        const I_hand = p.M * R * R;
-        const L_ball = I_ball * wVal;
-        const L_hand = I_hand * wVal;
-        const L_sys = L_ball + L_hand;
-
-        const tq = calcTorques(radVal, curDrdt, wVal, isPost, p);
-
-        // Gravity droop angle phi below horizontal plane y = 0: phi = atan2(g, max(0.001, r * w^2))
-        const phiRad = p.idealMode ? 0.0 : Math.atan2(G_ACCEL, Math.max(0.001, radVal * wVal * wVal));
-
-        traj.push({
-          t: timeVal,
-          r: radVal,
-          omega: wVal,
-          rpm: (wVal * 60.0) / (2.0 * Math.PI),
-          wIdeal,
-          rpmIdeal: (wIdeal * 60.0) / (2.0 * Math.PI),
-          FcIdeal,
-          R,
-          deltaR: Math.max(0.0, R - (p.wobbleEnabled && !p.idealMode ? p.R0 : 0.0)),
-          Fc,
-          L_ball,
-          L_hand,
-          L_sys,
-          phiRad,
-          phase: phaseName,
-          ...tq
-        });
-      }
-
-      // Differential equation d(omega)/dt = (tau_spin-up + tau_net) / I_eff
-      function accelOmega(radVal, curDrdt, wVal, isPost) {
-        if (wVal <= 0.0) return 0.0;
-        const R = calcWobbleRadius(radVal, wVal, p);
-        const yieldTerm = (p.wobbleEnabled && !p.idealMode) ? ((p.m * radVal * wVal * wVal) / p.kwrist) : 0.0;
-        const I_eff = p.m * radVal * radVal + p.M * R * R + 4.0 * p.M * R * yieldTerm;
-        const tq = calcTorques(radVal, curDrdt, wVal, isPost, p);
-        return (tq.tauSpinUp + tq.tauNet) / Math.max(1e-7, I_eff);
-      }
-
-      // Initial snapshot at t = 0
-      pushSnapshot(0.0, r, omega, 'PULLING');
-
-      // PHASE 1: INWARD PULL (0 < t <= dtPull)
-      const numPullSteps = Math.round(p.dtPull / dtStep);
-      for (let step = 1; step <= numPullSteps; step++) {
-        for (let s = 0; s < subSteps; s++) {
-          const t0 = t;
-          t += h;
-          const r0 = p.ri + drdtPull * Math.min(p.dtPull, t0);
-          const rMid = p.ri + drdtPull * Math.min(p.dtPull, t0 + 0.5 * h);
-          r = p.ri + drdtPull * Math.min(p.dtPull, t);
-
-          if (p.idealMode) {
-            omega = omega_i * Math.pow(p.ri / r, 2);
-          } else {
-            const k1 = accelOmega(r0, drdtPull, omega, false);
-            const k2 = accelOmega(rMid, drdtPull, Math.max(0.0, omega + 0.5 * h * k1), false);
-            const k3 = accelOmega(rMid, drdtPull, Math.max(0.0, omega + 0.5 * h * k2), false);
-            const k4 = accelOmega(r, drdtPull, Math.max(0.0, omega + h * k3), false);
-            omega = Math.max(0.0, omega + (h / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4));
-
-            // Coupled biomechanical governor enforcement as r approaches r_f (Paper Section 4)
-            const wEq = solveLocalEquilibriumOmega(r, drdtPull, p);
-            if (isFinite(wEq) && omega > wEq) {
-              const alpha = Math.min(1.0, h / 0.02);
-              omega = omega + (wEq - omega) * alpha;
-            }
-          }
-        }
-        pushSnapshot(step * dtStep, r, omega, 'PULLING');
-      }
-
-      const peakPullSnap = traj[traj.length - 1];
-
-      // PHASE 2: POST-PULL DECAY & STOP (t > dtPull, r = r_f, dr/dt = 0)
-      let stopTime = p.dtPull;
-      const maxPostDuration = 12.0;
-      const maxPostSteps = Math.round(maxPostDuration / dtStep);
-
-      if (p.idealMode) {
-        for (let step = 1; step <= Math.round(2.5 / dtStep); step++) {
-          const curT = p.dtPull + step * dtStep;
-          pushSnapshot(curT, p.rf, omega, 'IDEAL_COAST');
-        }
-        stopTime = Infinity;
+    // 2. Analytical Upper Bound at r = r_f (Wrist Damping Only, Paper Section 4 Eq. 18-20)
+    let Req_bound = (p.wobbleEnabled && !p.idealMode && !p.coaeMode) ? p.R0 : 0.0;
+    let omegaBound_f = p.coaeMode ? (omega_i * (p.ri / p.rf)) : omegaIdeal_f;
+    let FcBound_f = p.m * p.rf * omegaBound_f * omegaBound_f;
+    if (!p.idealMode && !p.coaeMode && p.wobbleEnabled && p.cwrist > 1e-6) {
+      Req_bound = p.ell * Math.sqrt((2.0 * p.m * p.rf * drdtAbs) / p.cwrist);
+      if (Req_bound > p.R0) {
+        FcBound_f = p.kwrist * (Req_bound - p.R0);
+        omegaBound_f = Math.sqrt(FcBound_f / (p.m * p.rf));
       } else {
-        for (let step = 1; step <= maxPostSteps; step++) {
-          for (let s = 0; s < subSteps; s++) {
-            t += h;
-            if (omega > 0.0) {
-              const k1 = accelOmega(p.rf, 0.0, omega, true);
-              const k2 = accelOmega(p.rf, 0.0, Math.max(0.0, omega + 0.5 * h * k1), true);
-              const k3 = accelOmega(p.rf, 0.0, Math.max(0.0, omega + 0.5 * h * k2), true);
-              const k4 = accelOmega(p.rf, 0.0, Math.max(0.0, omega + h * k3), true);
-              omega = omega + (h / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
-              if (omega <= 0.015) {
-                omega = 0.0;
-              }
+        FcBound_f = 0.0;
+        omegaBound_f = 0.0;
+      }
+    }
+
+    // Initial system angular momentum L_sys,i at t = 0
+    const R_i = calcWobbleRadius(p.ri, omega_i, p);
+    const I_ball_i = p.m * p.ri * p.ri;
+    const I_hand_i = p.M * R_i * R_i;
+    const L_sys_i = (I_ball_i + I_hand_i) * omega_i;
+    const L_ball_i = I_ball_i * omega_i;
+
+    const dtStep = 0.005; // 5 ms output interval
+    const subSteps = 5;   // 1 ms RK4 sub-step
+    const h = dtStep / subSteps;
+
+    const traj = [];
+    let t = 0.0;
+    let r = p.ri;
+    let omega = omega_i;
+    let theta = 0.0;
+
+    function pushSnapshot(timeVal, radVal, wVal, phaseName, thetaVal) {
+      const isPost = timeVal > p.dtPull + 1e-6;
+      const curDrdt = isPost ? 0.0 : drdtPull;
+      const R = calcWobbleRadius(radVal, wVal, p);
+      const Fc = p.m * radVal * wVal * wVal;
+
+      const rRatio = p.ri / radVal;
+      const wIdeal = omega_i * rRatio * rRatio;
+      const FcIdeal = p.m * radVal * wIdeal * wIdeal;
+
+      const I_ball = p.m * radVal * radVal;
+      const I_hand = p.M * R * R;
+      const L_ball = I_ball * wVal;
+      const L_hand = I_hand * wVal;
+      const L_sys = L_ball + L_hand;
+
+      const tq = calcTorques(radVal, curDrdt, wVal, isPost, p);
+
+      // Gravity droop angle phi below horizontal plane y = 0: phi = atan2(g, max(0.001, r * w^2))
+      const phiRad = (p.idealMode || p.coaeMode) ? 0.0 : Math.atan2(G_ACCEL, Math.max(0.001, radVal * wVal * wVal));
+
+      traj.push({
+        t: timeVal,
+        r: radVal,
+        omega: wVal,
+        theta: thetaVal,
+        rpm: (wVal * 60.0) / (2.0 * Math.PI),
+        wIdeal,
+        rpmIdeal: (wIdeal * 60.0) / (2.0 * Math.PI),
+        FcIdeal,
+        R,
+        deltaR: Math.max(0.0, R - (p.wobbleEnabled && !p.idealMode && !p.coaeMode ? p.R0 : 0.0)),
+        Fc,
+        L_ball,
+        L_hand,
+        L_sys,
+        phiRad,
+        phase: phaseName,
+        ...tq
+      });
+    }
+
+    // Differential equation d(omega)/dt = (tau_spin-up + tau_net) / I_eff
+    function accelOmega(radVal, curDrdt, wVal, isPost) {
+      if (wVal <= 0.0) return 0.0;
+      const R = calcWobbleRadius(radVal, wVal, p);
+      const yieldTerm = (p.wobbleEnabled && !p.idealMode && !p.coaeMode) ? ((p.m * radVal * wVal * wVal) / p.kwrist) : 0.0;
+      const I_eff = p.m * radVal * radVal + p.M * R * R + 4.0 * p.M * R * yieldTerm;
+      const tq = calcTorques(radVal, curDrdt, wVal, isPost, p);
+      return (tq.tauSpinUp + tq.tauNet) / Math.max(1e-7, I_eff);
+    }
+
+    // Initial snapshot at t = 0
+    pushSnapshot(0.0, r, omega, 'PULLING', theta);
+
+    // PHASE 1: INWARD PULL (0 < t <= dtPull)
+    const numPullSteps = Math.round(p.dtPull / dtStep);
+    for (let step = 1; step <= numPullSteps; step++) {
+      for (let s = 0; s < subSteps; s++) {
+        const prevOmega = omega;
+        const t0 = t;
+        t += h;
+        const r0 = p.ri + drdtPull * Math.min(p.dtPull, t0);
+        const rMid = p.ri + drdtPull * Math.min(p.dtPull, t0 + 0.5 * h);
+        r = p.ri + drdtPull * Math.min(p.dtPull, t);
+
+        if (p.idealMode) {
+          omega = omega_i * Math.pow(p.ri / r, 2);
+        } else if (p.coaeMode) {
+          omega = omega_i * (p.ri / r);
+        } else {
+          const k1 = accelOmega(r0, drdtPull, omega, false);
+          const k2 = accelOmega(rMid, drdtPull, Math.max(0.0, omega + 0.5 * h * k1), false);
+          const k3 = accelOmega(rMid, drdtPull, Math.max(0.0, omega + 0.5 * h * k2), false);
+          const k4 = accelOmega(r, drdtPull, Math.max(0.0, omega + h * k3), false);
+          omega = Math.max(0.0, omega + (h / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4));
+
+          // Coupled biomechanical governor enforcement as r approaches r_f (Paper Section 4)
+          const wEq = solveLocalEquilibriumOmega(r, drdtPull, p);
+          if (isFinite(wEq) && omega > wEq) {
+            const alpha = Math.min(1.0, h / 0.02);
+            omega = omega + (wEq - omega) * alpha;
+          }
+        }
+        theta += 0.5 * (prevOmega + omega) * h;
+      }
+      pushSnapshot(step * dtStep, r, omega, 'PULLING', theta);
+    }
+
+    const peakPullSnap = traj[traj.length - 1];
+
+    // PHASE 2: POST-PULL DECAY & STOP (t > dtPull, r = r_f, dr/dt = 0)
+    let stopTime = p.dtPull;
+    const maxPostDuration = 12.0;
+    const maxPostSteps = Math.round(maxPostDuration / dtStep);
+
+    if (p.idealMode || p.coaeMode) {
+      const coastPhase = p.coaeMode ? 'COAE_COAST' : 'IDEAL_COAST';
+      for (let step = 1; step <= Math.round(2.5 / dtStep); step++) {
+        const curT = p.dtPull + step * dtStep;
+        theta += omega * dtStep;
+        pushSnapshot(curT, p.rf, omega, coastPhase, theta);
+      }
+      stopTime = Infinity;
+    } else {
+      for (let step = 1; step <= maxPostSteps; step++) {
+        for (let s = 0; s < subSteps; s++) {
+          const prevOmega = omega;
+          t += h;
+          if (omega > 0.0) {
+            const k1 = accelOmega(p.rf, 0.0, omega, true);
+            const k2 = accelOmega(p.rf, 0.0, Math.max(0.0, omega + 0.5 * h * k1), true);
+            const k3 = accelOmega(p.rf, 0.0, Math.max(0.0, omega + 0.5 * h * k2), true);
+            const k4 = accelOmega(p.rf, 0.0, Math.max(0.0, omega + h * k3), true);
+            omega = omega + (h / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+            if (omega <= 0.015) {
+              omega = 0.0;
             }
           }
-          const curT = p.dtPull + step * dtStep;
-          const phaseStr = omega > 0.0 ? 'DECAY' : 'STOPPED';
-          pushSnapshot(curT, p.rf, omega, phaseStr);
-
-          if (omega === 0.0 && stopTime === p.dtPull) {
-            stopTime = curT;
-          }
-          // Record 0.5s after full stop so the user sees the stationary vertical ball
-          if (omega === 0.0 && curT >= stopTime + 0.5) {
-            break;
-          }
+          theta += 0.5 * (prevOmega + omega) * h;
         }
-        if (omega > 0.0) {
-          stopTime = p.dtPull + maxPostDuration;
+        const curT = p.dtPull + step * dtStep;
+        const phaseStr = omega > 0.0 ? 'DECAY' : 'STOPPED';
+        pushSnapshot(curT, p.rf, omega, phaseStr, theta);
+
+        if (omega === 0.0 && stopTime === p.dtPull) {
+          stopTime = curT;
+        }
+        // Record 0.5s after full stop so the user sees the stationary vertical ball
+        if (omega === 0.0 && curT >= stopTime + 0.5) {
+          break;
         }
       }
-
-      sim.trajectory = traj;
-
-      // Compute analytical bound momentum fractions (Paper Eq. 21)
-      const I_bound_f = p.m * p.rf * p.rf + p.M * Req_bound * Req_bound;
-      const L_sys_bound_f = I_bound_f * omegaBound_f;
-      const L_ball_bound_f = (p.m * p.rf * p.rf) * omegaBound_f;
-
-      sim.summary = {
-        idealRPM: (omegaIdeal_f * 60.0) / (2.0 * Math.PI),
-        idealFc: FcIdeal_f,
-        boundRPM: (omegaBound_f * 60.0) / (2.0 * Math.PI),
-        boundFc: FcBound_f,
-        boundR_mm: Req_bound * 1000.0,
-        boundLsysPct: L_sys_i > 0 ? Math.min(100.0, (L_sys_bound_f / L_sys_i) * 100.0) : 0.0,
-        boundLballPct: L_ball_i > 0 ? Math.min(100.0, (L_ball_bound_f / L_ball_i) * 100.0) : 0.0,
-        simPeakRPM: peakPullSnap.rpm,
-        simPeakFc: peakPullSnap.Fc,
-        simPeakR_mm: peakPullSnap.R * 1000.0,
-        simLsysPct: L_sys_i > 0 ? Math.min(100.0, (peakPullSnap.L_sys / L_sys_i) * 100.0) : 0.0,
-        simLballPct: L_ball_i > 0 ? Math.min(100.0, (peakPullSnap.L_ball / L_ball_i) * 100.0) : 0.0,
-        L_sys_i,
-        L_ball_i,
-        stopTime,
-        maxTime: traj[traj.length - 1].t
-      };
-
-      const scrubber = document.getElementById('scrubber-slider');
-      if (scrubber) {
-        scrubber.max = sim.summary.maxTime.toFixed(2);
+      if (omega > 0.0) {
+        stopTime = p.dtPull + maxPostDuration;
       }
-
-      updateTable1DOM();
     }
 
-    function sampleTrajectory(timeSec) {
-      const traj = sim.trajectory;
-      if (!traj || traj.length === 0) return null;
-      if (timeSec <= 0) return traj[0];
-      const maxT = traj[traj.length - 1].t;
-      if (timeSec >= maxT) return traj[traj.length - 1];
+    sim.trajectory = traj;
 
-      const dtStep = 0.005;
-      const idx = Math.floor(timeSec / dtStep);
-      const i0 = Math.max(0, Math.min(traj.length - 1, idx));
-      const i1 = Math.max(0, Math.min(traj.length - 1, idx + 1));
-      if (i0 === i1) return traj[i0];
+    // Compute analytical bound momentum fractions (Paper Eq. 21)
+    const I_bound_f = p.m * p.rf * p.rf + p.M * Req_bound * Req_bound;
+    const L_sys_bound_f = I_bound_f * omegaBound_f;
+    const L_ball_bound_f = (p.m * p.rf * p.rf) * omegaBound_f;
 
-      const p0 = traj[i0];
-      const p1 = traj[i1];
-      const f = (timeSec - p0.t) / (p1.t - p0.t);
-      const lerp = (a, b) => a + (b - a) * f;
-
-      return {
-        t: timeSec,
-        r: lerp(p0.r, p1.r),
-        omega: lerp(p0.omega, p1.omega),
-        rpm: lerp(p0.rpm, p1.rpm),
-        wIdeal: lerp(p0.wIdeal, p1.wIdeal),
-        rpmIdeal: lerp(p0.rpmIdeal, p1.rpmIdeal),
-        FcIdeal: lerp(p0.FcIdeal, p1.FcIdeal),
-        R: lerp(p0.R, p1.R),
-        deltaR: lerp(p0.deltaR, p1.deltaR),
-        Fc: lerp(p0.Fc, p1.Fc),
-        L_ball: lerp(p0.L_ball, p1.L_ball),
-        L_hand: lerp(p0.L_hand, p1.L_hand),
-        L_sys: lerp(p0.L_sys, p1.L_sys),
-        phiRad: lerp(p0.phiRad, p1.phiRad),
-        tauSpinUp: lerp(p0.tauSpinUp, p1.tauSpinUp),
-        tauDragBall: lerp(p0.tauDragBall, p1.tauDragBall),
-        tauDragString: lerp(p0.tauDragString, p1.tauDragString),
-        tauFric: lerp(p0.tauFric, p1.tauFric),
-        tauDamp: lerp(p0.tauDamp, p1.tauDamp),
-        tauNet: lerp(p0.tauNet, p1.tauNet),
-        phase: p1.phase
-      };
-    }
-
-    /*************************************************************************
-     * 3. THREE.JS 3D SCENE & UPWARD-POINTING ANATOMICAL HAND BELOW y = 0
-     *************************************************************************/
-    let scene, camera, renderer;
-    let ringInitialMesh, ringFinalMesh, wobbleCircleMesh;
-    let wristAnchorGroup, upperHandGroup, wristHaloMesh, pinchApertureRing, forearmMesh;
-    let lowerPullHandGroup, tailStringLine, activeStringLine;
-    let ballMesh, trailLine, arrowVel, arrowFc;
-
-    const MAX_TRAIL_PTS = 240;
-    const trailBuffer = [];
-
-    // Custom Vanilla JS Camera Orbit / Pan / Zoom State
-    const camState = {
-      theta: 0.62,
-      phi: 1.15,
-      radius: 1.08,
-      target: new THREE.Vector3(0.0, -0.08, 0.0),
-      dragging: false,
-      panMode: false,
-      lastX: 0,
-      lastY: 0
+    sim.summary = {
+      idealRPM: (omegaIdeal_f * 60.0) / (2.0 * Math.PI),
+      idealFc: FcIdeal_f,
+      boundRPM: (omegaBound_f * 60.0) / (2.0 * Math.PI),
+      boundFc: FcBound_f,
+      boundR_mm: Req_bound * 1000.0,
+      boundLsysPct: L_sys_i > 0 ? Math.min(100.0, (L_sys_bound_f / L_sys_i) * 100.0) : 0.0,
+      boundLballPct: L_ball_i > 0 ? Math.min(100.0, (L_ball_bound_f / L_ball_i) * 100.0) : 0.0,
+      simPeakRPM: peakPullSnap.rpm,
+      simPeakFc: peakPullSnap.Fc,
+      simPeakR_mm: peakPullSnap.R * 1000.0,
+      simLsysPct: L_sys_i > 0 ? Math.min(100.0, (peakPullSnap.L_sys / L_sys_i) * 100.0) : 0.0,
+      simLballPct: L_ball_i > 0 ? Math.min(100.0, (peakPullSnap.L_ball / L_ball_i) * 100.0) : 0.0,
+      L_sys_i,
+      L_ball_i,
+      stopTime,
+      maxTime: traj[traj.length - 1].t
     };
 
-    function initThreeScene() {
-      const container = document.getElementById('webgl-container');
-      const w = container.clientWidth || 700;
-      const h = container.clientHeight || 500;
-
-      scene = new THREE.Scene();
-      scene.FogExp2 = new THREE.FogExp2(0x060a12, 0.25);
-
-      camera = new THREE.PerspectiveCamera(42, w / h, 0.01, 25);
-      syncCameraPosition();
-
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setSize(w, h);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.shadowMap.enabled = true;
-      container.innerHTML = '';
-      container.appendChild(renderer.domElement);
-
-      // Lighting
-      const ambLight = new THREE.AmbientLight(0xdbeafe, 0.72);
-      scene.add(ambLight);
-
-      const dirLight = new THREE.DirectionalLight(0xffffff, 1.15);
-      dirLight.position.set(1.6, 2.8, 1.8);
-      dirLight.castShadow = true;
-      scene.add(dirLight);
-
-      const underLight = new THREE.PointLight(0x38bdf8, 0.75, 4.0);
-      underLight.position.set(-0.8, -0.3, 0.9);
-      scene.add(underLight);
-
-      // Subtle reference floor grid below the lower pulling hand
-      const floorGrid = new THREE.GridHelper(1.8, 18, 0x1e293b, 0x0f172a);
-      floorGrid.position.y = -0.52;
-      scene.add(floorGrid);
-
-      // Central vertical rotation axis line (x=0, z=0)
-      const axisGeo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, -0.52, 0),
-        new THREE.Vector3(0, 0.22, 0)
-      ]);
-      const axisMat = new THREE.LineDashedMaterial({ color: 0x475569, dashSize: 0.018, gapSize: 0.012 });
-      const axisLine = new THREE.Line(axisGeo, axisMat);
-      axisLine.computeLineDistances();
-      scene.add(axisLine);
-
-      // Horizontal Orbital Plane Reference Rings at y = 0
-      ringInitialMesh = createDashedCircle(params.ri, 0x334155, 0.025, 0.015);
-      ringFinalMesh = createDashedCircle(params.rf, 0x0284c7, 0.012, 0.008);
-      wobbleCircleMesh = createSolidCircle(1.0, 0xfbbf24); // dynamically scaled by R_vis
-      scene.add(ringInitialMesh);
-      scene.add(ringFinalMesh);
-      scene.add(wobbleCircleMesh);
-
-      // Build 3D Anatomical Hand Below Orbital Plane (y < 0) with Fingers Pointing Upward to y = 0
-      buildUpwardHandAndPuller();
-
-      // Build 3D Ball, String, Force Arrows & Trail
-      buildBallAndVectors();
-
-      // Attach Pointer/Mouse/Wheel/Touch Controls
-      attachCanvasControls(renderer.domElement);
-      window.addEventListener('resize', onResizeViewport);
+    const scrubber = document.getElementById('scrubber-slider');
+    if (scrubber) {
+      scrubber.max = sim.summary.maxTime.toFixed(2);
     }
 
-    function createDashedCircle(radius, hexColor, dashSize, gapSize) {
-      const pts = [];
-      const segs = 96;
-      for (let i = 0; i <= segs; i++) {
-        const a = (i / segs) * Math.PI * 2;
-        pts.push(new THREE.Vector3(Math.cos(a) * radius, 0.0, Math.sin(a) * radius));
-      }
-      const geo = new THREE.BufferGeometry().setFromPoints(pts);
-      const line = new THREE.Line(geo, new THREE.LineDashedMaterial({ color: hexColor, dashSize, gapSize }));
-      line.computeLineDistances();
-      return line;
+    updateTable1DOM();
+  }
+
+  function sampleTrajectory(timeSec) {
+    const traj = sim.trajectory;
+    if (!traj || traj.length === 0) return null;
+    if (timeSec <= 0) return traj[0];
+    const maxT = traj[traj.length - 1].t;
+    if (timeSec >= maxT) return traj[traj.length - 1];
+
+    const dtStep = 0.005;
+    const idx = Math.floor(timeSec / dtStep);
+    const i0 = Math.max(0, Math.min(traj.length - 1, idx));
+    const i1 = Math.max(0, Math.min(traj.length - 1, idx + 1));
+    if (i0 === i1) return traj[i0];
+
+    const p0 = traj[i0];
+    const p1 = traj[i1];
+    const f = (timeSec - p0.t) / (p1.t - p0.t);
+    const lerp = (a, b) => a + (b - a) * f;
+
+    return {
+      t: timeSec,
+      r: lerp(p0.r, p1.r),
+      omega: lerp(p0.omega, p1.omega),
+      theta: lerp(p0.theta, p1.theta),
+      rpm: lerp(p0.rpm, p1.rpm),
+      wIdeal: lerp(p0.wIdeal, p1.wIdeal),
+      rpmIdeal: lerp(p0.rpmIdeal, p1.rpmIdeal),
+      FcIdeal: lerp(p0.FcIdeal, p1.FcIdeal),
+      R: lerp(p0.R, p1.R),
+      deltaR: lerp(p0.deltaR, p1.deltaR),
+      Fc: lerp(p0.Fc, p1.Fc),
+      L_ball: lerp(p0.L_ball, p1.L_ball),
+      L_hand: lerp(p0.L_hand, p1.L_hand),
+      L_sys: lerp(p0.L_sys, p1.L_sys),
+      phiRad: lerp(p0.phiRad, p1.phiRad),
+      tauSpinUp: lerp(p0.tauSpinUp, p1.tauSpinUp),
+      tauDragBall: lerp(p0.tauDragBall, p1.tauDragBall),
+      tauDragString: lerp(p0.tauDragString, p1.tauDragString),
+      tauFric: lerp(p0.tauFric, p1.tauFric),
+      tauDamp: lerp(p0.tauDamp, p1.tauDamp),
+      tauNet: lerp(p0.tauNet, p1.tauNet),
+      phase: p1.phase
+    };
+  }
+
+  /*************************************************************************
+   * 3. THREE.JS 3D SCENE & REALISTIC ANATOMICAL HAND BELOW y = 0
+   *************************************************************************/
+  let scene, camera, renderer;
+  let ringInitialMesh, ringFinalMesh, wobbleCircleMesh;
+  let wristAnchorGroup, upperHandGroup, wristHaloMesh, pinchApertureRing, forearmMesh;
+  let lowerPullHandGroup, tailStringLine, activeStringLine;
+  let ballMesh, trailLine, arrowVel, arrowFc;
+
+  const MAX_TRAIL_PTS = 240;
+
+  // Custom Vanilla JS Camera Orbit / Pan / Zoom State
+  const camState = {
+    theta: 0.62,
+    phi: 1.15,
+    radius: 1.08,
+    target: new THREE.Vector3(0.0, -0.08, 0.0),
+    dragging: false,
+    panMode: false,
+    lastX: 0,
+    lastY: 0
+  };
+
+  function initThreeScene() {
+    const container = document.getElementById('webgl-container');
+    const w = container.clientWidth || 700;
+    const h = container.clientHeight || 500;
+
+    scene = new THREE.Scene();
+    scene.FogExp2 = new THREE.FogExp2(0x060a12, 0.25);
+
+    camera = new THREE.PerspectiveCamera(42, w / h, 0.01, 25);
+    syncCameraPosition();
+
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(w, h);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.shadowMap.enabled = true;
+    container.innerHTML = '';
+    container.appendChild(renderer.domElement);
+
+    // Lighting
+    const ambLight = new THREE.AmbientLight(0xdbeafe, 0.72);
+    scene.add(ambLight);
+
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.15);
+    dirLight.position.set(1.6, 2.8, 1.8);
+    dirLight.castShadow = true;
+    scene.add(dirLight);
+
+    const underLight = new THREE.PointLight(0x38bdf8, 0.75, 4.0);
+    underLight.position.set(-0.8, -0.3, 0.9);
+    scene.add(underLight);
+
+    // Subtle reference floor grid below the lower pulling hand
+    const floorGrid = new THREE.GridHelper(1.8, 18, 0x1e293b, 0x0f172a);
+    floorGrid.position.y = -0.52;
+    scene.add(floorGrid);
+
+    // Central vertical rotation axis line (x=0, z=0)
+    const axisGeo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, -0.52, 0),
+      new THREE.Vector3(0, 0.22, 0)
+    ]);
+    const axisMat = new THREE.LineDashedMaterial({ color: 0x475569, dashSize: 0.018, gapSize: 0.012 });
+    const axisLine = new THREE.Line(axisGeo, axisMat);
+    axisLine.computeLineDistances();
+    scene.add(axisLine);
+
+    // Horizontal Orbital Plane Reference Rings at y = 0
+    ringInitialMesh = createDashedCircle(params.ri, 0x334155, 0.025, 0.015);
+    ringFinalMesh = createDashedCircle(params.rf, 0x0284c7, 0.012, 0.008);
+    wobbleCircleMesh = createSolidCircle(1.0, 0xfbbf24); // dynamically scaled by R_vis
+    scene.add(ringInitialMesh);
+    scene.add(ringFinalMesh);
+    scene.add(wobbleCircleMesh);
+
+    // Build Realistic Multi-Phalanx 3D Anatomical Hand Below Orbital Plane (y < 0)
+    buildUpwardHandAndPuller();
+
+    // Build 3D Ball, String, Force Arrows & Trail
+    buildBallAndVectors();
+
+    // Attach Pointer/Mouse/Wheel/Touch Controls
+    attachCanvasControls(renderer.domElement);
+    window.addEventListener('resize', onResizeViewport);
+  }
+
+  function createDashedCircle(radius, hexColor, dashSize, gapSize) {
+    const pts = [];
+    const segs = 96;
+    for (let i = 0; i <= segs; i++) {
+      const a = (i / segs) * Math.PI * 2;
+      pts.push(new THREE.Vector3(Math.cos(a) * radius, 0.0, Math.sin(a) * radius));
+    }
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    const line = new THREE.Line(geo, new THREE.LineDashedMaterial({ color: hexColor, dashSize, gapSize }));
+    line.computeLineDistances();
+    return line;
+  }
+
+  function createSolidCircle(radius, hexColor) {
+    const pts = [];
+    const segs = 64;
+    for (let i = 0; i <= segs; i++) {
+      const a = (i / segs) * Math.PI * 2;
+      pts.push(new THREE.Vector3(Math.cos(a) * radius, 0.0, Math.sin(a) * radius));
+    }
+    const geo = new THREE.BufferGeometry().setFromPoints(pts);
+    return new THREE.Line(geo, new THREE.LineBasicMaterial({ color: hexColor }));
+  }
+
+  /**
+   * Helper to construct a cylinder + joint sphere connecting point pA to point pB.
+   */
+  function createBoneSegment(pA, pB, rBottom, rTop, mat, jointMat, addEndJoint = true) {
+    const group = new THREE.Group();
+    const dir = new THREE.Vector3().subVectors(pB, pA);
+    const len = Math.max(1e-5, dir.length());
+    const mid = new THREE.Vector3().addVectors(pA, pB).multiplyScalar(0.5);
+
+    const cylGeo = new THREE.CylinderGeometry(rTop, rBottom, len, 18);
+    const cylMesh = new THREE.Mesh(cylGeo, mat);
+    cylMesh.position.copy(mid);
+    cylMesh.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), dir.clone().normalize());
+    cylMesh.castShadow = true;
+    group.add(cylMesh);
+
+    const jStart = new THREE.Mesh(new THREE.SphereGeometry(rBottom * 1.04, 16, 16), jointMat || mat);
+    jStart.position.copy(pA);
+    group.add(jStart);
+
+    if (addEndJoint) {
+      const jEnd = new THREE.Mesh(new THREE.SphereGeometry(rTop * 1.03, 16, 16), jointMat || mat);
+      jEnd.position.copy(pB);
+      group.add(jEnd);
+    }
+    return group;
+  }
+
+  /**
+   * Helper to add a small anatomical fingernail plate near a distal fingertip.
+   */
+  function createFingernail(tipPos, dirVec, normalVec, width, length, nailMat) {
+    const nailGeo = new THREE.BoxGeometry(width, length, 0.0014);
+    const nail = new THREE.Mesh(nailGeo, nailMat);
+    const yAxis = dirVec.clone().normalize();
+    const zAxis = normalVec.clone().normalize();
+    const xAxis = new THREE.Vector3().crossVectors(yAxis, zAxis).normalize();
+    zAxis.crossVectors(xAxis, yAxis).normalize();
+
+    const pos = tipPos.clone()
+            .add(yAxis.clone().multiplyScalar(-length * 0.45))
+            .add(zAxis.clone().multiplyScalar(width * 0.46));
+    nail.position.copy(pos);
+
+    const rotMat = new THREE.Matrix4().makeBasis(xAxis, yAxis, zAxis);
+    nail.quaternion.setFromRotationMatrix(rotMat);
+    return nail;
+  }
+
+  /**
+   * Builds the operator's multi-phalanx anatomical upper hand positioned BELOW y = 0
+   * with articulated thumb and index finger pointing UPWARD so their distal pads meet
+   * at the pinch aperture (x_p, 0, z_p) on y = 0, wrist anchored at (0, -ell, 0) with
+   * thermal dissipation halo, tapered forearm extending downward, and an articulated
+   * secondary lower pulling hand drawing the string tail downward.
+   */
+  function buildUpwardHandAndPuller() {
+    const nominalLever = 0.08;
+    wristAnchorGroup = new THREE.Group();
+    wristAnchorGroup.position.set(0, -params.ell, 0);
+    scene.add(wristAnchorGroup);
+
+    // Realistic Anatomical Skin, Joint, Tendon, and Fingernail Materials
+    const skinMat = new THREE.MeshStandardMaterial({
+      color: 0xe8b892,
+      roughness: 0.46,
+      metalness: 0.04
+    });
+    const knuckleMat = new THREE.MeshStandardMaterial({
+      color: 0xdfa77e,
+      roughness: 0.50,
+      metalness: 0.04
+    });
+    const palmPadMat = new THREE.MeshStandardMaterial({
+      color: 0xe2ae86,
+      roughness: 0.52,
+      metalness: 0.03
+    });
+    const forearmSkinMat = new THREE.MeshStandardMaterial({
+      color: 0xd8a47c,
+      roughness: 0.54,
+      metalness: 0.04
+    });
+    const nailMat = new THREE.MeshStandardMaterial({
+      color: 0xf7dfd0,
+      roughness: 0.25,
+      metalness: 0.08
+    });
+    const sleeveMat = new THREE.MeshStandardMaterial({
+      color: 0x1e293b,
+      roughness: 0.78,
+      metalness: 0.06
+    });
+    const cuffTrimMat = new THREE.MeshStandardMaterial({
+      color: 0xe2e8f0,
+      roughness: 0.55,
+      metalness: 0.05
+    });
+
+    // 1. Anatomical Wrist Carpal Joint & Styloid Processes at (0, -ell, 0) + Thermal Dissipation Halo
+    const wristCore = new THREE.Mesh(new THREE.SphereGeometry(0.017, 24, 24), forearmSkinMat);
+    wristCore.scale.set(1.25, 0.85, 0.82);
+    wristAnchorGroup.add(wristCore);
+
+    // Radial and Ulnar styloid bony prominences on either side of the wrist
+    const radialStyloid = new THREE.Mesh(new THREE.SphereGeometry(0.0085, 16, 16), knuckleMat);
+    radialStyloid.position.set(-0.016, 0.001, 0.001);
+    wristAnchorGroup.add(radialStyloid);
+
+    const ulnarStyloid = new THREE.Mesh(new THREE.SphereGeometry(0.008, 16, 16), knuckleMat);
+    ulnarStyloid.position.set(0.016, 0.000, -0.002);
+    wristAnchorGroup.add(ulnarStyloid);
+
+    const haloGeo = new THREE.TorusGeometry(0.035, 0.005, 16, 48);
+    const haloMat = new THREE.MeshBasicMaterial({
+      color: 0xfbbf24,
+      transparent: true,
+      opacity: 0.35
+    });
+    wristHaloMesh = new THREE.Mesh(haloGeo, haloMat);
+    wristHaloMesh.rotation.x = Math.PI / 2;
+    wristAnchorGroup.add(wristHaloMesh);
+
+    // 2. Anatomical Forearm (Radius + Ulna twin-cylinder contour + shirt/jacket cuff)
+    const forearmGroup = new THREE.Group();
+    const radiusShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.019, 0.175, 20), forearmSkinMat);
+    radiusShaft.position.set(-0.006, -0.088, 0.001);
+    radiusShaft.rotation.z = -0.025;
+    forearmGroup.add(radiusShaft);
+
+    const ulnaShaft = new THREE.Mesh(new THREE.CylinderGeometry(0.013, 0.018, 0.175, 20), forearmSkinMat);
+    ulnaShaft.position.set(0.006, -0.088, -0.001);
+    ulnaShaft.rotation.z = 0.025;
+    forearmGroup.add(ulnaShaft);
+
+    const forearmBridge = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.024, 0.175, 24), forearmSkinMat);
+    forearmBridge.scale.set(1.18, 1.0, 0.82);
+    forearmBridge.position.set(0, -0.088, 0);
+    forearmGroup.add(forearmBridge);
+
+    // Shirt & Lab Jacket Cuff
+    const shirtCuff = new THREE.Mesh(new THREE.CylinderGeometry(0.023, 0.025, 0.048, 24), cuffTrimMat);
+    shirtCuff.scale.set(1.16, 1.0, 0.86);
+    shirtCuff.position.set(0, -0.142, 0);
+    forearmGroup.add(shirtCuff);
+
+    const jacketSleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.028, 0.058, 24), sleeveMat);
+    jacketSleeve.scale.set(1.16, 1.0, 0.88);
+    jacketSleeve.position.set(0, -0.156, 0);
+    forearmGroup.add(jacketSleeve);
+
+    wristAnchorGroup.add(forearmGroup);
+    forearmMesh = forearmGroup;
+
+    // 3. Articulated Upper Hand Group (pivots at wrist (0,0,0) and reaches UPWARD to local (0, +0.08, 0))
+    upperHandGroup = new THREE.Group();
+    wristAnchorGroup.add(upperHandGroup);
+
+    // 3A. Sculpted Metacarpal Palm (5 radiating metacarpals + palmar muscle pads + dorsal tendon ridges)
+    const mcpPositions = [
+      new THREE.Vector3(-0.015, 0.044, 0.003),  // Index MCP knuckle
+      new THREE.Vector3(-0.004, 0.046, 0.000),  // Middle MCP knuckle
+      new THREE.Vector3(0.007, 0.043, -0.002),  // Ring MCP knuckle
+      new THREE.Vector3(0.017, 0.039, -0.004)   // Pinky MCP knuckle
+    ];
+
+    // Radiating Metacarpal Cylinders & Dorsal Extensor Tendon Ridges
+    const mcRadii = [0.0068, 0.0066, 0.0062, 0.0058];
+    for (let i = 0; i < 4; i++) {
+      const mcStart = new THREE.Vector3((i - 1.5) * 0.0055, 0.005, -0.002);
+      upperHandGroup.add(createBoneSegment(mcStart, mcpPositions[i], mcRadii[i] * 1.08, mcRadii[i], skinMat, knuckleMat, true));
+
+      // Subtle dorsal tendon ridge
+      const tendonStart = mcStart.clone().add(new THREE.Vector3(0, 0.002, -0.0055));
+      const tendonEnd = mcpPositions[i].clone().add(new THREE.Vector3(0, -0.001, -0.0055));
+      upperHandGroup.add(createBoneSegment(tendonStart, tendonEnd, 0.0018, 0.0016, knuckleMat, knuckleMat, false));
     }
 
-    function createSolidCircle(radius, hexColor) {
-      const pts = [];
-      const segs = 64;
-      for (let i = 0; i <= segs; i++) {
-        const a = (i / segs) * Math.PI * 2;
-        pts.push(new THREE.Vector3(Math.cos(a) * radius, 0.0, Math.sin(a) * radius));
+    // Central palmar web & soft tissue fill between metacarpals
+    const palmCore = new THREE.Mesh(new THREE.CylinderGeometry(0.021, 0.018, 0.038, 24), skinMat);
+    palmCore.scale.set(1.12, 1.0, 0.46);
+    palmCore.position.set(0.001, 0.024, 0.000);
+    upperHandGroup.add(palmCore);
+
+    // Transverse knuckle arch cylinder connecting the 4 MCP joints
+    upperHandGroup.add(createBoneSegment(mcpPositions[0], mcpPositions[3], 0.0065, 0.0058, skinMat, knuckleMat, false));
+
+    // Thenar Eminence (prominent thumb muscle belly on palmar-radial side)
+    const thenarPad = new THREE.Mesh(new THREE.SphereGeometry(0.0135, 20, 20), palmPadMat);
+    thenarPad.scale.set(0.85, 1.38, 0.78);
+    thenarPad.position.set(-0.014, 0.022, 0.006);
+    thenarPad.rotation.z = 0.28;
+    thenarPad.rotation.x = -0.15;
+    upperHandGroup.add(thenarPad);
+
+    // Hypothenar Eminence (ulnar palm muscle pad below pinky)
+    const hypothenarPad = new THREE.Mesh(new THREE.SphereGeometry(0.0105, 18, 18), palmPadMat);
+    hypothenarPad.scale.set(0.72, 1.45, 0.72);
+    hypothenarPad.position.set(0.015, 0.022, 0.003);
+    hypothenarPad.rotation.z = -0.18;
+    upperHandGroup.add(hypothenarPad);
+
+    // 3B. Articulated 3-Segment Thumb (CMC -> MCP -> IP -> Distal Pinch Pad at (-0.0038, 0.080, 0.001))
+    const thumbCMC = new THREE.Vector3(-0.016, 0.013, 0.005);
+    const thumbMCP = new THREE.Vector3(-0.024, 0.036, 0.009);
+    const thumbIP  = new THREE.Vector3(-0.016, 0.060, 0.006);
+    const thumbTip = new THREE.Vector3(-0.0038, nominalLever, 0.001);
+
+    upperHandGroup.add(createBoneSegment(thumbCMC, thumbMCP, 0.0088, 0.0076, skinMat, knuckleMat, true));
+    upperHandGroup.add(createBoneSegment(thumbMCP, thumbIP,  0.0074, 0.0065, skinMat, knuckleMat, true));
+    upperHandGroup.add(createBoneSegment(thumbIP,  thumbTip, 0.0064, 0.0054, skinMat, palmPadMat, true));
+
+    // Thumbnail on radial/dorsal aspect of distal thumb phalanx
+    const thumbDir = new THREE.Vector3().subVectors(thumbTip, thumbIP);
+    upperHandGroup.add(createFingernail(thumbTip, thumbDir, new THREE.Vector3(-0.85, 0.25, 0.45), 0.0068, 0.0085, nailMat));
+
+    // 3C. Articulated 3-Phalanx Index Finger (MCP -> PIP -> DIP -> Distal Pinch Pad at (+0.0032, 0.080, 0.001))
+    const indexMCP = mcpPositions[0];
+    const indexPIP = new THREE.Vector3(-0.018, 0.062, 0.007);
+    const indexDIP = new THREE.Vector3(-0.009, 0.074, 0.004);
+    const indexTip = new THREE.Vector3(0.0032, nominalLever, 0.001);
+
+    upperHandGroup.add(createBoneSegment(indexMCP, indexPIP, 0.0066, 0.0058, skinMat, knuckleMat, true));
+    upperHandGroup.add(createBoneSegment(indexPIP, indexDIP, 0.0056, 0.0049, skinMat, knuckleMat, true));
+    upperHandGroup.add(createBoneSegment(indexDIP, indexTip, 0.0048, 0.0042, skinMat, palmPadMat, true));
+
+    const indexDir = new THREE.Vector3().subVectors(indexTip, indexDIP);
+    upperHandGroup.add(createFingernail(indexTip, indexDir, new THREE.Vector3(-0.35, 0.65, -0.65), 0.0056, 0.0072, nailMat));
+
+    // 3D. Articulated 3-Phalanx Middle, Ring, and Pinky Fingers (Natural Curled Flexion Cascade)
+    const curledSpecs = [
+      {
+        // Middle Finger (3 phalanges gently curled inward toward palm)
+        mcp: mcpPositions[1],
+        pip: new THREE.Vector3(-0.004, 0.063, 0.008),
+        dip: new THREE.Vector3(-0.003, 0.057, 0.021),
+        tip: new THREE.Vector3(-0.002, 0.044, 0.020),
+        r0: 0.0065, r1: 0.0056, r2: 0.0048, r3: 0.0041,
+        nailNorm: new THREE.Vector3(0, 0.4, 0.9)
+      },
+      {
+        // Ring Finger (3 phalanges more flexed)
+        mcp: mcpPositions[2],
+        pip: new THREE.Vector3(0.008, 0.058, 0.007),
+        dip: new THREE.Vector3(0.008, 0.049, 0.019),
+        tip: new THREE.Vector3(0.006, 0.036, 0.016),
+        r0: 0.0060, r1: 0.0052, r2: 0.0045, r3: 0.0039,
+        nailNorm: new THREE.Vector3(0.1, 0.3, 0.95)
+      },
+      {
+        // Pinky Finger (3 phalanges tucked neatly into hypothenar palm)
+        mcp: mcpPositions[3],
+        pip: new THREE.Vector3(0.018, 0.051, 0.005),
+        dip: new THREE.Vector3(0.017, 0.042, 0.016),
+        tip: new THREE.Vector3(0.013, 0.031, 0.013),
+        r0: 0.0053, r1: 0.0046, r2: 0.0040, r3: 0.0035,
+        nailNorm: new THREE.Vector3(0.2, 0.25, 0.95)
       }
-      const geo = new THREE.BufferGeometry().setFromPoints(pts);
-      return new THREE.Line(geo, new THREE.LineBasicMaterial({ color: hexColor }));
+    ];
+
+    curledSpecs.forEach((f) => {
+      upperHandGroup.add(createBoneSegment(f.mcp, f.pip, f.r0, f.r1, skinMat, knuckleMat, true));
+      upperHandGroup.add(createBoneSegment(f.pip, f.dip, f.r1, f.r2, skinMat, knuckleMat, true));
+      upperHandGroup.add(createBoneSegment(f.dip, f.tip, f.r2, f.r3, skinMat, palmPadMat, true));
+      const dVec = new THREE.Vector3().subVectors(f.tip, f.dip);
+      upperHandGroup.add(createFingernail(f.tip, dVec, f.nailNorm, f.r3 * 1.3, f.r3 * 1.6, nailMat));
+    });
+
+    // Pinch Guide Aperture Ring at local (0, +0.08, 0) where thumb and index distal pads meet on y = 0
+    pinchApertureRing = new THREE.Mesh(
+            new THREE.TorusGeometry(0.0068, 0.0020, 14, 32),
+            new THREE.MeshBasicMaterial({ color: 0xf43f5e, transparent: true, opacity: 0.85 })
+    );
+    pinchApertureRing.rotation.x = Math.PI / 2;
+    pinchApertureRing.position.set(0, nominalLever, 0);
+    upperHandGroup.add(pinchApertureRing);
+
+    // 4. Secondary Articulated Lower Pulling Hand below the wrist (draws string tail downward during pull)
+    lowerPullHandGroup = new THREE.Group();
+    scene.add(lowerPullHandGroup);
+
+    // Glowing cyan pinch marker at local (0,0,0) where the lower hand grips the string tail
+    const pullPinchRing = new THREE.Mesh(
+            new THREE.TorusGeometry(0.0058, 0.0018, 12, 24),
+            new THREE.MeshBasicMaterial({ color: 0x38bdf8 })
+    );
+    pullPinchRing.rotation.x = Math.PI / 2;
+    lowerPullHandGroup.add(pullPinchRing);
+
+    // Lower hand palm & metacarpal block angled in from the side
+    const lpWrist = new THREE.Vector3(0.056, -0.018, -0.008);
+    const lpPalmCenter = new THREE.Vector3(0.032, -0.008, -0.004);
+    lowerPullHandGroup.add(createBoneSegment(lpWrist, lpPalmCenter, 0.014, 0.016, forearmSkinMat, knuckleMat, true));
+
+    const lpSleeve = new THREE.Mesh(new THREE.CylinderGeometry(0.017, 0.019, 0.036, 18), sleeveMat);
+    lpSleeve.position.set(0.070, -0.025, -0.011);
+    lpSleeve.rotation.z = 1.15;
+    lowerPullHandGroup.add(lpSleeve);
+
+    // Multi-segment Thumb & Index Finger pinching local (0, 0, 0)
+    const lpThumbMCP = new THREE.Vector3(0.024, 0.004, 0.009);
+    const lpThumbIP  = new THREE.Vector3(0.011, 0.003, 0.006);
+    const lpThumbTip = new THREE.Vector3(0.002, 0.001, 0.002);
+    lowerPullHandGroup.add(createBoneSegment(lpPalmCenter, lpThumbMCP, 0.0075, 0.0065, skinMat, knuckleMat, true));
+    lowerPullHandGroup.add(createBoneSegment(lpThumbMCP, lpThumbIP, 0.0062, 0.0054, skinMat, knuckleMat, true));
+    lowerPullHandGroup.add(createBoneSegment(lpThumbIP, lpThumbTip, 0.0052, 0.0044, skinMat, palmPadMat, true));
+
+    const lpIdxMCP = new THREE.Vector3(0.025, 0.003, -0.008);
+    const lpIdxPIP = new THREE.Vector3(0.012, 0.004, -0.006);
+    const lpIdxTip = new THREE.Vector3(0.002, 0.000, -0.002);
+    lowerPullHandGroup.add(createBoneSegment(lpPalmCenter, lpIdxMCP, 0.0065, 0.0058, skinMat, knuckleMat, true));
+    lowerPullHandGroup.add(createBoneSegment(lpIdxMCP, lpIdxPIP, 0.0056, 0.0048, skinMat, knuckleMat, true));
+    lowerPullHandGroup.add(createBoneSegment(lpIdxPIP, lpIdxTip, 0.0046, 0.0040, skinMat, palmPadMat, true));
+
+    // 3 Curled lower fingers (Middle, Ring, Pinky) wrapping around the cord
+    for (let i = 0; i < 3; i++) {
+      const yOff = -0.006 - i * 0.0065;
+      const fMcp = new THREE.Vector3(0.026, yOff, -0.009);
+      const fPip = new THREE.Vector3(0.012, yOff, -0.007);
+      const fDip = new THREE.Vector3(0.008, yOff, 0.004);
+      const fTip = new THREE.Vector3(0.016, yOff, 0.007);
+      const rBase = 0.0054 - i * 0.0004;
+      lowerPullHandGroup.add(createBoneSegment(lpPalmCenter, fMcp, rBase * 1.1, rBase, skinMat, knuckleMat, true));
+      lowerPullHandGroup.add(createBoneSegment(fMcp, fPip, rBase, rBase * 0.88, skinMat, knuckleMat, true));
+      lowerPullHandGroup.add(createBoneSegment(fPip, fDip, rBase * 0.88, rBase * 0.78, skinMat, knuckleMat, true));
+      lowerPullHandGroup.add(createBoneSegment(fDip, fTip, rBase * 0.78, rBase * 0.68, skinMat, palmPadMat, true));
     }
 
-    /**
-     * Builds the operator's upper hand positioned BELOW y = 0 with thumb and index finger
-     * pointing UPWARD so their fingertips meet at the pinch aperture (x_p, 0, z_p) on y = 0,
-     * wrist anchored at (0, -ell, 0) with thermal dissipation halo, forearm extending downward
-     * to y = -ell - 0.18, and secondary lower pulling hand drawing the string tail downward.
-     */
-    function buildUpwardHandAndPuller() {
-      const nominalLever = 0.08;
-      wristAnchorGroup = new THREE.Group();
-      wristAnchorGroup.position.set(0, -params.ell, 0);
-      scene.add(wristAnchorGroup);
+    // String tail line from upper pinch aperture (x_p, 0, z_p) down to lower pulling hand
+    const tailGeo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0, -0.25, 0)
+    ]);
+    tailStringLine = new THREE.Line(
+            tailGeo,
+            new THREE.LineDashedMaterial({ color: 0x94a3b8, dashSize: 0.014, gapSize: 0.008 })
+    );
+    tailStringLine.computeLineDistances();
+    scene.add(tailStringLine);
+  }
 
-      const skinMat = new THREE.MeshStandardMaterial({
-        color: 0xe6b88a,
-        roughness: 0.48,
-        metalness: 0.05
-      });
-      const forearmSkinMat = new THREE.MeshStandardMaterial({
-        color: 0xd4a373,
-        roughness: 0.55,
-        metalness: 0.05
-      });
-      const sleeveMat = new THREE.MeshStandardMaterial({
-        color: 0x1e293b,
-        roughness: 0.75,
-        metalness: 0.08
-      });
+  function buildBallAndVectors() {
+    // Procedural Striped Texture on Ball for Clear Visual Rotation
+    const texCanvas = document.createElement('canvas');
+    texCanvas.width = 256;
+    texCanvas.height = 128;
+    const tCtx = texCanvas.getContext('2d');
+    tCtx.fillStyle = '#0284c7';
+    tCtx.fillRect(0, 0, 256, 128);
+    tCtx.fillStyle = '#38bdf8';
+    for (let x = 0; x < 256; x += 64) {
+      tCtx.fillRect(x, 0, 28, 128);
+    }
+    tCtx.fillStyle = '#f8fafc';
+    tCtx.fillRect(0, 54, 256, 20);
 
-      // 1. Wrist Joint Sphere at (0, -ell, 0) & Thermal Dissipation Halo
-      const wristJoint = new THREE.Mesh(new THREE.SphereGeometry(0.021, 24, 24), forearmSkinMat);
-      wristAnchorGroup.add(wristJoint);
+    const ballTex = new THREE.CanvasTexture(texCanvas);
+    ballMesh = new THREE.Mesh(
+            new THREE.SphereGeometry(1.0, 32, 32),
+            new THREE.MeshStandardMaterial({ map: ballTex, roughness: 0.25, metalness: 0.15 })
+    );
+    ballMesh.castShadow = true;
+    scene.add(ballMesh);
 
-      const haloGeo = new THREE.TorusGeometry(0.034, 0.005, 16, 48);
-      const haloMat = new THREE.MeshBasicMaterial({
-        color: 0xfbbf24,
-        transparent: true,
-        opacity: 0.35
-      });
-      wristHaloMesh = new THREE.Mesh(haloGeo, haloMat);
-      wristHaloMesh.rotation.x = Math.PI / 2;
-      wristAnchorGroup.add(wristHaloMesh);
+    // Active String from Pinch Aperture (x_p, 0, z_p) to 3D Ball
+    const strGeo = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(0, 0, 0),
+      new THREE.Vector3(0.5, 0, 0)
+    ]);
+    activeStringLine = new THREE.Line(strGeo, new THREE.LineBasicMaterial({ color: 0xf8fafc, linewidth: 2 }));
+    scene.add(activeStringLine);
 
-      // 2. Forearm Cylinder extending downward below the wrist from y = 0 to y = -0.18 (in wrist local coords)
-      const forearmGroup = new THREE.Group();
-      const armCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.020, 0.025, 0.18, 24), forearmSkinMat);
-      armCyl.position.set(0, -0.09, 0);
-      forearmGroup.add(armCyl);
+    // Velocity & Centripetal Tension Vector Arrows
+    arrowVel = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.14, 0x34d399, 0.028, 0.016);
+    arrowFc = new THREE.ArrowHelper(new THREE.Vector3(-1, 0, 0), new THREE.Vector3(), 0.14, 0xf43f5e, 0.028, 0.016);
+    scene.add(arrowVel);
+    scene.add(arrowFc);
 
-      const cuffCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.026, 0.028, 0.06, 24), sleeveMat);
-      cuffCyl.position.set(0, -0.15, 0);
-      forearmGroup.add(cuffCyl);
-      wristAnchorGroup.add(forearmGroup);
-      forearmMesh = forearmGroup;
+    // Orbiting Ball Ribbon/Line Trail
+    const trailGeo = new THREE.BufferGeometry();
+    const posArr = new Float32Array(MAX_TRAIL_PTS * 3);
+    trailGeo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
+    trailLine = new THREE.Line(
+            trailGeo,
+            new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.65 })
+    );
+    scene.add(trailLine);
+  }
 
-      // 3. Articulated Upper Hand Group (pivots at wrist (0,0,0) and points UPWARD to local y = +nominalLever = +0.08)
-      upperHandGroup = new THREE.Group();
-      wristAnchorGroup.add(upperHandGroup);
+  const _upVec = new THREE.Vector3(0, 1, 0);
+  const _leverVec = new THREE.Vector3();
 
-      // Sculpted rounded palm (from local y = +0.008 up to knuckles at y = +0.046)
-      const palmBox = new THREE.Mesh(new THREE.BoxGeometry(0.044, 0.042, 0.018), skinMat);
-      palmBox.position.set(0, 0.025, -0.004);
-      upperHandGroup.add(palmBox);
+  function updateThreeScene(snap, dtWall) {
+    if (!snap || !scene) return;
 
-      const knuckleBar = new THREE.Mesh(new THREE.CylinderGeometry(0.009, 0.009, 0.043, 16), skinMat);
-      knuckleBar.rotation.z = Math.PI / 2;
-      knuckleBar.position.set(0, 0.045, -0.003);
-      upperHandGroup.add(knuckleBar);
+    const nominalLever = 0.08;
+    const ell = params.ell;
 
-      // Upward-pointing Thumb (reaches from left side of palm up to meet index finger at (0, +0.08, 0))
-      const thumbGroup = new THREE.Group();
-      thumbGroup.position.set(-0.019, 0.032, 0.002);
-      thumbGroup.rotation.z = -0.35;
-      const thumbCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.0065, 0.008, 0.047, 16), skinMat);
-      thumbCyl.position.set(0, 0.023, 0);
-      thumbGroup.add(thumbCyl);
-      const thumbTip = new THREE.Mesh(new THREE.SphereGeometry(0.0068, 16, 16), skinMat);
-      thumbTip.position.set(0, 0.047, 0);
-      thumbGroup.add(thumbTip);
-      upperHandGroup.add(thumbGroup);
+    // Deterministic orbital angle theta(t) from trajectory snapshot (supports full scrubbing rollback)
+    sim.theta = snap.theta;
+    const theta = sim.theta;
 
-      // Upward-pointing Index Finger (reaches from knuckle ridge up to meet thumb tip at (0, +0.08, 0))
-      const indexGroup = new THREE.Group();
-      indexGroup.position.set(0.016, 0.043, 0.002);
-      indexGroup.rotation.z = 0.38;
-      const indexCyl = new THREE.Mesh(new THREE.CylinderGeometry(0.0058, 0.007, 0.041, 16), skinMat);
-      indexCyl.position.set(0, 0.019, 0);
-      indexGroup.add(indexCyl);
-      const indexTip = new THREE.Mesh(new THREE.SphereGeometry(0.0062, 16, 16), skinMat);
-      indexTip.position.set(0, 0.040, 0);
-      indexGroup.add(indexTip);
-      upperHandGroup.add(indexGroup);
+    // Visual Wobble Radius R_vis on orbital plane y = 0
+    const magFactor = sim.magnifyWobble ? 5.0 : 1.0;
+    const R_vis = Math.min(0.11, snap.R * magFactor);
 
-      // Curled Middle, Ring, and Pinky Fingers tucked cleanly
-      for (let i = 0; i < 3; i++) {
-        const curled = new THREE.Mesh(new THREE.CylinderGeometry(0.0052, 0.006, 0.028, 12), skinMat);
-        curled.position.set(0.004 - i * 0.011, 0.048, -0.012);
-        curled.rotation.x = -0.9;
-        upperHandGroup.add(curled);
-      }
+    // Pinch aperture coordinates on horizontal orbital plane y = 0: (x_p, 0, z_p)
+    const xp = R_vis * Math.cos(theta);
+    const zp = R_vis * Math.sin(theta);
+    const pinchPos = new THREE.Vector3(xp, 0.0, zp);
 
-      // Pinch Guide Aperture Ring at local (0, +0.08, 0) where thumb and index tips meet on y = 0
-      pinchApertureRing = new THREE.Mesh(
-        new THREE.TorusGeometry(0.0072, 0.0022, 12, 32),
-        new THREE.MeshBasicMaterial({ color: 0xf43f5e, transparent: true, opacity: 0.8 })
-      );
-      pinchApertureRing.rotation.x = Math.PI / 2;
-      pinchApertureRing.position.set(0, nominalLever, 0);
-      upperHandGroup.add(pinchApertureRing);
+    // Anchor wrist joint at (0, -ell, 0) and orient upward-pointing hand to track (xp, 0, zp)
+    wristAnchorGroup.position.set(0.0, -ell, 0.0);
+    _leverVec.set(xp, ell, zp);
+    const leverLength = _leverVec.length();
+    upperHandGroup.quaternion.setFromUnitVectors(_upVec, _leverVec.clone().normalize());
+    upperHandGroup.scale.set(1.0, leverLength / nominalLever, 1.0);
 
-      // 4. Secondary Lower Pulling Hand below the wrist (draws string tail downward during pull)
-      lowerPullHandGroup = new THREE.Group();
-      scene.add(lowerPullHandGroup);
-
-      // Sculpted lower pulling hand (pinching fingers + palm gripping the lower string tail)
-      const pullPinchKnob = new THREE.Mesh(
-        new THREE.SphereGeometry(0.011, 16, 16),
-        new THREE.MeshStandardMaterial({ color: 0x38bdf8, roughness: 0.3 })
-      );
-      lowerPullHandGroup.add(pullPinchKnob);
-
-      const lowerHandPalm = new THREE.Mesh(new THREE.BoxGeometry(0.036, 0.022, 0.016), skinMat);
-      lowerHandPalm.position.set(0.022, -0.003, 0);
-      lowerPullHandGroup.add(lowerHandPalm);
-
-      const lowerThumb = new THREE.Mesh(new THREE.CylinderGeometry(0.005, 0.006, 0.022, 12), skinMat);
-      lowerThumb.rotation.z = Math.PI / 2.3;
-      lowerThumb.position.set(0.010, 0.005, 0.005);
-      lowerPullHandGroup.add(lowerThumb);
-
-      // String tail line from upper pinch aperture (x_p, 0, z_p) down to lower pulling hand
-      const tailGeo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(0, -0.25, 0)
-      ]);
-      tailStringLine = new THREE.Line(
-        tailGeo,
-        new THREE.LineDashedMaterial({ color: 0x94a3b8, dashSize: 0.014, gapSize: 0.008 })
-      );
-      tailStringLine.computeLineDistances();
-      scene.add(tailStringLine);
+    // Update Wobble Reference Ring at y = 0
+    if (R_vis > 0.0003) {
+      wobbleCircleMesh.visible = true;
+      wobbleCircleMesh.scale.set(R_vis, 1.0, R_vis);
+    } else {
+      wobbleCircleMesh.visible = false;
     }
 
-    function buildBallAndVectors() {
-      // Procedural Striped Texture on Ball for Clear Visual Rotation
-      const texCanvas = document.createElement('canvas');
-      texCanvas.width = 256;
-      texCanvas.height = 128;
-      const tCtx = texCanvas.getContext('2d');
-      tCtx.fillStyle = '#0284c7';
-      tCtx.fillRect(0, 0, 256, 128);
-      tCtx.fillStyle = '#38bdf8';
-      for (let x = 0; x < 256; x += 64) {
-        tCtx.fillRect(x, 0, 28, 128);
-      }
-      tCtx.fillStyle = '#f8fafc';
-      tCtx.fillRect(0, 54, 256, 20);
+    // Update Wrist Thermal Dissipation Halo (P_diss = |tau_damp| * omega)
+    const pDiss = Math.abs(snap.tauDamp * snap.omega);
+    const heatNorm = Math.min(1.0, pDiss / 2.2);
+    wristHaloMesh.material.opacity = 0.22 + 0.75 * heatNorm;
+    wristHaloMesh.scale.setScalar(1.0 + 0.48 * heatNorm);
+    wristHaloMesh.material.color.setHSL(0.11 * (1.0 - heatNorm), 0.95, 0.55);
 
-      const ballTex = new THREE.CanvasTexture(texCanvas);
-      ballMesh = new THREE.Mesh(
-        new THREE.SphereGeometry(1.0, 32, 32),
-        new THREE.MeshStandardMaterial({ map: ballTex, roughness: 0.25, metalness: 0.15 })
-      );
-      ballMesh.castShadow = true;
-      scene.add(ballMesh);
+    // Update Lower Pulling Hand below the wrist: translates downward by (r_i - r(t)) during inward pull
+    const pulledAmount = Math.max(0.0, params.ri - snap.r);
+    const pullY = -ell - 0.055 - pulledAmount * 0.52;
+    const pullPos = new THREE.Vector3(0.032, pullY, 0.018);
+    lowerPullHandGroup.position.copy(pullPos);
 
-      // Active String from Pinch Aperture (x_p, 0, z_p) to 3D Ball
-      const strGeo = new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(0, 0, 0),
-        new THREE.Vector3(0.5, 0, 0)
-      ]);
-      activeStringLine = new THREE.Line(strGeo, new THREE.LineBasicMaterial({ color: 0xf8fafc, linewidth: 2 }));
-      scene.add(activeStringLine);
+    // Update string tail from upper pinch aperture (xp, 0, zp) down to lower pulling hand
+    const tailArr = tailStringLine.geometry.attributes.position.array;
+    tailArr[0] = pinchPos.x; tailArr[1] = pinchPos.y; tailArr[2] = pinchPos.z;
+    tailArr[3] = pullPos.x;  tailArr[4] = pullPos.y;  tailArr[5] = pullPos.z;
+    tailStringLine.geometry.attributes.position.needsUpdate = true;
+    tailStringLine.computeLineDistances();
 
-      // Velocity & Centripetal Tension Vector Arrows
-      arrowVel = new THREE.ArrowHelper(new THREE.Vector3(0, 0, 1), new THREE.Vector3(), 0.14, 0x34d399, 0.028, 0.016);
-      arrowFc = new THREE.ArrowHelper(new THREE.Vector3(-1, 0, 0), new THREE.Vector3(), 0.14, 0xf43f5e, 0.028, 0.016);
-      scene.add(arrowVel);
-      scene.add(arrowFc);
+    // Compute 3D Ball Position with Realistic Gravity Droop phi = atan2(g, r * omega^2)
+    const phi = snap.phiRad;
+    const rHoriz = snap.r * Math.cos(phi);
+    const rDrop = snap.r * Math.sin(phi);
 
-      // Orbiting Ball Ribbon/Line Trail
-      const trailGeo = new THREE.BufferGeometry();
-      const posArr = new Float32Array(MAX_TRAIL_PTS * 3);
-      trailGeo.setAttribute('position', new THREE.BufferAttribute(posArr, 3));
-      trailLine = new THREE.Line(
-        trailGeo,
-        new THREE.LineBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.65 })
-      );
-      scene.add(trailLine);
+    const bx = pinchPos.x + rHoriz * Math.cos(theta);
+    const by = pinchPos.y - rDrop;
+    const bz = pinchPos.z + rHoriz * Math.sin(theta);
+    const ballPos = new THREE.Vector3(bx, by, bz);
+
+    const rBall = 0.5 * params.d;
+    ballMesh.scale.set(rBall, rBall, rBall);
+    ballMesh.position.copy(ballPos);
+    ballMesh.rotation.y = -theta;
+    ballMesh.rotation.z = phi * 0.5;
+
+    // Update Active String from Pinch Fingertips (xp, 0, zp) to Ball
+    const actArr = activeStringLine.geometry.attributes.position.array;
+    actArr[0] = pinchPos.x; actArr[1] = pinchPos.y; actArr[2] = pinchPos.z;
+    actArr[3] = ballPos.x;  actArr[4] = ballPos.y;  actArr[5] = ballPos.z;
+    activeStringLine.geometry.attributes.position.needsUpdate = true;
+
+    // Update Velocity & Centripetal Tension Vectors
+    if (snap.omega > 0.25) {
+      arrowVel.visible = true;
+      arrowFc.visible = true;
+      const tanDir = new THREE.Vector3(-Math.sin(theta), 0.0, Math.cos(theta)).normalize();
+      const vLen = Math.min(0.24, 0.05 + snap.r * snap.omega * 0.032);
+      arrowVel.position.copy(ballPos);
+      arrowVel.setDirection(tanDir);
+      arrowVel.setLength(vLen, 0.026, 0.015);
+
+      const fcDir = new THREE.Vector3().subVectors(pinchPos, ballPos).normalize();
+      const fcLen = Math.min(0.25, 0.05 + Math.log10(1.0 + snap.Fc) * 0.1);
+      arrowFc.position.copy(ballPos);
+      arrowFc.setDirection(fcDir);
+      arrowFc.setLength(fcLen, 0.026, 0.015);
+    } else {
+      arrowVel.visible = false;
+      arrowFc.visible = false;
     }
 
-    const _upVec = new THREE.Vector3(0, 1, 0);
-    const _leverVec = new THREE.Vector3();
-
-    function updateThreeScene(snap, dtWall) {
-      if (!snap || !scene) return;
-
-      const nominalLever = 0.08;
-      const ell = params.ell;
-
-      // Advance orbital angle theta
-      if (sim.playing && snap.omega > 0) {
-        sim.theta += snap.omega * dtWall * sim.speed;
+    // Deterministic 3D Orbiting Ball Trail (reconstructed from historical trajectory [t - trailSpan, t])
+    const posAttr = trailLine.geometry.attributes.position;
+    if (snap.t <= 0.001) {
+      trailLine.geometry.setDrawRange(0, 0);
+    } else {
+      const trailWindow = 0.65; // 0.65s trailing history window
+      const tStart = Math.max(0.0, snap.t - trailWindow);
+      const span = snap.t - tStart;
+      const count = MAX_TRAIL_PTS;
+      for (let i = 0; i < count; i++) {
+        const ts = tStart + (i / (count - 1)) * span;
+        const sPt = sampleTrajectory(ts);
+        const R_v = Math.min(0.11, sPt.R * magFactor);
+        const px = R_v * Math.cos(sPt.theta);
+        const pz = R_v * Math.sin(sPt.theta);
+        const rh = sPt.r * Math.cos(sPt.phiRad);
+        const rd = sPt.r * Math.sin(sPt.phiRad);
+        posAttr.array[i * 3]     = px + rh * Math.cos(sPt.theta);
+        posAttr.array[i * 3 + 1] = -rd;
+        posAttr.array[i * 3 + 2] = pz + rh * Math.sin(sPt.theta);
       }
-      const theta = sim.theta;
+      trailLine.geometry.setDrawRange(0, count);
+      posAttr.needsUpdate = true;
+    }
+  }
 
-      // Visual Wobble Radius R_vis on orbital plane y = 0
-      const magFactor = sim.magnifyWobble ? 5.0 : 1.0;
-      const R_vis = Math.min(0.11, snap.R * magFactor);
+  function clearBallTrail() {
+    if (trailLine) {
+      trailLine.geometry.setDrawRange(0, 0);
+    }
+  }
 
-      // Pinch aperture coordinates on horizontal orbital plane y = 0: (x_p, 0, z_p)
-      const xp = R_vis * Math.cos(theta);
-      const zp = R_vis * Math.sin(theta);
-      const pinchPos = new THREE.Vector3(xp, 0.0, zp);
+  /*************************************************************************
+   * 4. VANILLA JS CAMERA ORBIT, PITCH, ZOOM & PAN CONTROLS
+   *************************************************************************/
+  function syncCameraPosition() {
+    if (!camera) return;
+    const sinPhi = Math.sin(camState.phi);
+    const x = camState.target.x + camState.radius * sinPhi * Math.sin(camState.theta);
+    const y = camState.target.y + camState.radius * Math.cos(camState.phi);
+    const z = camState.target.z + camState.radius * sinPhi * Math.cos(camState.theta);
+    camera.position.set(x, y, z);
+    camera.lookAt(camState.target);
+  }
 
-      // Anchor wrist joint at (0, -ell, 0) and orient upward-pointing hand to track (xp, 0, zp)
-      wristAnchorGroup.position.set(0.0, -ell, 0.0);
-      _leverVec.set(xp, ell, zp);
-      const leverLength = _leverVec.length();
-      upperHandGroup.quaternion.setFromUnitVectors(_upVec, _leverVec.clone().normalize());
-      upperHandGroup.scale.set(1.0, leverLength / nominalLever, 1.0);
+  function setCameraView(preset) {
+    if (preset === 'perspective') {
+      camState.theta = 0.62;
+      camState.phi = 1.15;
+      camState.radius = 1.08;
+      camState.target.set(0.0, -0.08, 0.0);
+    } else if (preset === 'top') {
+      camState.theta = 0.0;
+      camState.phi = 0.06;
+      camState.radius = 1.15;
+      camState.target.set(0.0, 0.0, 0.0);
+    } else if (preset === 'side') {
+      camState.theta = 0.0;
+      camState.phi = 1.52;
+      camState.radius = 0.92;
+      camState.target.set(0.0, -0.10, 0.0);
+    }
+    syncCameraPosition();
+  }
 
-      // Update Wobble Reference Ring at y = 0
-      if (R_vis > 0.0003) {
-        wobbleCircleMesh.visible = true;
-        wobbleCircleMesh.scale.set(R_vis, 1.0, R_vis);
+  function attachCanvasControls(canvasEl) {
+    canvasEl.addEventListener('contextmenu', (e) => e.preventDefault());
+
+    canvasEl.addEventListener('mousedown', (e) => {
+      camState.dragging = true;
+      camState.panMode = (e.button === 2 || e.shiftKey);
+      camState.lastX = e.clientX;
+      camState.lastY = e.clientY;
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!camState.dragging) return;
+      const dx = e.clientX - camState.lastX;
+      const dy = e.clientY - camState.lastY;
+      camState.lastX = e.clientX;
+      camState.lastY = e.clientY;
+
+      if (camState.panMode) {
+        const panScale = camState.radius * 0.0015;
+        camState.target.x -= dx * panScale;
+        camState.target.y += dy * panScale;
       } else {
-        wobbleCircleMesh.visible = false;
-      }
-
-      // Update Wrist Thermal Dissipation Halo (P_diss = |tau_damp| * omega)
-      const pDiss = Math.abs(snap.tauDamp * snap.omega);
-      const heatNorm = Math.min(1.0, pDiss / 2.2);
-      wristHaloMesh.material.opacity = 0.22 + 0.75 * heatNorm;
-      wristHaloMesh.scale.setScalar(1.0 + 0.48 * heatNorm);
-      wristHaloMesh.material.color.setHSL(0.11 * (1.0 - heatNorm), 0.95, 0.55);
-
-      // Update Lower Pulling Hand below the wrist: translates downward by (r_i - r(t)) during inward pull
-      const pulledAmount = Math.max(0.0, params.ri - snap.r);
-      const pullY = -ell - 0.055 - pulledAmount * 0.52;
-      const pullPos = new THREE.Vector3(0.032, pullY, 0.018);
-      lowerPullHandGroup.position.copy(pullPos);
-
-      // Update string tail from upper pinch aperture (xp, 0, zp) down to lower pulling hand
-      const tailArr = tailStringLine.geometry.attributes.position.array;
-      tailArr[0] = pinchPos.x; tailArr[1] = pinchPos.y; tailArr[2] = pinchPos.z;
-      tailArr[3] = pullPos.x;  tailArr[4] = pullPos.y;  tailArr[5] = pullPos.z;
-      tailStringLine.geometry.attributes.position.needsUpdate = true;
-      tailStringLine.computeLineDistances();
-
-      // Compute 3D Ball Position with Realistic Gravity Droop phi = atan2(g, r * omega^2)
-      const phi = snap.phiRad;
-      const rHoriz = snap.r * Math.cos(phi);
-      const rDrop = snap.r * Math.sin(phi);
-
-      const bx = pinchPos.x + rHoriz * Math.cos(theta);
-      const by = pinchPos.y - rDrop;
-      const bz = pinchPos.z + rHoriz * Math.sin(theta);
-      const ballPos = new THREE.Vector3(bx, by, bz);
-
-      const rBall = 0.5 * params.d;
-      ballMesh.scale.set(rBall, rBall, rBall);
-      ballMesh.position.copy(ballPos);
-      ballMesh.rotation.y = -theta;
-      ballMesh.rotation.z = phi * 0.5;
-
-      // Update Active String from Pinch Fingertips (xp, 0, zp) to Ball
-      const actArr = activeStringLine.geometry.attributes.position.array;
-      actArr[0] = pinchPos.x; actArr[1] = pinchPos.y; actArr[2] = pinchPos.z;
-      actArr[3] = ballPos.x;  actArr[4] = ballPos.y;  actArr[5] = ballPos.z;
-      activeStringLine.geometry.attributes.position.needsUpdate = true;
-
-      // Update Velocity & Centripetal Tension Vectors
-      if (snap.omega > 0.25) {
-        arrowVel.visible = true;
-        arrowFc.visible = true;
-        const tanDir = new THREE.Vector3(-Math.sin(theta), 0.0, Math.cos(theta)).normalize();
-        const vLen = Math.min(0.24, 0.05 + snap.r * snap.omega * 0.032);
-        arrowVel.position.copy(ballPos);
-        arrowVel.setDirection(tanDir);
-        arrowVel.setLength(vLen, 0.026, 0.015);
-
-        const fcDir = new THREE.Vector3().subVectors(pinchPos, ballPos).normalize();
-        const fcLen = Math.min(0.25, 0.05 + Math.log10(1.0 + snap.Fc) * 0.1);
-        arrowFc.position.copy(ballPos);
-        arrowFc.setDirection(fcDir);
-        arrowFc.setLength(fcLen, 0.026, 0.015);
-      } else {
-        arrowVel.visible = false;
-        arrowFc.visible = false;
-      }
-
-      // Update Orbiting Ball Trail
-      if (sim.playing) {
-        trailBuffer.push(ballPos.x, ballPos.y, ballPos.z);
-        if (trailBuffer.length > MAX_TRAIL_PTS * 3) {
-          trailBuffer.splice(0, 3);
-        }
-        const posAttr = trailLine.geometry.attributes.position;
-        for (let i = 0; i < MAX_TRAIL_PTS * 3; i++) {
-          posAttr.array[i] = i < trailBuffer.length ? trailBuffer[i] : 0;
-        }
-        trailLine.geometry.setDrawRange(0, Math.floor(trailBuffer.length / 3));
-        posAttr.needsUpdate = true;
-      }
-    }
-
-    function clearBallTrail() {
-      trailBuffer.length = 0;
-      if (trailLine) {
-        trailLine.geometry.setDrawRange(0, 0);
-      }
-    }
-
-    /*************************************************************************
-     * 4. VANILLA JS CAMERA ORBIT, PITCH, ZOOM & PAN CONTROLS
-     *************************************************************************/
-    function syncCameraPosition() {
-      if (!camera) return;
-      const sinPhi = Math.sin(camState.phi);
-      const x = camState.target.x + camState.radius * sinPhi * Math.sin(camState.theta);
-      const y = camState.target.y + camState.radius * Math.cos(camState.phi);
-      const z = camState.target.z + camState.radius * sinPhi * Math.cos(camState.theta);
-      camera.position.set(x, y, z);
-      camera.lookAt(camState.target);
-    }
-
-    function setCameraView(preset) {
-      if (preset === 'perspective') {
-        camState.theta = 0.62;
-        camState.phi = 1.15;
-        camState.radius = 1.08;
-        camState.target.set(0.0, -0.08, 0.0);
-      } else if (preset === 'top') {
-        camState.theta = 0.0;
-        camState.phi = 0.06;
-        camState.radius = 1.15;
-        camState.target.set(0.0, 0.0, 0.0);
-      } else if (preset === 'side') {
-        camState.theta = 0.0;
-        camState.phi = 1.52;
-        camState.radius = 0.92;
-        camState.target.set(0.0, -0.10, 0.0);
-      }
-      syncCameraPosition();
-    }
-
-    function attachCanvasControls(canvasEl) {
-      canvasEl.addEventListener('contextmenu', (e) => e.preventDefault());
-
-      canvasEl.addEventListener('mousedown', (e) => {
-        camState.dragging = true;
-        camState.panMode = (e.button === 2 || e.shiftKey);
-        camState.lastX = e.clientX;
-        camState.lastY = e.clientY;
-      });
-
-      window.addEventListener('mousemove', (e) => {
-        if (!camState.dragging) return;
-        const dx = e.clientX - camState.lastX;
-        const dy = e.clientY - camState.lastY;
-        camState.lastX = e.clientX;
-        camState.lastY = e.clientY;
-
-        if (camState.panMode) {
-          const panScale = camState.radius * 0.0015;
-          camState.target.x -= dx * panScale;
-          camState.target.y += dy * panScale;
-        } else {
-          camState.theta -= dx * 0.007;
-          camState.phi = Math.max(0.06, Math.min(Math.PI - 0.12, camState.phi - dy * 0.007));
-        }
-        syncCameraPosition();
-      });
-
-      window.addEventListener('mouseup', () => {
-        camState.dragging = false;
-      });
-
-      canvasEl.addEventListener('wheel', (e) => {
-        e.preventDefault();
-        camState.radius = Math.max(0.22, Math.min(3.2, camState.radius + e.deltaY * 0.001));
-        syncCameraPosition();
-      }, { passive: false });
-
-      // Touch Controls
-      canvasEl.addEventListener('touchstart', (e) => {
-        if (e.touches.length === 1) {
-          camState.dragging = true;
-          camState.panMode = false;
-          camState.lastX = e.touches[0].clientX;
-          camState.lastY = e.touches[0].clientY;
-        }
-      }, { passive: true });
-
-      canvasEl.addEventListener('touchmove', (e) => {
-        if (!camState.dragging || e.touches.length !== 1) return;
-        const dx = e.touches[0].clientX - camState.lastX;
-        const dy = e.touches[0].clientY - camState.lastY;
-        camState.lastX = e.touches[0].clientX;
-        camState.lastY = e.touches[0].clientY;
-
         camState.theta -= dx * 0.007;
         camState.phi = Math.max(0.06, Math.min(Math.PI - 0.12, camState.phi - dy * 0.007));
-        syncCameraPosition();
-      }, { passive: true });
-
-      canvasEl.addEventListener('touchend', () => {
-        camState.dragging = false;
-      });
-    }
-
-    function onResizeViewport() {
-      const container = document.getElementById('webgl-container');
-      if (!container || !renderer || !camera) return;
-      const w = container.clientWidth || 700;
-      const h = container.clientHeight || 500;
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-      renderer.setSize(w, h);
-      renderAllCharts();
-    }
-
-    /*************************************************************************
-     * 5. NATIVE 2D CANVAS TIME-SERIES CHARTS (ZERO EXTERNAL CHART LIBS)
-     *************************************************************************/
-    function prepareCanvas2D(canvasId) {
-      const c = document.getElementById(canvasId);
-      if (!c) return null;
-      const rect = c.getBoundingClientRect();
-      const w = rect.width || 260;
-      const h = rect.height || 155;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) {
-        c.width = Math.round(w * dpr);
-        c.height = Math.round(h * dpr);
       }
-      const ctx = c.getContext('2d');
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      ctx.clearRect(0, 0, w, h);
-      return { ctx, w, h, canvas: c };
+      syncCameraPosition();
+    });
+
+    window.addEventListener('mouseup', () => {
+      camState.dragging = false;
+    });
+
+    canvasEl.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      camState.radius = Math.max(0.22, Math.min(3.2, camState.radius + e.deltaY * 0.001));
+      syncCameraPosition();
+    }, { passive: false });
+
+    // Touch Controls
+    canvasEl.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        camState.dragging = true;
+        camState.panMode = false;
+        camState.lastX = e.touches[0].clientX;
+        camState.lastY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    canvasEl.addEventListener('touchmove', (e) => {
+      if (!camState.dragging || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - camState.lastX;
+      const dy = e.touches[0].clientY - camState.lastY;
+      camState.lastX = e.touches[0].clientX;
+      camState.lastY = e.touches[0].clientY;
+
+      camState.theta -= dx * 0.007;
+      camState.phi = Math.max(0.06, Math.min(Math.PI - 0.12, camState.phi - dy * 0.007));
+      syncCameraPosition();
+    }, { passive: true });
+
+    canvasEl.addEventListener('touchend', () => {
+      camState.dragging = false;
+    });
+  }
+
+  function onResizeViewport() {
+    const container = document.getElementById('webgl-container');
+    if (!container || !renderer || !camera) return;
+    const w = container.clientWidth || 700;
+    const h = container.clientHeight || 500;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+    renderAllCharts();
+  }
+
+  /*************************************************************************
+   * 5. NATIVE 2D CANVAS TIME-SERIES CHARTS (ZERO EXTERNAL CHART LIBS)
+   *************************************************************************/
+  function prepareCanvas2D(canvasId) {
+    const c = document.getElementById(canvasId);
+    if (!c) return null;
+    const rect = c.getBoundingClientRect();
+    const w = rect.width || 260;
+    const h = rect.height || 155;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (c.width !== Math.round(w * dpr) || c.height !== Math.round(h * dpr)) {
+      c.width = Math.round(w * dpr);
+      c.height = Math.round(h * dpr);
+    }
+    const ctx = c.getContext('2d');
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, w, h);
+    return { ctx, w, h, canvas: c };
+  }
+
+  function drawChartScaffold(ctx, w, h, maxT, dtPull) {
+    const padL = 42, padR = 36, padT = 12, padB = 20;
+    const pw = w - padL - padR;
+    const ph = h - padT - padB;
+    const xOfT = (t) => padL + (t / maxT) * pw;
+
+    // Shaded pull zone (0 <= t <= dtPull)
+    const xPull = xOfT(Math.min(maxT, dtPull));
+    ctx.fillStyle = 'rgba(56, 189, 248, 0.07)';
+    ctx.fillRect(padL, padT, xPull - padL, ph);
+
+    // Horizontal grid lines
+    ctx.strokeStyle = 'rgba(148, 163, 184, 0.13)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 3; i++) {
+      const y = padT + (i / 3) * ph;
+      ctx.beginPath();
+      ctx.moveTo(padL, y);
+      ctx.lineTo(padL + pw, y);
+      ctx.stroke();
     }
 
-    function drawChartScaffold(ctx, w, h, maxT, dtPull) {
-      const padL = 42, padR = 36, padT = 12, padB = 20;
-      const pw = w - padL - padR;
-      const ph = h - padT - padB;
-      const xOfT = (t) => padL + (t / maxT) * pw;
+    // Dashed vertical line at t = dtPull
+    ctx.save();
+    ctx.strokeStyle = 'rgba(251, 191, 36, 0.55)';
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(xPull, padT);
+    ctx.lineTo(xPull, padT + ph);
+    ctx.stroke();
+    ctx.restore();
 
-      // Shaded pull zone (0 <= t <= dtPull)
-      const xPull = xOfT(Math.min(maxT, dtPull));
-      ctx.fillStyle = 'rgba(56, 189, 248, 0.07)';
-      ctx.fillRect(padL, padT, xPull - padL, ph);
+    // X-axis time ticks
+    ctx.fillStyle = '#64748b';
+    ctx.font = '9.5px monospace';
+    ctx.textAlign = 'center';
+    for (let i = 0; i <= 4; i++) {
+      const tv = (i / 4) * maxT;
+      ctx.fillText(tv.toFixed(1) + 's', xOfT(tv), h - 4);
+    }
 
-      // Horizontal grid lines
-      ctx.strokeStyle = 'rgba(148, 163, 184, 0.13)';
-      ctx.lineWidth = 1;
+    return { padL, padR, padT, padB, pw, ph, xOfT };
+  }
+
+  function drawPlayhead(ctx, xPlay, padT, ph) {
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.moveTo(xPlay, padT);
+    ctx.lineTo(xPlay, padT + ph);
+    ctx.stroke();
+
+    ctx.fillStyle = '#38bdf8';
+    ctx.beginPath();
+    ctx.arc(xPlay, padT + 3, 3.2, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  function renderAllCharts() {
+    const traj = sim.trajectory;
+    if (!traj || traj.length < 2) return;
+    const maxT = traj[traj.length - 1].t;
+
+    // 1. CHART 1: Angular Velocity omega(t) in RPM (Real-World vs Idealized Reference)
+    const c1 = prepareCanvas2D('canvas-chart-omega');
+    if (c1) {
+      const { ctx, w, h } = c1;
+      const { padL, padT, pw, ph, xOfT } = drawChartScaffold(ctx, w, h, maxT, params.dtPull);
+
+      let maxRPM = 150;
+      for (let i = 0; i < traj.length; i++) {
+        if (traj[i].rpm > maxRPM) maxRPM = traj[i].rpm;
+      }
+      maxRPM *= 1.12;
+
+      // Y-axis ticks (RPM)
+      ctx.fillStyle = '#38bdf8';
+      ctx.textAlign = 'right';
       for (let i = 0; i <= 3; i++) {
+        const val = maxRPM * (1 - i / 3);
         const y = padT + (i / 3) * ph;
-        ctx.beginPath();
-        ctx.moveTo(padL, y);
-        ctx.lineTo(padL + pw, y);
-        ctx.stroke();
+        ctx.fillText(val >= 1000 ? (val / 1000).toFixed(1) + 'k' : Math.round(val), padL - 4, y + 3);
       }
 
-      // Dashed vertical line at t = dtPull
+      // Idealized curve (dashed amber, clipped to chart ceiling)
       ctx.save();
       ctx.strokeStyle = 'rgba(251, 191, 36, 0.55)';
       ctx.setLineDash([3, 3]);
+      ctx.lineWidth = 1.4;
       ctx.beginPath();
-      ctx.moveTo(xPull, padT);
-      ctx.lineTo(xPull, padT + ph);
+      for (let i = 0; i < traj.length; i++) {
+        const x = xOfT(traj[i].t);
+        const y = padT + Math.max(0, 1 - traj[i].rpmIdeal / maxRPM) * ph;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
       ctx.stroke();
       ctx.restore();
 
-      // X-axis time ticks
-      ctx.fillStyle = '#64748b';
-      ctx.font = '9.5px monospace';
-      ctx.textAlign = 'center';
-      for (let i = 0; i <= 4; i++) {
-        const tv = (i / 4) * maxT;
-        ctx.fillText(tv.toFixed(1) + 's', xOfT(tv), h - 4);
-      }
-
-      return { padL, padR, padT, padB, pw, ph, xOfT };
-    }
-
-    function drawPlayhead(ctx, xPlay, padT, ph) {
-      ctx.strokeStyle = '#ffffff';
-      ctx.lineWidth = 1.4;
+      // Simulated Real-World RPM curve (solid sky blue)
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2.2;
       ctx.beginPath();
-      ctx.moveTo(xPlay, padT);
-      ctx.lineTo(xPlay, padT + ph);
+      for (let i = 0; i < traj.length; i++) {
+        const x = xOfT(traj[i].t);
+        const y = padT + (1 - traj[i].rpm / maxRPM) * ph;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
       ctx.stroke();
 
-      ctx.fillStyle = '#38bdf8';
+      drawPlayhead(ctx, xOfT(Math.min(maxT, sim.time)), padT, ph);
+    }
+
+    // 2. CHART 2: Wobble Radius R(t) [mm] & String Radius r(t) [m]
+    const c2 = prepareCanvas2D('canvas-chart-radii');
+    if (c2) {
+      const { ctx, w, h } = c2;
+      const { padL, padT, pw, ph, xOfT } = drawChartScaffold(ctx, w, h, maxT, params.dtPull);
+
+      let maxR_mm = 15.0;
+      for (let i = 0; i < traj.length; i++) {
+        const mm = traj[i].R * 1000.0;
+        if (mm > maxR_mm) maxR_mm = mm;
+      }
+      maxR_mm *= 1.15;
+      const maxStr_m = Math.max(0.5, params.ri * 1.05);
+
+      // Left Y-axis: Wobble R in mm
+      ctx.fillStyle = '#fbbf24';
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= 3; i++) {
+        const val = maxR_mm * (1 - i / 3);
+        const y = padT + (i / 3) * ph;
+        ctx.fillText(val.toFixed(0) + 'mm', padL - 4, y + 3);
+      }
+
+      // Right Y-axis: String r in m
+      ctx.fillStyle = '#94a3b8';
+      ctx.textAlign = 'left';
+      for (let i = 0; i <= 3; i++) {
+        const val = maxStr_m * (1 - i / 3);
+        const y = padT + (i / 3) * ph;
+        ctx.fillText(val.toFixed(2) + 'm', padL + pw + 4, y + 3);
+      }
+
+      // String radius r(t) (dashed slate)
+      ctx.save();
+      ctx.strokeStyle = '#94a3b8';
+      ctx.setLineDash([4, 3]);
+      ctx.lineWidth = 1.6;
       ctx.beginPath();
-      ctx.arc(xPlay, padT + 3, 3.2, 0, Math.PI * 2);
-      ctx.fill();
+      for (let i = 0; i < traj.length; i++) {
+        const x = xOfT(traj[i].t);
+        const y = padT + (1 - traj[i].r / maxStr_m) * ph;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      // Wobble radius R(t) in mm (solid amber)
+      ctx.strokeStyle = '#fbbf24';
+      ctx.lineWidth = 2.1;
+      ctx.beginPath();
+      for (let i = 0; i < traj.length; i++) {
+        const x = xOfT(traj[i].t);
+        const y = padT + (1 - (traj[i].R * 1000.0) / maxR_mm) * ph;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      drawPlayhead(ctx, xOfT(Math.min(maxT, sim.time)), padT, ph);
     }
 
-    function renderAllCharts() {
-      const traj = sim.trajectory;
-      if (!traj || traj.length < 2) return;
-      const maxT = traj[traj.length - 1].t;
+    // 3. CHART 3: Torque Balance tau_spin-up vs |tau_net| [N*m]
+    const c3 = prepareCanvas2D('canvas-chart-torque');
+    if (c3) {
+      const { ctx, w, h } = c3;
+      const { padL, padT, pw, ph, xOfT } = drawChartScaffold(ctx, w, h, maxT, params.dtPull);
 
-      // 1. CHART 1: Angular Velocity omega(t) in RPM (Real-World vs Idealized Reference)
-      const c1 = prepareCanvas2D('canvas-chart-omega');
-      if (c1) {
-        const { ctx, w, h } = c1;
-        const { padL, padT, pw, ph, xOfT } = drawChartScaffold(ctx, w, h, maxT, params.dtPull);
+      let maxTau = 0.05;
+      for (let i = 0; i < traj.length; i++) {
+        maxTau = Math.max(maxTau, traj[i].tauSpinUp, Math.abs(traj[i].tauNet));
+      }
+      maxTau *= 1.12;
 
-        let maxRPM = 150;
-        for (let i = 0; i < traj.length; i++) {
-          if (traj[i].rpm > maxRPM) maxRPM = traj[i].rpm;
-        }
-        maxRPM *= 1.12;
-
-        // Y-axis ticks (RPM)
-        ctx.fillStyle = '#38bdf8';
-        ctx.textAlign = 'right';
-        for (let i = 0; i <= 3; i++) {
-          const val = maxRPM * (1 - i / 3);
-          const y = padT + (i / 3) * ph;
-          ctx.fillText(val >= 1000 ? (val / 1000).toFixed(1) + 'k' : Math.round(val), padL - 4, y + 3);
-        }
-
-        // Idealized curve (dashed amber, clipped to chart ceiling)
-        ctx.save();
-        ctx.strokeStyle = 'rgba(251, 191, 36, 0.55)';
-        ctx.setLineDash([3, 3]);
-        ctx.lineWidth = 1.4;
-        ctx.beginPath();
-        for (let i = 0; i < traj.length; i++) {
-          const x = xOfT(traj[i].t);
-          const y = padT + Math.max(0, 1 - traj[i].rpmIdeal / maxRPM) * ph;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-        ctx.restore();
-
-        // Simulated Real-World RPM curve (solid sky blue)
-        ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 2.2;
-        ctx.beginPath();
-        for (let i = 0; i < traj.length; i++) {
-          const x = xOfT(traj[i].t);
-          const y = padT + (1 - traj[i].rpm / maxRPM) * ph;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-
-        drawPlayhead(ctx, xOfT(Math.min(maxT, sim.time)), padT, ph);
+      ctx.fillStyle = '#cbd5e1';
+      ctx.textAlign = 'right';
+      for (let i = 0; i <= 3; i++) {
+        const val = maxTau * (1 - i / 3);
+        const y = padT + (i / 3) * ph;
+        ctx.fillText(val.toFixed(2), padL - 4, y + 3);
       }
 
-      // 2. CHART 2: Wobble Radius R(t) [mm] & String Radius r(t) [m]
-      const c2 = prepareCanvas2D('canvas-chart-radii');
-      if (c2) {
-        const { ctx, w, h } = c2;
-        const { padL, padT, pw, ph, xOfT } = drawChartScaffold(ctx, w, h, maxT, params.dtPull);
-
-        let maxR_mm = 15.0;
-        for (let i = 0; i < traj.length; i++) {
-          const mm = traj[i].R * 1000.0;
-          if (mm > maxR_mm) maxR_mm = mm;
-        }
-        maxR_mm *= 1.15;
-        const maxStr_m = Math.max(0.5, params.ri * 1.05);
-
-        // Left Y-axis: Wobble R in mm
-        ctx.fillStyle = '#fbbf24';
-        ctx.textAlign = 'right';
-        for (let i = 0; i <= 3; i++) {
-          const val = maxR_mm * (1 - i / 3);
-          const y = padT + (i / 3) * ph;
-          ctx.fillText(val.toFixed(0) + 'mm', padL - 4, y + 3);
-        }
-
-        // Right Y-axis: String r in m
-        ctx.fillStyle = '#94a3b8';
-        ctx.textAlign = 'left';
-        for (let i = 0; i <= 3; i++) {
-          const val = maxStr_m * (1 - i / 3);
-          const y = padT + (i / 3) * ph;
-          ctx.fillText(val.toFixed(2) + 'm', padL + pw + 4, y + 3);
-        }
-
-        // String radius r(t) (dashed slate)
-        ctx.save();
-        ctx.strokeStyle = '#94a3b8';
-        ctx.setLineDash([4, 3]);
-        ctx.lineWidth = 1.6;
-        ctx.beginPath();
-        for (let i = 0; i < traj.length; i++) {
-          const x = xOfT(traj[i].t);
-          const y = padT + (1 - traj[i].r / maxStr_m) * ph;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-        ctx.restore();
-
-        // Wobble radius R(t) in mm (solid amber)
-        ctx.strokeStyle = '#fbbf24';
-        ctx.lineWidth = 2.1;
-        ctx.beginPath();
-        for (let i = 0; i < traj.length; i++) {
-          const x = xOfT(traj[i].t);
-          const y = padT + (1 - (traj[i].R * 1000.0) / maxR_mm) * ph;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-
-        drawPlayhead(ctx, xOfT(Math.min(maxT, sim.time)), padT, ph);
+      // Coriolis Spin-up driving torque tau_spin-up (sky blue)
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 2.0;
+      ctx.beginPath();
+      for (let i = 0; i < traj.length; i++) {
+        const x = xOfT(traj[i].t);
+        const y = padT + (1 - traj[i].tauSpinUp / maxTau) * ph;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
       }
+      ctx.stroke();
 
-      // 3. CHART 3: Torque Balance tau_spin-up vs |tau_net| [N*m]
-      const c3 = prepareCanvas2D('canvas-chart-torque');
-      if (c3) {
-        const { ctx, w, h } = c3;
-        const { padL, padT, pw, ph, xOfT } = drawChartScaffold(ctx, w, h, maxT, params.dtPull);
-
-        let maxTau = 0.05;
-        for (let i = 0; i < traj.length; i++) {
-          maxTau = Math.max(maxTau, traj[i].tauSpinUp, Math.abs(traj[i].tauNet));
-        }
-        maxTau *= 1.12;
-
-        ctx.fillStyle = '#cbd5e1';
-        ctx.textAlign = 'right';
-        for (let i = 0; i <= 3; i++) {
-          const val = maxTau * (1 - i / 3);
-          const y = padT + (i / 3) * ph;
-          ctx.fillText(val.toFixed(2), padL - 4, y + 3);
-        }
-
-        // Coriolis Spin-up driving torque tau_spin-up (sky blue)
-        ctx.strokeStyle = '#38bdf8';
-        ctx.lineWidth = 2.0;
-        ctx.beginPath();
-        for (let i = 0; i < traj.length; i++) {
-          const x = xOfT(traj[i].t);
-          const y = padT + (1 - traj[i].tauSpinUp / maxTau) * ph;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-
-        // Net Resistive Magnitude |tau_net| (rose)
-        ctx.strokeStyle = '#f43f5e';
-        ctx.lineWidth = 2.0;
-        ctx.beginPath();
-        for (let i = 0; i < traj.length; i++) {
-          const x = xOfT(traj[i].t);
-          const y = padT + (1 - Math.abs(traj[i].tauNet) / maxTau) * ph;
-          if (i === 0) ctx.moveTo(x, y);
-          else ctx.lineTo(x, y);
-        }
-        ctx.stroke();
-
-        drawPlayhead(ctx, xOfT(Math.min(maxT, sim.time)), padT, ph);
+      // Net Resistive Magnitude |tau_net| (rose)
+      ctx.strokeStyle = '#f43f5e';
+      ctx.lineWidth = 2.0;
+      ctx.beginPath();
+      for (let i = 0; i < traj.length; i++) {
+        const x = xOfT(traj[i].t);
+        const y = padT + (1 - Math.abs(traj[i].tauNet) / maxTau) * ph;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
       }
+      ctx.stroke();
+
+      drawPlayhead(ctx, xOfT(Math.min(maxT, sim.time)), padT, ph);
     }
+  }
 
-    function attachChartScrubbing() {
-      ['canvas-chart-omega', 'canvas-chart-radii', 'canvas-chart-torque'].forEach((id) => {
-        const canvas = document.getElementById(id);
-        if (!canvas) return;
-        let scrubbing = false;
+  function attachChartScrubbing() {
+    ['canvas-chart-omega', 'canvas-chart-radii', 'canvas-chart-torque'].forEach((id) => {
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      let scrubbing = false;
 
-        function scrubFromEvent(e) {
-          const rect = canvas.getBoundingClientRect();
-          const padL = 42, padR = 36;
-          const pw = Math.max(10, rect.width - padL - padR);
-          const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-          const frac = Math.max(0.0, Math.min(1.0, (clientX - rect.left - padL) / pw));
-          const maxT = sim.summary.maxTime || 4.0;
-          onScrubTime(frac * maxT);
-        }
+      function scrubFromEvent(e) {
+        const rect = canvas.getBoundingClientRect();
+        const padL = 42, padR = 36;
+        const pw = Math.max(10, rect.width - padL - padR);
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const frac = Math.max(0.0, Math.min(1.0, (clientX - rect.left - padL) / pw));
+        const maxT = sim.summary.maxTime || 4.0;
+        onScrubTime(frac * maxT);
+      }
 
-        canvas.addEventListener('mousedown', (e) => {
-          scrubbing = true;
-          scrubFromEvent(e);
-        });
-        window.addEventListener('mousemove', (e) => {
-          if (scrubbing) scrubFromEvent(e);
-        });
-        window.addEventListener('mouseup', () => {
-          scrubbing = false;
-        });
+      canvas.addEventListener('mousedown', (e) => {
+        scrubbing = true;
+        scrubFromEvent(e);
       });
+      window.addEventListener('mousemove', (e) => {
+        if (scrubbing) scrubFromEvent(e);
+      });
+      window.addEventListener('mouseup', () => {
+        scrubbing = false;
+      });
+    });
+  }
+
+  /*************************************************************************
+   * 6. UI SYNCHRONIZATION, TELEMETRY UPDATES & INTERACTIVE HANDLERS
+   *************************************************************************/
+  function updateTable1DOM() {
+    const s = sim.summary;
+    document.getElementById('tbl-ideal-rpm').textContent = Math.round(s.idealRPM).toLocaleString();
+    document.getElementById('tbl-ideal-fc').textContent = Math.round(s.idealFc).toLocaleString() + ' N';
+
+    document.getElementById('tbl-bound-rpm').textContent = Math.round(s.boundRPM).toLocaleString() + ' RPM';
+    document.getElementById('tbl-bound-fc').textContent = s.boundFc >= 100
+            ? Math.round(s.boundFc).toLocaleString() + ' N'
+            : s.boundFc.toFixed(1) + ' N';
+    document.getElementById('tbl-bound-R').textContent = s.boundR_mm.toFixed(1) + ' mm';
+    document.getElementById('tbl-bound-lsys').textContent = s.boundLsysPct.toFixed(1) + '%';
+    document.getElementById('tbl-bound-lball').textContent = s.boundLballPct.toFixed(2) + '%';
+
+    document.getElementById('tbl-sim-rpm').textContent = Math.round(s.simPeakRPM).toLocaleString() + ' RPM';
+    document.getElementById('tbl-sim-fc').textContent = s.simPeakFc >= 100
+            ? Math.round(s.simPeakFc).toLocaleString() + ' N'
+            : s.simPeakFc.toFixed(1) + ' N';
+    document.getElementById('tbl-sim-R').textContent = s.simPeakR_mm.toFixed(1) + ' mm';
+    document.getElementById('tbl-sim-lsys').textContent = s.simLsysPct.toFixed(1) + '%';
+    document.getElementById('tbl-sim-lball').textContent = s.simLballPct.toFixed(2) + '%';
+
+    document.getElementById('lbl-pull-end').textContent = params.dtPull.toFixed(2);
+    document.getElementById('lbl-stop-time').textContent = isFinite(s.stopTime) ? s.stopTime.toFixed(2) : '∞';
+  }
+
+  function updateTelemetryDOM(snap) {
+    if (!snap) return;
+
+    // Top-left 3D viewport phase badge
+    const dot = document.getElementById('phase-dot');
+    const txt = document.getElementById('phase-text');
+    if (params.coaeMode) {
+      dot.style.background = '#f43f5e';
+      dot.style.boxShadow = '0 0 8px #f43f5e';
+      txt.style.color = '#fb7185';
+      txt.textContent = `BOGUS "COAE" SCENARIO (ω_f = ω_i(r_i/r_f), τ_net = 0)`;
+    } else if (snap.phase === 'PULLING') {
+      dot.style.background = '#38bdf8';
+      dot.style.boxShadow = '0 0 8px #38bdf8';
+      txt.style.color = '#38bdf8';
+      txt.textContent = `PHASE 1: INWARD PULL (0 ≤ t ≤ ${params.dtPull.toFixed(1)}s)`;
+    } else if (snap.phase === 'DECAY') {
+      dot.style.background = '#fbbf24';
+      dot.style.boxShadow = '0 0 8px #fbbf24';
+      txt.style.color = '#fbbf24';
+      txt.textContent = `PHASE 2: POST-PULL DECAY & STOP (t > ${params.dtPull.toFixed(1)}s)`;
+    } else if (snap.phase === 'STOPPED') {
+      dot.style.background = '#f43f5e';
+      dot.style.boxShadow = '0 0 8px #f43f5e';
+      txt.style.color = '#f43f5e';
+      txt.textContent = `PHASE 3: STOPPED AT REST (ω = 0 RPM, HANGING AT φ = 90°)`;
+    } else {
+      dot.style.background = '#a78bfa';
+      dot.style.boxShadow = '0 0 8px #a78bfa';
+      txt.style.color = '#a78bfa';
+      txt.textContent = `IDEALIZED ZERO-TORQUE LIMIT (τ_net = 0, R = 0)`;
     }
 
-    /*************************************************************************
-     * 6. UI SYNCHRONIZATION, TELEMETRY UPDATES & INTERACTIVE HANDLERS
-     *************************************************************************/
-    function updateTable1DOM() {
-      const s = sim.summary;
-      document.getElementById('tbl-ideal-rpm').textContent = Math.round(s.idealRPM).toLocaleString();
-      document.getElementById('tbl-ideal-fc').textContent = Math.round(s.idealFc).toLocaleString() + ' N';
+    // Scrubber & time badges
+    document.getElementById('lbl-sim-time').textContent = snap.t.toFixed(2);
+    document.getElementById('scrubber-slider').value = snap.t;
+    document.getElementById('tel-time-badge').textContent = `t = ${snap.t.toFixed(2)} s`;
 
-      document.getElementById('tbl-bound-rpm').textContent = Math.round(s.boundRPM) + ' RPM';
-      document.getElementById('tbl-bound-fc').textContent = s.boundFc.toFixed(1) + ' N';
-      document.getElementById('tbl-bound-R').textContent = s.boundR_mm.toFixed(1) + ' mm';
-      document.getElementById('tbl-bound-lsys').textContent = s.boundLsysPct.toFixed(1) + '%';
-      document.getElementById('tbl-bound-lball').textContent = s.boundLballPct.toFixed(2) + '%';
+    // Card 1: Angular Velocity | Radii | String Tension
+    const rpmStr = snap.rpm >= 1000 ? Math.round(snap.rpm).toLocaleString() : snap.rpm.toFixed(1);
+    document.getElementById('tel-rpm').innerHTML = `${rpmStr} <span style="font-size:0.7rem;">RPM</span>`;
+    document.getElementById('tel-rads').textContent = `${snap.omega.toFixed(2)} rad/s (${(snap.omega / (2 * Math.PI)).toFixed(2)} rev/s)`;
+    document.getElementById('tel-ideal-rpm').textContent = `Ideal: ${Math.round(snap.rpmIdeal).toLocaleString()} RPM`;
 
-      document.getElementById('tbl-sim-rpm').textContent = Math.round(s.simPeakRPM).toLocaleString() + ' RPM';
-      document.getElementById('tbl-sim-fc').textContent = s.simPeakFc >= 100
-        ? Math.round(s.simPeakFc).toLocaleString() + ' N'
-        : s.simPeakFc.toFixed(1) + ' N';
-      document.getElementById('tbl-sim-R').textContent = s.simPeakR_mm.toFixed(1) + ' mm';
-      document.getElementById('tbl-sim-lsys').textContent = s.simLsysPct.toFixed(1) + '%';
-      document.getElementById('tbl-sim-lball').textContent = s.simLballPct.toFixed(2) + '%';
+    document.getElementById('tel-r').innerHTML = `${snap.r.toFixed(3)} <span style="font-size:0.7rem;">m</span>`;
+    document.getElementById('tel-R').textContent = `Wobble R: ${(snap.R * 1000).toFixed(2)} mm`;
+    document.getElementById('tel-dR').textContent = `Yield ΔR: +${(snap.deltaR * 1000).toFixed(2)} mm`;
 
-      document.getElementById('lbl-pull-end').textContent = params.dtPull.toFixed(2);
-      document.getElementById('lbl-stop-time').textContent = isFinite(s.stopTime) ? s.stopTime.toFixed(2) : '∞';
-    }
+    const fcStr = snap.Fc >= 100 ? Math.round(snap.Fc).toLocaleString() : snap.Fc.toFixed(2);
+    document.getElementById('tel-fc').innerHTML = `${fcStr} <span style="font-size:0.7rem;">N</span>`;
+    document.getElementById('tel-sag').textContent = `Droop φ: ${((snap.phiRad * 180) / Math.PI).toFixed(1)}°`;
+    document.getElementById('tel-ideal-fc').textContent = `Ideal: ${snap.FcIdeal >= 100 ? Math.round(snap.FcIdeal).toLocaleString() : snap.FcIdeal.toFixed(2)} N`;
 
-    function updateTelemetryDOM(snap) {
-      if (!snap) return;
+    // Card 2: Angular Momentum Partition
+    const L_init = Math.max(1e-9, sim.summary.L_sys_i);
+    const pctSys = Math.min(100.0, (snap.L_sys / L_init) * 100.0);
+    const pctBall = Math.min(100.0, (snap.L_ball / L_init) * 100.0);
+    const pctHand = Math.min(100.0, (snap.L_hand / L_init) * 100.0);
+    const pctLost = Math.max(0.0, 100.0 - pctSys);
 
-      // Top-left 3D viewport phase badge
-      const dot = document.getElementById('phase-dot');
-      const txt = document.getElementById('phase-text');
-      if (snap.phase === 'PULLING') {
-        dot.style.background = '#38bdf8';
-        dot.style.boxShadow = '0 0 8px #38bdf8';
-        txt.style.color = '#38bdf8';
-        txt.textContent = `PHASE 1: INWARD PULL (0 ≤ t ≤ ${params.dtPull.toFixed(1)}s)`;
-      } else if (snap.phase === 'DECAY') {
-        dot.style.background = '#fbbf24';
-        dot.style.boxShadow = '0 0 8px #fbbf24';
-        txt.style.color = '#fbbf24';
-        txt.textContent = `PHASE 2: POST-PULL DECAY & STOP (t > ${params.dtPull.toFixed(1)}s)`;
-      } else if (snap.phase === 'STOPPED') {
-        dot.style.background = '#f43f5e';
-        dot.style.boxShadow = '0 0 8px #f43f5e';
-        txt.style.color = '#f43f5e';
-        txt.textContent = `PHASE 3: STOPPED AT REST (ω = 0 RPM, HANGING AT φ = 90°)`;
-      } else {
-        dot.style.background = '#a78bfa';
-        dot.style.boxShadow = '0 0 8px #a78bfa';
-        txt.style.color = '#a78bfa';
-        txt.textContent = `IDEALIZED ZERO-TORQUE LIMIT (τ_net = 0, R = 0)`;
-      }
+    document.getElementById('tel-lsys-init').textContent = `${L_init.toFixed(4)} N·m·s`;
+    document.getElementById('tel-lsys-cur').textContent = `${snap.L_sys.toFixed(4)} N·m·s (${pctSys.toFixed(1)}%)`;
 
-      // Scrubber & time badges
-      document.getElementById('lbl-sim-time').textContent = snap.t.toFixed(2);
-      document.getElementById('scrubber-slider').value = snap.t;
-      document.getElementById('tel-time-badge').textContent = `t = ${snap.t.toFixed(2)} s`;
+    document.getElementById('bar-l-ball').style.width = `${pctBall.toFixed(1)}%`;
+    document.getElementById('bar-l-hand').style.width = `${pctHand.toFixed(1)}%`;
+    document.getElementById('bar-l-lost').style.width = `${pctLost.toFixed(1)}%`;
 
-      // Card 1: Angular Velocity | Radii | String Tension
-      const rpmStr = snap.rpm >= 1000 ? Math.round(snap.rpm).toLocaleString() : snap.rpm.toFixed(1);
-      document.getElementById('tel-rpm').innerHTML = `${rpmStr} <span style="font-size:0.7rem;">RPM</span>`;
-      document.getElementById('tel-rads').textContent = `${snap.omega.toFixed(2)} rad/s (${(snap.omega / (2 * Math.PI)).toFixed(2)} rev/s)`;
-      document.getElementById('tel-ideal-rpm').textContent = `Ideal: ${Math.round(snap.rpmIdeal).toLocaleString()} RPM`;
+    document.getElementById('tel-l-ball').textContent = `${snap.L_ball.toFixed(4)} N·m·s (${pctBall.toFixed(2)}%)`;
+    document.getElementById('tel-l-hand').textContent = `${snap.L_hand.toFixed(4)} N·m·s (${pctHand.toFixed(2)}%)`;
+    document.getElementById('tel-l-lost').textContent = `${Math.max(0, L_init - snap.L_sys).toFixed(4)} N·m·s (${pctLost.toFixed(1)}%)`;
 
-      document.getElementById('tel-r').innerHTML = `${snap.r.toFixed(3)} <span style="font-size:0.7rem;">m</span>`;
-      document.getElementById('tel-R').textContent = `Wobble R: ${(snap.R * 1000).toFixed(2)} mm`;
-      document.getElementById('tel-dR').textContent = `Yield ΔR: +${(snap.deltaR * 1000).toFixed(2)} mm`;
+    // Card 3: Instantaneous Torque Balance
+    const aeroTotal = snap.tauDragBall + snap.tauDragString;
+    const pDiss = Math.abs(snap.tauDamp * snap.omega);
 
-      const fcStr = snap.Fc >= 100 ? Math.round(snap.Fc).toLocaleString() : snap.Fc.toFixed(2);
-      document.getElementById('tel-fc').innerHTML = `${fcStr} <span style="font-size:0.7rem;">N</span>`;
-      document.getElementById('tel-sag').textContent = `Droop φ: ${((snap.phiRad * 180) / Math.PI).toFixed(1)}°`;
-      document.getElementById('tel-ideal-fc').textContent = `Ideal: ${snap.FcIdeal >= 100 ? Math.round(snap.FcIdeal).toLocaleString() : snap.FcIdeal.toFixed(2)} N`;
+    document.getElementById('tel-tau-spin').textContent = `+${snap.tauSpinUp.toFixed(4)} N·m`;
+    document.getElementById('tel-tau-damp').textContent = `${snap.tauDamp.toFixed(4)} N·m`;
+    document.getElementById('tel-tau-fric').textContent = `${snap.tauFric.toFixed(4)} N·m`;
+    document.getElementById('tel-tau-drag').textContent = `${aeroTotal.toFixed(4)} N·m`;
+    document.getElementById('tel-tau-net').textContent = `${snap.tauNet.toFixed(4)} N·m`;
+    document.getElementById('tel-p-diss').textContent = `${pDiss.toFixed(2)} W`;
 
-      // Card 2: Angular Momentum Partition
-      const L_init = Math.max(1e-9, sim.summary.L_sys_i);
-      const pctSys = Math.min(100.0, (snap.L_sys / L_init) * 100.0);
-      const pctBall = Math.min(100.0, (snap.L_ball / L_init) * 100.0);
-      const pctHand = Math.min(100.0, (snap.L_hand / L_init) * 100.0);
-      const pctLost = Math.max(0.0, 100.0 - pctSys);
+    // Chart Header Live Mini-Readouts
+    document.getElementById('chart-lbl-rpm').textContent = `${rpmStr} RPM`;
+    document.getElementById('chart-lbl-radii').textContent = `R=${(snap.R * 1000).toFixed(1)}mm, r=${snap.r.toFixed(2)}m`;
+    document.getElementById('chart-lbl-torque').textContent = `τ_net = ${snap.tauNet.toFixed(3)} N·m`;
+  }
 
-      document.getElementById('tel-lsys-init').textContent = `${L_init.toFixed(4)} N·m·s`;
-      document.getElementById('tel-lsys-cur').textContent = `${snap.L_sys.toFixed(4)} N·m·s (${pctSys.toFixed(1)}%)`;
+  function syncSlidersToLabels() {
+    const w_i = (params.omegaRPM_i * 2 * Math.PI) / 60.0;
+    document.getElementById('lbl-omega-i').textContent = `${params.omegaRPM_i} RPM (${w_i.toFixed(1)} rad/s)`;
+    document.getElementById('lbl-ri').textContent = `${params.ri.toFixed(2)} m`;
+    document.getElementById('lbl-rf').textContent = `${params.rf.toFixed(3)} m (${(params.ri / params.rf).toFixed(1)}×)`;
+    const drdt = Math.abs(params.ri - params.rf) / params.dtPull;
+    document.getElementById('lbl-dt').textContent = `${params.dtPull.toFixed(2)} s (|dr/dt|=${drdt.toFixed(2)} m/s)`;
+    document.getElementById('lbl-m').textContent = `${params.m.toFixed(3)} kg (${Math.round(params.m * 1000)} g)`;
+    document.getElementById('lbl-d').textContent = `${params.d.toFixed(3)} m (${(params.d * 100).toFixed(1)} cm)`;
 
-      document.getElementById('bar-l-ball').style.width = `${pctBall.toFixed(1)}%`;
-      document.getElementById('bar-l-hand').style.width = `${pctHand.toFixed(1)}%`;
-      document.getElementById('bar-l-lost').style.width = `${pctLost.toFixed(1)}%`;
+    document.getElementById('lbl-M').textContent = `${params.M.toFixed(2)} kg`;
+    document.getElementById('lbl-R0').textContent = `${(params.R0 * 1000).toFixed(1)} mm (${params.R0.toFixed(3)} m)`;
+    document.getElementById('lbl-cwrist').textContent = `${params.cwrist.toFixed(3)} N·m·s/rad`;
+    document.getElementById('lbl-kwrist').textContent = `${Math.round(params.kwrist)} N/m`;
+    document.getElementById('lbl-ell').textContent = `${params.ell.toFixed(3)} m (${(params.ell * 100).toFixed(1)} cm)`;
 
-      document.getElementById('tel-l-ball').textContent = `${snap.L_ball.toFixed(4)} N·m·s (${pctBall.toFixed(2)}%)`;
-      document.getElementById('tel-l-hand').textContent = `${snap.L_hand.toFixed(4)} N·m·s (${pctHand.toFixed(2)}%)`;
-      document.getElementById('tel-l-lost').textContent = `${Math.max(0, L_init - snap.L_sys).toFixed(4)} N·m·s (${pctLost.toFixed(1)}%)`;
+    document.getElementById('lbl-muk').textContent = params.muk.toFixed(2);
+    document.getElementById('lbl-rgrip').textContent = `${(params.rgrip * 1000).toFixed(1)} mm (${params.rgrip.toFixed(4)} m)`;
+    document.getElementById('lbl-rho').textContent = `${params.rho.toFixed(3)} kg/m³`;
+  }
 
-      // Card 3: Instantaneous Torque Balance
-      const aeroTotal = snap.tauDragBall + snap.tauDragString;
-      const pDiss = Math.abs(snap.tauDamp * snap.omega);
+  function onSliderChange() {
+    params.idealMode = false;
+    params.coaeMode = false;
+    params.omegaRPM_i = parseFloat(document.getElementById('sl-omega-i').value);
+    params.ri = parseFloat(document.getElementById('sl-ri').value);
+    params.rf = Math.min(params.ri - 0.02, parseFloat(document.getElementById('sl-rf').value));
+    document.getElementById('sl-rf').value = params.rf;
 
-      document.getElementById('tel-tau-spin').textContent = `+${snap.tauSpinUp.toFixed(4)} N·m`;
-      document.getElementById('tel-tau-damp').textContent = `${snap.tauDamp.toFixed(4)} N·m`;
-      document.getElementById('tel-tau-fric').textContent = `${snap.tauFric.toFixed(4)} N·m`;
-      document.getElementById('tel-tau-drag').textContent = `${aeroTotal.toFixed(4)} N·m`;
-      document.getElementById('tel-tau-net').textContent = `${snap.tauNet.toFixed(4)} N·m`;
-      document.getElementById('tel-p-diss').textContent = `${pDiss.toFixed(2)} W`;
+    params.dtPull = parseFloat(document.getElementById('sl-dt').value);
+    params.m = parseFloat(document.getElementById('sl-m').value);
+    params.d = parseFloat(document.getElementById('sl-d').value);
 
-      // Chart Header Live Mini-Readouts
-      document.getElementById('chart-lbl-rpm').textContent = `${rpmStr} RPM`;
-      document.getElementById('chart-lbl-radii').textContent = `R=${(snap.R * 1000).toFixed(1)}mm, r=${snap.r.toFixed(2)}m`;
-      document.getElementById('chart-lbl-torque').textContent = `τ_net = ${snap.tauNet.toFixed(3)} N·m`;
-    }
+    params.M = parseFloat(document.getElementById('sl-M').value);
+    params.R0 = parseFloat(document.getElementById('sl-R0').value);
+    params.cwrist = parseFloat(document.getElementById('sl-cwrist').value);
+    params.kwrist = parseFloat(document.getElementById('sl-kwrist').value);
+    params.ell = parseFloat(document.getElementById('sl-ell').value);
 
-    function syncSlidersToLabels() {
-      const w_i = (params.omegaRPM_i * 2 * Math.PI) / 60.0;
-      document.getElementById('lbl-omega-i').textContent = `${params.omegaRPM_i} RPM (${w_i.toFixed(1)} rad/s)`;
-      document.getElementById('lbl-ri').textContent = `${params.ri.toFixed(2)} m`;
-      document.getElementById('lbl-rf').textContent = `${params.rf.toFixed(3)} m (${(params.ri / params.rf).toFixed(1)}×)`;
-      const drdt = Math.abs(params.ri - params.rf) / params.dtPull;
-      document.getElementById('lbl-dt').textContent = `${params.dtPull.toFixed(2)} s (|dr/dt|=${drdt.toFixed(2)} m/s)`;
-      document.getElementById('lbl-m').textContent = `${params.m.toFixed(3)} kg (${Math.round(params.m * 1000)} g)`;
-      document.getElementById('lbl-d').textContent = `${params.d.toFixed(3)} m (${(params.d * 100).toFixed(1)} cm)`;
+    params.muk = parseFloat(document.getElementById('sl-muk').value);
+    params.rgrip = parseFloat(document.getElementById('sl-rgrip').value);
+    params.rho = parseFloat(document.getElementById('sl-rho').value);
+    params.wobbleEnabled = (params.M > 0 || params.R0 > 0);
 
-      document.getElementById('lbl-M').textContent = `${params.M.toFixed(2)} kg`;
-      document.getElementById('lbl-R0').textContent = `${(params.R0 * 1000).toFixed(1)} mm (${params.R0.toFixed(3)} m)`;
-      document.getElementById('lbl-cwrist').textContent = `${params.cwrist.toFixed(3)} N·m·s/rad`;
-      document.getElementById('lbl-kwrist').textContent = `${Math.round(params.kwrist)} N/m`;
-      document.getElementById('lbl-ell').textContent = `${params.ell.toFixed(3)} m (${(params.ell * 100).toFixed(1)} cm)`;
+    syncSlidersToLabels();
+    rebuildOrbitalReferenceRings();
+    recomputePhysicsTrajectory();
+    renderAllCharts();
+  }
 
-      document.getElementById('lbl-muk').textContent = params.muk.toFixed(2);
-      document.getElementById('lbl-rgrip').textContent = `${(params.rgrip * 1000).toFixed(1)} mm (${params.rgrip.toFixed(4)} m)`;
-      document.getElementById('lbl-rho').textContent = `${params.rho.toFixed(3)} kg/m³`;
-    }
+  function rebuildOrbitalReferenceRings() {
+    if (!scene) return;
+    if (ringInitialMesh) scene.remove(ringInitialMesh);
+    if (ringFinalMesh) scene.remove(ringFinalMesh);
+    ringInitialMesh = createDashedCircle(params.ri, 0x334155, 0.025, 0.015);
+    ringFinalMesh = createDashedCircle(params.rf, 0x0284c7, 0.012, 0.008);
+    scene.add(ringInitialMesh);
+    scene.add(ringFinalMesh);
+  }
 
-    function onSliderChange() {
+  function applyPreset(presetKey) {
+    sim.preset = presetKey;
+    // Paper Section 1 & 3 defaults
+    params.m = 0.05;
+    params.d = 0.04;
+    params.M = 1.0;
+    params.ri = 0.50;
+    params.rf = 0.05;
+    params.R0 = 0.01;
+    params.rgrip = 0.002;
+    params.ell = 0.08;
+    params.dtPull = 1.0;
+    params.omegaRPM_i = 120;
+    params.cwrist = 0.10;
+    params.kwrist = 2500;
+    params.muk = 0.80;
+    params.rho = 1.225;
+    params.wobbleEnabled = true;
+    params.idealMode = false;
+    params.coaeMode = false;
+
+    if (presetKey === 'zerogrip') {
+      params.muk = 0.0;
+      params.rgrip = 0.0;
+    } else if (presetKey === 'fixedpivot') {
+      params.M = 0.0;
+      params.R0 = 0.0;
+      params.cwrist = 0.0;
+      params.wobbleEnabled = false;
+    } else if (presetKey === 'ideal') {
+      params.M = 0.0;
+      params.R0 = 0.0;
+      params.cwrist = 0.0;
+      params.muk = 0.0;
+      params.rho = 0.0;
+      params.wobbleEnabled = false;
+      params.idealMode = true;
+    } else if (presetKey === 'coae') {
+      params.M = 0.0;
+      params.R0 = 0.0;
+      params.cwrist = 0.0;
+      params.muk = 0.0;
+      params.rho = 0.0;
+      params.wobbleEnabled = false;
       params.idealMode = false;
-      params.omegaRPM_i = parseFloat(document.getElementById('sl-omega-i').value);
-      params.ri = parseFloat(document.getElementById('sl-ri').value);
-      params.rf = Math.min(params.ri - 0.02, parseFloat(document.getElementById('sl-rf').value));
-      document.getElementById('sl-rf').value = params.rf;
-
-      params.dtPull = parseFloat(document.getElementById('sl-dt').value);
-      params.m = parseFloat(document.getElementById('sl-m').value);
-      params.d = parseFloat(document.getElementById('sl-d').value);
-
-      params.M = parseFloat(document.getElementById('sl-M').value);
-      params.R0 = parseFloat(document.getElementById('sl-R0').value);
-      params.cwrist = parseFloat(document.getElementById('sl-cwrist').value);
-      params.kwrist = parseFloat(document.getElementById('sl-kwrist').value);
-      params.ell = parseFloat(document.getElementById('sl-ell').value);
-
-      params.muk = parseFloat(document.getElementById('sl-muk').value);
-      params.rgrip = parseFloat(document.getElementById('sl-rgrip').value);
-      params.rho = parseFloat(document.getElementById('sl-rho').value);
-      params.wobbleEnabled = (params.M > 0 || params.R0 > 0);
-
-      syncSlidersToLabels();
-      rebuildOrbitalReferenceRings();
-      recomputePhysicsTrajectory();
-      renderAllCharts();
+      params.coaeMode = true;
     }
 
-    function rebuildOrbitalReferenceRings() {
-      if (!scene) return;
-      if (ringInitialMesh) scene.remove(ringInitialMesh);
-      if (ringFinalMesh) scene.remove(ringFinalMesh);
-      ringInitialMesh = createDashedCircle(params.ri, 0x334155, 0.025, 0.015);
-      ringFinalMesh = createDashedCircle(params.rf, 0x0284c7, 0.012, 0.008);
-      scene.add(ringInitialMesh);
-      scene.add(ringFinalMesh);
-    }
+    // Update slider DOM controls
+    document.getElementById('sl-omega-i').value = params.omegaRPM_i;
+    document.getElementById('sl-ri').value = params.ri;
+    document.getElementById('sl-rf').value = params.rf;
+    document.getElementById('sl-dt').value = params.dtPull;
+    document.getElementById('sl-m').value = params.m;
+    document.getElementById('sl-d').value = params.d;
+    document.getElementById('sl-M').value = params.M;
+    document.getElementById('sl-R0').value = params.R0;
+    document.getElementById('sl-cwrist').value = params.cwrist;
+    document.getElementById('sl-kwrist').value = params.kwrist;
+    document.getElementById('sl-ell').value = params.ell;
+    document.getElementById('sl-muk').value = params.muk;
+    document.getElementById('sl-rgrip').value = params.rgrip;
+    document.getElementById('sl-rho').value = params.rho;
 
-    function applyPreset(presetKey) {
-      sim.preset = presetKey;
-      // Paper Section 1 & 3 defaults
-      params.m = 0.05;
-      params.d = 0.04;
-      params.M = 1.0;
-      params.ri = 0.50;
-      params.rf = 0.05;
-      params.R0 = 0.01;
-      params.rgrip = 0.002;
-      params.ell = 0.08;
-      params.dtPull = 1.0;
-      params.omegaRPM_i = 120;
-      params.cwrist = 0.10;
-      params.kwrist = 2500;
-      params.muk = 0.80;
-      params.rho = 1.225;
-      params.wobbleEnabled = true;
-      params.idealMode = false;
+    ['paper', 'zerogrip', 'fixedpivot', 'ideal', 'coae'].forEach((k) => {
+      const el = document.getElementById('preset-' + k);
+      if (el) el.classList.toggle('active', k === presetKey);
+    });
 
-      if (presetKey === 'zerogrip') {
-        params.muk = 0.0;
-        params.rgrip = 0.0;
-      } else if (presetKey === 'fixedpivot') {
-        params.M = 0.0;
-        params.R0 = 0.0;
-        params.cwrist = 0.0;
-        params.wobbleEnabled = false;
-      } else if (presetKey === 'ideal') {
-        params.M = 0.0;
-        params.R0 = 0.0;
-        params.cwrist = 0.0;
-        params.muk = 0.0;
-        params.rho = 0.0;
-        params.wobbleEnabled = false;
-        params.idealMode = true;
-      }
+    syncSlidersToLabels();
+    rebuildOrbitalReferenceRings();
+    recomputePhysicsTrajectory();
+    restartSimulation();
+  }
 
-      // Update slider DOM controls
-      document.getElementById('sl-omega-i').value = params.omegaRPM_i;
-      document.getElementById('sl-ri').value = params.ri;
-      document.getElementById('sl-rf').value = params.rf;
-      document.getElementById('sl-dt').value = params.dtPull;
-      document.getElementById('sl-m').value = params.m;
-      document.getElementById('sl-d').value = params.d;
-      document.getElementById('sl-M').value = params.M;
-      document.getElementById('sl-R0').value = params.R0;
-      document.getElementById('sl-cwrist').value = params.cwrist;
-      document.getElementById('sl-kwrist').value = params.kwrist;
-      document.getElementById('sl-ell').value = params.ell;
-      document.getElementById('sl-muk').value = params.muk;
-      document.getElementById('sl-rgrip').value = params.rgrip;
-      document.getElementById('sl-rho').value = params.rho;
+  function switchParamTab(tabKey) {
+    ['kin', 'bio', 'drag'].forEach((k) => {
+      document.getElementById('tab-btn-' + k).classList.toggle('active', k === tabKey);
+      document.getElementById('tab-panel-' + k).classList.toggle('hidden', k !== tabKey);
+    });
+  }
 
-      ['paper', 'zerogrip', 'fixedpivot', 'ideal'].forEach((k) => {
-        const el = document.getElementById('preset-' + k);
-        if (el) el.classList.toggle('active', k === presetKey);
-      });
-
-      syncSlidersToLabels();
-      rebuildOrbitalReferenceRings();
-      recomputePhysicsTrajectory();
-      restartSimulation();
-    }
-
-    function switchParamTab(tabKey) {
-      ['kin', 'bio', 'drag'].forEach((k) => {
-        document.getElementById('tab-btn-' + k).classList.toggle('active', k === tabKey);
-        document.getElementById('tab-panel-' + k).classList.toggle('hidden', k !== tabKey);
-      });
-    }
-
-    function togglePlayPause() {
-      const maxT = sim.summary.maxTime || 4.5;
-      if (sim.time >= maxT - 0.02) {
-        sim.time = 0.0;
-        clearBallTrail();
-        sim.playing = true;
-      } else {
-        sim.playing = !sim.playing;
-      }
-      updatePlayPauseButtonUI();
-    }
-
-    function restartSimulation() {
+  function togglePlayPause() {
+    const maxT = sim.summary.maxTime || 4.5;
+    if (sim.time >= maxT - 0.02) {
       sim.time = 0.0;
       clearBallTrail();
       sim.playing = true;
-      updatePlayPauseButtonUI();
-    }
-
-    function stepSimulation() {
-      sim.playing = false;
-      const maxT = sim.summary.maxTime || 4.5;
-      sim.time = Math.min(maxT, sim.time + 0.05);
-      const snap = sampleTrajectory(sim.time);
-      if (snap) sim.theta += snap.omega * 0.05;
-      updatePlayPauseButtonUI();
-    }
-
-    function jumpToPeakPull() {
-      sim.playing = false;
-      sim.time = params.dtPull;
-      updatePlayPauseButtonUI();
-    }
-
-    function onScrubTime(val) {
-      sim.playing = false;
-      sim.time = parseFloat(val);
-      updatePlayPauseButtonUI();
-    }
-
-    function setPlaybackSpeed(spd) {
-      sim.speed = spd;
-      document.getElementById('spd-025').classList.toggle('btn-active', Math.abs(spd - 0.25) < 0.01);
-      document.getElementById('spd-050').classList.toggle('btn-active', Math.abs(spd - 0.50) < 0.01);
-      document.getElementById('spd-100').classList.toggle('btn-active', Math.abs(spd - 1.00) < 0.01);
-    }
-
-    function toggleWobbleMagnification() {
-      sim.magnifyWobble = !sim.magnifyWobble;
-      const btn = document.getElementById('btn-wobble-mag');
-      btn.classList.toggle('btn-active', sim.magnifyWobble);
-      btn.textContent = sim.magnifyWobble ? 'Wobble Magnification 5×: ON' : 'Wobble Magnification 1× (True)';
-    }
-
-    function updatePlayPauseButtonUI() {
-      const lbl = document.getElementById('play-pause-text');
-      const maxT = sim.summary.maxTime || 4.5;
-      if (!sim.playing && sim.time >= maxT - 0.02) {
-        lbl.textContent = 'Replay Pull';
-      } else {
-        lbl.textContent = sim.playing ? 'Pause' : 'Play';
-      }
-    }
-
-    /*************************************************************************
-     * 7. MAIN ANIMATION LOOP & SAFE INITIALIZATION
-     *************************************************************************/
-    let prevWallTime = performance.now();
-
-    function animateFrame(now) {
-      requestAnimationFrame(animateFrame);
-
-      const dtWall = Math.min(0.05, (now - prevWallTime) / 1000.0);
-      prevWallTime = now;
-
-      if (sim.playing) {
-        const maxT = sim.summary.maxTime || 4.5;
-        sim.time += dtWall * sim.speed;
-        if (sim.time >= maxT) {
-          sim.time = maxT;
-          sim.playing = false;
-          updatePlayPauseButtonUI();
-        }
-      }
-
-      const snap = sampleTrajectory(sim.time);
-      updateThreeScene(snap, dtWall);
-      updateTelemetryDOM(snap);
-      renderAllCharts();
-
-      if (renderer && scene && camera) {
-        renderer.render(scene, camera);
-      }
-    }
-
-    function bootApplication() {
-      try {
-        syncSlidersToLabels();
-        recomputePhysicsTrajectory();
-        initThreeScene();
-        attachChartScrubbing();
-        updatePlayPauseButtonUI();
-        prevWallTime = performance.now();
-        requestAnimationFrame(animateFrame);
-      } catch (err) {
-        console.error('Initialization error:', err);
-      }
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', bootApplication);
     } else {
-      bootApplication();
+      sim.playing = !sim.playing;
     }
-  </script>
+    updatePlayPauseButtonUI();
+  }
+
+  function restartSimulation() {
+    sim.time = 0.0;
+    clearBallTrail();
+    sim.playing = true;
+    updatePlayPauseButtonUI();
+  }
+
+  function stepSimulation() {
+    sim.playing = false;
+    const maxT = sim.summary.maxTime || 4.5;
+    sim.time = Math.min(maxT, sim.time + 0.05);
+    updatePlayPauseButtonUI();
+  }
+
+  function jumpToPeakPull() {
+    sim.playing = false;
+    sim.time = params.dtPull;
+    updatePlayPauseButtonUI();
+  }
+
+  function onScrubTime(val) {
+    sim.playing = false;
+    sim.time = parseFloat(val);
+    updatePlayPauseButtonUI();
+  }
+
+  function setPlaybackSpeed(spd) {
+    sim.speed = spd;
+    document.getElementById('spd-025').classList.toggle('btn-active', Math.abs(spd - 0.25) < 0.01);
+    document.getElementById('spd-050').classList.toggle('btn-active', Math.abs(spd - 0.50) < 0.01);
+    document.getElementById('spd-100').classList.toggle('btn-active', Math.abs(spd - 1.00) < 0.01);
+  }
+
+  function toggleWobbleMagnification() {
+    sim.magnifyWobble = !sim.magnifyWobble;
+    const btn = document.getElementById('btn-wobble-mag');
+    btn.classList.toggle('btn-active', sim.magnifyWobble);
+    btn.textContent = sim.magnifyWobble ? 'Wobble Magnification 5×: ON' : 'Wobble Magnification 1×';
+  }
+
+  function updatePlayPauseButtonUI() {
+    const lbl = document.getElementById('play-pause-text');
+    const maxT = sim.summary.maxTime || 4.5;
+    if (!sim.playing && sim.time >= maxT - 0.02) {
+      lbl.textContent = 'Replay Pull';
+    } else {
+      lbl.textContent = sim.playing ? 'Pause' : 'Play';
+    }
+  }
+
+  /*************************************************************************
+   * 7. MAIN ANIMATION LOOP & SAFE INITIALIZATION
+   *************************************************************************/
+  let prevWallTime = performance.now();
+
+  function animateFrame(now) {
+    requestAnimationFrame(animateFrame);
+
+    const dtWall = Math.min(0.05, (now - prevWallTime) / 1000.0);
+    prevWallTime = now;
+
+    if (sim.playing) {
+      const maxT = sim.summary.maxTime || 4.5;
+      sim.time += dtWall * sim.speed;
+      if (sim.time >= maxT) {
+        sim.time = maxT;
+        sim.playing = false;
+        updatePlayPauseButtonUI();
+      }
+    }
+
+    const snap = sampleTrajectory(sim.time);
+    updateThreeScene(snap, dtWall);
+    updateTelemetryDOM(snap);
+    renderAllCharts();
+
+    if (renderer && scene && camera) {
+      renderer.render(scene, camera);
+    }
+  }
+
+  function bootApplication() {
+    try {
+      syncSlidersToLabels();
+      recomputePhysicsTrajectory();
+      initThreeScene();
+      attachChartScrubbing();
+      updatePlayPauseButtonUI();
+      prevWallTime = performance.now();
+      requestAnimationFrame(animateFrame);
+    } catch (err) {
+      console.error('Initialization error:', err);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', bootApplication);
+  } else {
+    bootApplication();
+  }
+</script>
 </body>
 </html>
