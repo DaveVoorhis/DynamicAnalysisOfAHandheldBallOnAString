@@ -891,8 +891,8 @@
           </div>
           <input type="range" id="sl-g" min="0.00" max="25.00" step="0.01" value="9.81" oninput="onSliderChange()" />
           <div class="slider-minmax"><span>0.00 (0g Space)</span><span>Earth: 9.81</span><span>25.00 m/s²</span></div>
-          <button id="btn-zero-g-tab" class="btn" style="margin-top: 4px; width: 100%; font-size: 0.71rem;" onclick="toggleZeroGravity()">
-            Toggle Zero-G (Space Mode: g = 0 m/s²)
+          <button id="btn-zerog-tab" class="btn" style="margin-top: 4px; width: 100%; font-size: 0.71rem;" onclick="toggleZeroGravity()">
+            <span id="zerog-tab-text">Toggle Zero-G (Space Mode: g = 0 m/s²)</span>
           </button>
         </div>
       </div>
@@ -980,8 +980,8 @@
         <button id="btn-wobble-mag" class="btn" onclick="toggleWobbleMagnification()">
           Wobble Magnification 1×
         </button>
-        <button id="btn-zero-g" class="btn" onclick="toggleZeroGravity()" title="Toggle gravitational acceleration between Earth (9.81 m/s²) and Zero-G Space (0 m/s²)">
-          Zero-G (Space): OFF
+        <button id="btn-zerog-top" class="btn" onclick="toggleZeroGravity()" title="Toggle gravitational acceleration between Earth (9.81 m/s²) and Zero-G Space (0 m/s²)">
+          <span id="zerog-top-text">Zero-G (Space): OFF</span>
         </button>
       </div>
 
@@ -1216,6 +1216,7 @@
     muk: 0.80,        // Skin kinetic friction coefficient
     rho: 1.225,       // Air density (kg/m^3)
     g: 9.81,          // Gravitational acceleration (m/s^2), 0 = Zero-G Space
+    savedG: 9.81,     // Saved non-zero gravitational acceleration for Space Mode toggle
     wobbleEnabled: true,
     idealMode: false,
     coaeMode: false
@@ -1227,7 +1228,6 @@
     speed: 1.0,
     theta: 0.0,
     magnifyWobble: false,
-    lastNonZeroG: DEFAULT_G_ACCEL,
     preset: 'paper',
     trajectory: [],
     summary: {
@@ -1409,10 +1409,8 @@
       const tq = calcTorques(radVal, curDrdt, wVal, isPost, p);
 
       // Gravity droop angle phi below horizontal plane y = 0: phi = atan2(g, max(0.001, r * w^2))
-      // In Zero-G Space mode (g <= 0.0001), phiRad is strictly 0.0 rad (0.0 deg)
-      const phiRad = (p.idealMode || p.coaeMode || p.g <= 0.0001)
-              ? 0.0
-              : Math.atan2(p.g, Math.max(0.001, radVal * wVal * wVal));
+      // In Zero-G Space mode (g <= 1e-6), phiRad is strictly 0.0 rad (0.0 deg)
+      const phiRad = (p.idealMode || p.coaeMode || p.g <= 1e-6) ? 0.0 : Math.atan2(p.g, Math.max(0.001, radVal * wVal * wVal));
 
       traj.push({
         t: timeVal,
@@ -1620,7 +1618,7 @@
    * 3. THREE.JS 3D SCENE & REALISTIC ANATOMICAL HAND BELOW y = 0
    *************************************************************************/
   let scene, camera, renderer;
-  let floorGridMesh, spaceStarsMesh;
+  let floorGridMesh, starfieldPoints;
   let ringInitialMesh, ringFinalMesh, wobbleCircleMesh;
   let wristAnchorGroup, upperHandGroup, wristHaloMesh, pinchApertureRing, forearmMesh;
   let lowerPullHandGroup, tailStringLine, activeStringLine;
@@ -1735,11 +1733,11 @@
       size: 0.028,
       vertexColors: true,
       transparent: true,
-      opacity: 0.85
+      opacity: 0.0
     });
-    spaceStarsMesh = new THREE.Points(starGeo, starMat);
-    spaceStarsMesh.visible = (params.g <= 0.0001);
-    scene.add(spaceStarsMesh);
+    starfieldPoints = new THREE.Points(starGeo, starMat);
+    starfieldPoints.visible = false;
+    scene.add(starfieldPoints);
   }
 
   function createDashedCircle(radius, hexColor, dashSize, gapSize) {
@@ -2161,11 +2159,15 @@
   function updateThreeScene(snap, dtWall) {
     if (!snap || !scene) return;
 
-    const isZeroG = (params.g <= 0.0001);
-    if (spaceStarsMesh) {
-      spaceStarsMesh.visible = isZeroG;
-      if (isZeroG && sim.playing) {
-        spaceStarsMesh.rotation.y += dtWall * 0.015;
+    const isZeroG = (params.g <= 1e-6);
+    if (starfieldPoints) {
+      const targetOpacity = isZeroG ? 0.85 : 0.0;
+      const curOpacity = starfieldPoints.material.opacity;
+      const nextOpacity = curOpacity + (targetOpacity - curOpacity) * Math.min(1.0, dtWall * 8.0);
+      starfieldPoints.material.opacity = nextOpacity;
+      starfieldPoints.visible = (nextOpacity > 0.01);
+      if (starfieldPoints.visible && sim.playing) {
+        starfieldPoints.rotation.y += dtWall * 0.015;
       }
     }
     if (floorGridMesh && floorGridMesh.material) {
@@ -2714,7 +2716,7 @@
     // Top-left 3D viewport phase badge
     const dot = document.getElementById('phase-dot');
     const txt = document.getElementById('phase-text');
-    const isZeroG = (params.g <= 0.0001);
+    const isZeroG = (params.g <= 1e-6);
     const gSuffix = isZeroG ? ' [0G SPACE]' : '';
 
     if (params.coaeMode) {
@@ -2805,18 +2807,26 @@
     document.getElementById('chart-lbl-torque').textContent = `τ_net = ${snap.tauNet.toFixed(3)} N·m`;
   }
 
-  function updateZeroGButtonsUI() {
-    const isZeroG = (params.g <= 0.0001);
-    const btnTop = document.getElementById('btn-zero-g');
-    if (btnTop) {
-      btnTop.classList.toggle('btn-active', isZeroG);
-      btnTop.textContent = isZeroG ? 'Zero-G (Space): ON' : 'Zero-G (Space): OFF';
+  function updateGravityUI() {
+    const isZeroG = (params.g <= 1e-6);
+    const lblG = document.getElementById('lbl-g');
+    if (lblG) {
+      lblG.textContent = isZeroG
+              ? `0.00 m/s² (0g Space)`
+              : `${params.g.toFixed(2)} m/s² (${(params.g / DEFAULT_G_ACCEL).toFixed(2)} g)`;
     }
-    const btnTab = document.getElementById('btn-zero-g-tab');
-    if (btnTab) {
-      btnTab.classList.toggle('btn-active', isZeroG);
-      btnTab.textContent = isZeroG
-              ? 'Zero-G Space Mode: ON (Click for Earth 9.81 m/s²)'
+
+    const btnTop = document.getElementById('btn-zerog-top');
+    const txtTop = document.getElementById('zerog-top-text');
+    if (btnTop) btnTop.classList.toggle('btn-active', isZeroG);
+    if (txtTop) txtTop.textContent = isZeroG ? 'Zero-G (Space): ON' : 'Zero-G (Space): OFF';
+
+    const btnTab = document.getElementById('btn-zerog-tab');
+    const txtTab = document.getElementById('zerog-tab-text');
+    if (btnTab) btnTab.classList.toggle('btn-active', isZeroG);
+    if (txtTab) {
+      txtTab.textContent = isZeroG
+              ? `Zero-G Space Mode: ON (Restore g = ${params.savedG.toFixed(2)} m/s²)`
               : 'Toggle Zero-G (Space Mode: g = 0 m/s²)';
     }
   }
@@ -2841,11 +2851,7 @@
     document.getElementById('lbl-rgrip').textContent = `${(params.rgrip * 1000).toFixed(1)} mm (${params.rgrip.toFixed(4)} m)`;
     document.getElementById('lbl-rho').textContent = `${params.rho.toFixed(3)} kg/m³`;
 
-    const isZeroG = (params.g <= 0.0001);
-    document.getElementById('lbl-g').textContent = isZeroG
-            ? `0.00 m/s² (0g Space)`
-            : `${params.g.toFixed(2)} m/s² (${(params.g / DEFAULT_G_ACCEL).toFixed(2)} g)`;
-    updateZeroGButtonsUI();
+    updateGravityUI();
   }
 
   function onSliderChange() {
@@ -2871,7 +2877,7 @@
     params.rho = parseFloat(document.getElementById('sl-rho').value);
     params.g = parseFloat(document.getElementById('sl-g').value);
     if (params.g > 0.01) {
-      sim.lastNonZeroG = params.g;
+      params.savedG = params.g;
     }
     params.wobbleEnabled = (params.M > 0 || params.R0 > 0);
 
@@ -2882,11 +2888,11 @@
   }
 
   function toggleZeroGravity() {
-    if (params.g > 0.0001) {
-      sim.lastNonZeroG = params.g;
+    if (params.g > 1e-6) {
+      params.savedG = params.g;
       params.g = 0.0;
     } else {
-      params.g = (sim.lastNonZeroG > 0.01) ? sim.lastNonZeroG : DEFAULT_G_ACCEL;
+      params.g = (params.savedG > 0.01) ? params.savedG : DEFAULT_G_ACCEL;
     }
     const slG = document.getElementById('sl-g');
     if (slG) {
@@ -2925,7 +2931,7 @@
     params.muk = 0.80;
     params.rho = 1.225;
     params.g = DEFAULT_G_ACCEL;
-    sim.lastNonZeroG = DEFAULT_G_ACCEL;
+    params.savedG = DEFAULT_G_ACCEL;
     params.wobbleEnabled = true;
     params.idealMode = false;
     params.coaeMode = false;
