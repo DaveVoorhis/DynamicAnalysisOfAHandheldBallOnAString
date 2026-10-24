@@ -1,0 +1,210 @@
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+\usepackage{parskip}
+\usepackage{enumitem}
+\usepackage{makecell}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\title{Dynamics of a Hand-Held Ball-on-a-String}
+\author{Dave Voorhis$^1$ \and Google Gemini$^2$}
+\date{
+    $^1$ Derbyshire, United Kingdom\\
+    $^2$ Google LLC
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This paper presents a rigorous physical and mathematical model of a hand-held ball-on-a-string undergoing radial reduction, demonstrating why real-world rotational velocities fall drastically short of the textbook zero-torque limit ($L=mr^2\omega = \text{constant}$). By applying Euler's Second Law to a coupled, co-orbiting two-mass model, we identify hand wobble as both a primary inertial sink and a mechanical amplifier of viscous tissue dissipation. Furthermore, we demonstrate that minimizing string-on-skin grip friction cannot produce unbounded angular acceleration; instead, rising centripetal tension triggers nonlinear biomechanical yielding in the operator's wrist. Because biomechanical damping scales with the square of the wobble radius, elastic expansion of the orbit creates a quintic ($\propto \omega^5$) dissipative brake. This self-governing mechanism bounds the terminal angular velocity to realistic physical limits ($\approx 427\text{ RPM}$), completely resolving the apparent discrepancy between idealized angular momentum conservation and empirical observation.
+\end{abstract}
+
+\vspace{0.5pc}
+\noindent\textbf{Keywords}: angular momentum, rigid body dynamics, biomechanics, Euler's Second Law, rotational damping
+
+\section{Introduction and System Parameters}
+The hand-held ball-on-a-string is a classic qualitative classroom demonstration used to illustrate the inward radial transfer of rotational motion. However, treating a human-operated apparatus as a frictionless, stationary point-pivot in a vacuum leads to severe quantitative mispredictions. This paper derives the governing equations of motion and predicts the terminal rotational velocity of a hand-held ball-on-a-string during radial reduction under Euler's Second Law ($\frac{dL}{dt} = \tau_{\text{net}}$). For a comprehensive pedagogical and experimental analysis of ball-on-a-string dynamics, we refer readers to the foundational work of Andrea Sacchetti \cite{sacchetti}.
+
+To evaluate a concrete, representative system, we define the following independent physical and biomechanical parameters:
+\begin{itemize}[noitemsep, topsep=2pt]
+    \item Mass of the ball ($m$): $0.05\text{ kg}$ ($50\text{ g}$)
+    \item Diameter of the ball ($d$): $0.04\text{ m}$ ($4\text{ cm}$, radius $r_{\text{ball}} = 0.02\text{ m}$)
+    \item Effective co-orbiting mass of the hand and distal forearm ($M$): $1.0\text{ kg}$
+    \item Initial string radius ($r_i$): $0.50\text{ m}$
+    \item Final string radius ($r_f$): $0.05\text{ m}$ ($10\%$ of the initial radius)
+    \item Baseline wobble radius of the hand ($R_0$): $0.01\text{ m}$ ($1\text{ cm}$)
+    \item Effective guide/pinch radius of the fingers ($r_{\text{grip}}$): $0.002\text{ m}$ ($2\text{ mm}$)
+    \item Lever distance from pinch pivot to wrist joint ($\ell$): $0.08\text{ m}$ ($8\text{ cm}$)
+    \item Duration of uniform radial reduction ($\Delta t$): $1.0\text{ s}$
+    \item Initial angular velocity ($\omega_i$): $2\text{ rev/s}$ ($120\text{ RPM}$, or $4\pi \approx 12.57\text{ rad/s}$)
+\end{itemize}
+
+\section{The Idealized Textbook Limit}
+In an idealized textbook model where the pivot is strictly immobile ($R = 0$) and all external torques vanish ($\tau_{\text{net}} = 0$), Euler's Second Law reduces to $\frac{dL}{dt} = 0$, meaning the ball's orbital angular momentum $L = m r^2 \omega$ is strictly conserved. Equating the initial and final states ($L_i = L_f$) for a tenfold reduction in radius ($r_i / r_f = 10$) increases the idealized angular velocity by a factor of $100$:
+\begin{equation}
+    m r_i^2 \omega_i = m r_f^2 \omega_f \implies \omega_f = \omega_i \left(\frac{r_i}{r_f}\right)^2 = 2\text{ rev/s} \times (10)^2 = 200\text{ rev/s} = 12,000\text{ RPM}
+\end{equation}
+
+Achieving $12,000\text{ RPM}$ ($\approx 1,257\text{ rad/s}$) in a hand-held apparatus is physically impossible: at $r_f = 0.05\text{ m}$, this speed would subject the operator's fingers to a centripetal tension of $F_c = m r_f \omega_f^2 \approx 3,948\text{ N}$ ($\approx 402\text{ kgf}$), instantly tearing the string from the operator's grasp or causing severe musculoskeletal injury. 
+
+Failing to distinguish between an idealized zero-torque boundary condition ($\tau_{\text{net}} = 0$) and a dissipative, non-inertial biomechanical system leads to profound analytical errors. Most notably, John Mandlbaur \cite{mandlbaur} conflates the conditional textbook conservation formula ($L_i = L_f$) with the universal law of motion ($\frac{dL}{dt} = \tau_{\text{net}}$), erroneously concluding that classical mechanics is falsified simply because a hand-held ball-on-a-string does not reach $12,000\text{ RPM}$.
+
+\section{Real-World Resistive and Inertial Dynamics}
+An accurate physical model of the hand-held apparatus must account for aerodynamic drag, guide-pivot tribology, coupled two-body kinematics, and viscoelastic biomechanics.
+
+\subsection{Aerodynamic Drag of the Ball}
+As the ball orbits at tangential speed $v = r\omega$, it experiences quadratic aerodynamic drag opposing its motion. For a spherical ball of diameter $d = 0.04\text{ m}$ ($r_{\text{ball}} = 0.02\text{ m}$), the frontal cross-sectional area is:
+\begin{equation}
+    A = \pi r_{\text{ball}}^2 = \pi (0.02\text{ m})^2 \approx 0.00126\text{ m}^2
+\end{equation}
+Using standard sea-level air density ($\rho \approx 1.225\text{ kg/m}^3$) and the subcritical drag coefficient of a sphere ($C_d \approx 0.47$), the retarding torque about the rotation axis is:
+\begin{equation}
+    \tau_{\text{drag\_ball}} = - \frac{1}{2} \rho C_d A r^3 \omega^2 = - \frac{1}{2} (1.225)(0.47)(0.00126) r^3 \omega^2 \approx -0.00036\, r^3 \omega^2
+\end{equation}
+where $C_{\text{drag\_ball}} = 0.00036\text{ kg/m}$.
+
+\subsection{Aerodynamic Drag of the String}
+The rotating string sweeps an annulus of air, generating a distributed aerodynamic drag that scales with the fourth power of the radius. Integrating the differential drag torque along a cylindrical cord of diameter $w = 0.002\text{ m}$ ($2\text{ mm}$) and cylindrical drag coefficient $C_{d,\text{cyl}} \approx 1.0$ from $x = 0$ to $x = r$ yields:
+\begin{equation}
+    \tau_{\text{drag\_string}} = - \int_{0}^{r} \frac{1}{2} \rho C_{d,\text{cyl}} w (\omega x)^2 x \, dx = - \frac{1}{8} \rho C_{d,\text{cyl}} w r^4 \omega^2 \approx -0.00031\, r^4 \omega^2
+\end{equation}
+where $C_{\text{drag\_string}} = 0.00031\text{ kg/m}^2$. While aerodynamic drag is substantial at large radii ($r \approx 0.5\text{ m}$), its $r^3$ and $r^4$ dependence causes it to diminish rapidly as $r \to 0.05\text{ m}$, transferring the primary braking role to biomechanical mechanisms.
+
+\subsection{Pivot Guide Skin Friction}
+Without a low-friction rigid sleeve or bearing, the orbiting string bears directly against the compliant skin of the thumb and index finger as it exits the pinch aperture and is drawn inward. The normal reaction force at the finger guide scales directly with the centripetal string tension ($T = m r \omega^2$). Under load, dry human skin exhibits significant viscoelastic adhesion and deformation, with tribological studies establishing a median kinetic friction coefficient of $\mu_k \approx 0.80$ \cite{derler}. Assuming the operator minimizes contact to a loose $2\text{ mm}$ pinch aperture ($r_{\text{grip}} = 0.002\text{ m}$), the frictional retarding torque is:
+\begin{equation}
+    \tau_{\text{fric}} = -\mu_k (m r \omega^2) r_{\text{grip}} = -(0.80)(0.05)(0.002) r \omega^2 = -0.00008\, r \omega^2
+\end{equation}
+where $C_{\text{fric}} = 0.00008\text{ kg}\cdot\text{m}$.
+
+\subsection{Co-Orbiting Hand Wobble as an Inertial Sink}
+A human hand cannot maintain a mathematically stationary point-pivot in space against a rotating lateral load; furthermore, the operator must initially wobble the hand to establish the orbit. Consequently, the hand (effective mass $M = 1.0\text{ kg}$) and the ball ($m = 0.05\text{ kg}$) form a coupled, co-orbiting system with a total dynamic moment of inertia:
+\begin{equation}
+    I(r, \omega) = m r^2 + M R(\omega)^2
+\end{equation}
+where $R(\omega)$ is the dynamic wobble radius of the hand originating from a baseline perturbation of $R_0 = 0.01\text{ m}$.
+
+At the start of the pull ($r_i = 0.50\text{ m}$), centripetal tension is small ($F_{c,i} = m r_i \omega_i^2 \approx 3.95\text{ N}$), and the ball dominates the system's moment of inertia:
+\begin{equation}
+    I_i \approx 0.05 (0.50)^2 + 1.0 (0.01)^2 = 0.0125 + 0.0001 = 0.0126\text{ kg}\cdot\text{m}^2
+\end{equation}
+However, as $r$ shrinks tenfold to $r_f = 0.05\text{ m}$, the ball's moment of inertia drops by a factor of $100$ to just $m r_f^2 = 0.000125\text{ kg}\cdot\text{m}^2$. Even at the baseline $1\text{ cm}$ wobble ($M R_0^2 = 0.00010\text{ kg}\cdot\text{m}^2$), the hand's rotational inertia becomes comparable to that of the ball, and as the wobble expands under centripetal load, the hand overtakes the ball as the primary reservoir of angular momentum.
+
+\subsection{Biomechanical Viscous Damping}
+As the pinch pivot translates around a wobble circle of radius $R$ at angular frequency $\omega$, the wrist joint (located at lever distance $\ell = 0.08\text{ m}$) undergoes continuous conical circumduction. In the small-angle regime, this orbital motion decomposes into two orthogonal anatomical articulations—flexion/extension ($\theta_x$) and radial/ulnar deviation ($\theta_y$):
+\begin{equation}
+    \theta_x(t) \approx \frac{R}{\ell}\cos(\omega t), \qquad \theta_y(t) \approx \frac{R}{\ell}\sin(\omega t)
+\end{equation}
+Maintaining a stiffened wrist via muscular co-contraction introduces an intrinsic rotational viscous damping coefficient of $c_{\text{wrist}} \approx 0.10\text{ N}\cdot\text{m}\cdot\text{s/rad}$ \cite{kuchenbecker}. The instantaneous mechanical power dissipated as heat within the muscle, tendon, and ligament tissues across both orthogonal axes is:
+\begin{equation}
+    P_{\text{diss}} = c_{\text{wrist}}\left(\dot{\theta}_x^2 + \dot{\theta}_y^2\right) = c_{\text{wrist}} \left(\frac{R}{\ell}\right)^2 \omega^2 \left(\sin^2\omega t + \cos^2\omega t\right) = c_{\text{wrist}} \left(\frac{R}{\ell}\right)^2 \omega^2
+\end{equation}
+Equating the dissipated biomechanical power to the rate of rotational work extracted from the orbiting system ($P_{\text{diss}} = |\tau_{\text{damp}}|\omega$) and substituting $c_{\text{wrist}} = 0.10\text{ N}\cdot\text{m}\cdot\text{s/rad}$ and $\ell = 0.08\text{ m}$ yields the effective damping torque:
+\begin{equation}\label{eq:tau_damp}
+    \tau_{\text{damp}} = - c_{\text{wrist}} \left(\frac{R}{\ell}\right)^2 \omega = - 0.10 \left(\frac{R}{0.08}\right)^2 \omega = -15.625\, R(\omega)^2 \omega
+\end{equation}
+
+\subsection{Nonlinear Centripetal Yielding (Dynamic Wobble Expansion)}
+Human tendons, muscles, and joints are elastically compliant. As angular velocity increases during the pull, the rotating outward centripetal load ($F_c = m r \omega^2$) forces the wrist and fingers to yield radially. Modeling the co-contracted wrist and grip structure with an effective translational stiffness of $k_{\text{wrist}} \approx 2500\text{ N/m}$, the dynamic wobble radius $R(\omega)$ expands linearly with centripetal force:
+\begin{equation}
+    R(r, \omega) = R_0 + \frac{m r \omega^2}{k_{\text{wrist}}} = 0.01 + \frac{0.05\, r \omega^2}{2500} = 0.01 + 0.00002\, r \omega^2
+\end{equation}
+Substituting $R(r, \omega)$ into Eq.~\eqref{eq:tau_damp} reveals that the biomechanical damping torque contains a quintic ($\propto \omega^5$) nonlinearity:
+\begin{equation}
+    \tau_{\text{damp}} = -15.625 \left(0.01 + 0.00002\, r \omega^2\right)^2 \omega
+\end{equation}
+This coupling forms a steep, self-governing mechanical brake: any surge in angular velocity $\omega$ quadratically increases centripetal tension, forcing the wobble trajectory $R$ to expand, which in turn quadratically multiplies viscous wrist dissipation.
+
+\section{Euler's Second Law and Terminal Velocity Calculation}
+Applying Euler's Second Law to the coupled hand-ball system gives:
+\begin{equation}\label{eq:euler}
+    \frac{dL}{dt} = \frac{d}{dt}\left[ I(r,\omega)\omega \right] = \tau_{\text{net}} = \tau_{\text{drag\_ball}} + \tau_{\text{drag\_string}} + \tau_{\text{fric}} + \tau_{\text{damp}}
+\end{equation}
+Integrating with respect to time from $t = 0$ to $t = \Delta t = 1.0\text{ s}$ expresses the exact angular momentum balance:
+\begin{equation}
+    \left(m r_f^2 + M R_f^2\right)\omega_f - \left(m r_i^2 + M R_0^2\right)\omega_i = \int_{0}^{1.0} \tau_{\text{net}}\, dt \implies \omega_f = \frac{I_i \omega_i + \int_{0}^{1.0} \tau_{\text{net}}\, dt}{m r_f^2 + M R(\omega_f)^2}
+\end{equation}
+
+To find the analytical upper bound on the angular velocity as the string reaches $r_f = 0.05\text{ m}$, we first derive the constant radial retraction velocity $\frac{dr}{dt}$ from the initial radius $r_i = 0.50\text{ m}$, final radius $r_f = 0.05\text{ m}$, and pull duration $\Delta t = 1.0\text{ s}$:
+\begin{equation}
+    \frac{dr}{dt} = \frac{r_f - r_i}{\Delta t} = \frac{0.05\text{ m} - 0.50\text{ m}}{1.0\text{ s}} = -0.45\text{ m/s}
+\end{equation}
+Expanding the time derivative in Eq.~\eqref{eq:euler} via the product rule ($I_{\text{eff}} = I + \omega \frac{\partial I}{\partial \omega}$) and isolating the angular acceleration shows how the inward pull ($\frac{dr}{dt} = -0.45\text{ m/s}$) generates an effective radial-inflow (Coriolis) spin-up torque $\tau_{\text{spin-up}}$ that competes directly against $\tau_{\text{net}}$:
+\begin{equation}
+    I_{\text{eff}} \frac{d\omega}{dt} + \left(2 m r \frac{dr}{dt}\right)\omega = \tau_{\text{net}} \implies I_{\text{eff}} \frac{d\omega}{dt} = \underbrace{2 m r \left|\frac{dr}{dt}\right| \omega}_{\tau_{\text{spin-up}}} + \tau_{\text{net}}
+\end{equation}
+
+The system reaches its terminal angular velocity ceiling when angular acceleration stalls ($\frac{d\omega}{dt} = 0$), which occurs when the inward spin-up driving term is completely absorbed by the resistive torques ($\tau_{\text{spin-up}} = |\tau_{\text{net}}|$). At the final radius $r_f = 0.05\text{ m}$ and derived retraction rate $\left|\frac{dr}{dt}\right| = 0.45\text{ m/s}$, the spin-up driving term is:
+\begin{equation}
+    \tau_{\text{spin-up}} = 2 m r_f \left| \frac{dr}{dt} \right| \omega = 2(0.05)(0.05)(0.45)\omega = 0.00225\, \omega
+\end{equation}
+
+At $r_f = 0.05\text{ m}$, wrist damping accounts for over $92\%$ of the total resistive torque, allowing us to determine a tight analytical upper bound on $\omega_f$ by balancing $\tau_{\text{spin-up}}$ directly against $|\tau_{\text{damp}}|$:
+\begin{equation}
+    15.625 (R_{\text{eq}})^2 \omega = 0.00225\, \omega \implies (R_{\text{eq}})^2 = 0.000144\text{ m}^2 \implies R_{\text{eq}} = 0.012\text{ m}
+\end{equation}
+
+Thus, dynamic equilibrium is reached when the hand's wobble radius expands by just $\Delta R = R_{\text{eq}} - R_0 = 0.002\text{ m}$ ($2\text{ mm}$), from $10\text{ mm}$ to $12\text{ mm}$. From Hooke's Law, this $2\text{ mm}$ elastic yield corresponds to a terminal centripetal tension of:
+\begin{equation}
+    F_c = k_{\text{wrist}} \Delta R = (2500\text{ N/m})(0.002\text{ m}) = 5.0\text{ N}
+\end{equation}
+Solving the centripetal force relation at $r_f = 0.05\text{ m}$ and converting to revolutions per minute yields the maximum sustainable angular velocity:
+\begin{equation}
+    m r_f \omega_f^2 = 5.0\text{ N} \implies \omega_f = \sqrt{\frac{5.0}{0.0025}} = \sqrt{2000} \approx 44.72\text{ rad/s} \approx 427\text{ RPM} \quad (\approx 7.12\text{ rev/s})
+\end{equation}
+(Note: Including the secondary pinch-friction torque $|\tau_{\text{fric}}| = 0.008\text{ N}\cdot\text{m}$ and aerodynamic drag $|\tau_{\text{drag}}| \approx 0.00009\text{ N}\cdot\text{m}$ at $r_f = 0.05\text{ m}$ lowers the exact equilibrium ceiling slightly further to $\approx 378\text{ RPM}$, confirming $427\text{ RPM}$ as a conservative upper bound.)
+
+Finally, evaluating the moments of inertia at this terminal state highlights the dual role of hand wobble:
+\begin{equation}
+    I_f = m r_f^2 + M R_{\text{eq}}^2 = 0.000125 + 0.000144 = 0.000269\text{ kg}\cdot\text{m}^2
+\end{equation}
+Not only has external damping bled off $92.4\%$ of the total system's initial angular momentum ($L_{\text{sys},f} = 0.0120\text{ N}\cdot\text{m}\cdot\text{s}$ vs.\ $L_{\text{sys},i} = 0.1583\text{ N}\cdot\text{m}\cdot\text{s}$), but of the $7.6\%$ that remains in the coupled system, more than half ($53.5\%$) is partitioned into the wobbling hand rather than the ball, leaving the ball itself with just $3.56\%$ of its initial angular momentum ($L_{\text{ball},f} = 0.00559\text{ N}\cdot\text{m}\cdot\text{s}$ vs.\ $L_{\text{ball},i} = 0.1571\text{ N}\cdot\text{m}\cdot\text{s}$).
+
+\section{Conclusion}
+
+\begin{table}[ht!]
+\centering
+\small
+\caption{Comparison of idealized conservation vs.\ coupled nonlinear biomechanical modeling.}
+\vspace{0.3em}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Performance Metric} & \makecell{\textbf{Ideal System} \\ \footnotesize{(Fixed Pivot / Zero Torque)}} & \makecell{\textbf{Real-World Dynamic} \\ \footnotesize{(Coupled Wobble + Yield)}} \\
+\midrule
+Initial Velocity ($\omega_i$) & $2\text{ rev/s}$ ($120\text{ RPM}$) & $2\text{ rev/s}$ ($120\text{ RPM}$) \\
+Final Velocity ($\omega_f$) & $200\text{ rev/s}$ ($12,000\text{ RPM}$) & $\approx 7.1\text{ rev/s}$ ($427\text{ RPM}$) \\
+Terminal String Tension ($F_c$) & $3,948\text{ N}$ & $5.0\text{ N}$ \\
+System Momentum Retained ($L_{\text{sys}}$) & $100\%$ & $\approx 7.6\%$ \\
+Ball Momentum Retained ($L_{\text{ball}}$) & $100\%$ & $\approx 3.56\%$ \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The reduction from the idealized zero-torque limit of $12,000\text{ RPM}$ to a physically realistic ceiling of $427\text{ RPM}$ follows directly from Euler's Second Law when external resistive torques and non-rigid boundary conditions are properly modeled. A hand-held ball-on-a-string operates under an intrinsic biomechanical governor. Even when an operator reduces string-on-skin friction to a minimal $2\text{ mm}$ pinch, they cannot bypass the structural compliance of the human body.
+
+As the string shortens and angular velocity climbs, rising centripetal tension forces the operator's wrist to yield radially. Our coupled model demonstrates that an elastic wobble expansion of just $2\text{ mm}$ triggers a quintic ($\propto \omega^5$) surge in viscous wrist dissipation while simultaneously partitioning over half of the surviving angular momentum into the co-orbiting hand. The terminal velocity of a hand-held ball-on-a-string is therefore strictly bounded by human biomechanics, stalling naturally near $427\text{ RPM}$ in full accordance with Newtonian mechanics.
+
+\begingroup
+\small
+\setlength{\itemsep}{2pt}
+\begin{thebibliography}{9}
+\bibitem{sacchetti}
+Sacchetti A 2023 On the ball on a string demonstration of angular momentum conservation \textit{Eur. J. Phys.} \textbf{45} 015001 \url{https://iopscience.iop.org/article/10.1088/1361-6404/acf6b9}
+
+\bibitem{mandlbaur}
+Mandlbaur J 2022 \textit{Angular Energy} \textit{ResearchGate} \url{https://www.researchgate.net/publication/364946928_Angular_Energy}
+
+\bibitem{derler}
+Derler S and Gerhardt L-C 2012 Tribology of Skin: Review and Analysis of Experimental Results for the Friction Coefficient of Human Skin \textit{Tribol. Lett.} \textbf{45} 1--27 \url{https://link.springer.com/article/10.1007/s11249-011-9854-y}
+
+\bibitem{kuchenbecker}
+Kuchenbecker K J, Park J G and Niemeyer G 2003 Characterizing the human wrist for improved haptic interaction \textit{Proc. ASME Int. Mech. Eng. Congr. and Expo.} \url{https://www.researchgate.net/publication/228830154_Characterizing_the_Human_Wrist_for_Improved_Haptic_Interaction}
+\end{thebibliography}
+\endgroup
+
+\end{document}
