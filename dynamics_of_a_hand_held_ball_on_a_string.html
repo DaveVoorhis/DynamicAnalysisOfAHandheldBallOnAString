@@ -286,7 +286,7 @@
     }
 
     .tab-btn {
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 600;
       padding: 6px 4px;
       border-radius: 6px;
@@ -747,7 +747,7 @@
       <div class="tab-row">
         <button id="tab-btn-kin" class="tab-btn active" onclick="switchParamTab('kin')">1. Pull &amp; Ball</button>
         <button id="tab-btn-bio" class="tab-btn" onclick="switchParamTab('bio')">2. Hand &amp; Wrist</button>
-        <button id="tab-btn-drag" class="tab-btn" onclick="switchParamTab('drag')">3. Grip &amp; Aero</button>
+        <button id="tab-btn-drag" class="tab-btn" onclick="switchParamTab('drag')">3. Grip, Aero &amp; Gravity</button>
       </div>
 
       <!-- Tab 1: Pull & Ball -->
@@ -855,7 +855,7 @@
         </div>
       </div>
 
-      <!-- Tab 3: Grip Friction & Aerodynamic Drag -->
+      <!-- Tab 3: Grip Friction, Aerodynamic Drag & Gravity -->
       <div id="tab-panel-drag" class="param-group hidden">
         <div class="slider-item">
           <div class="slider-top">
@@ -882,6 +882,18 @@
           </div>
           <input type="range" id="sl-rho" min="0.000" max="10.000" step="0.025" value="1.225" oninput="onSliderChange()" />
           <div class="slider-minmax"><span>0.00 (Vacuum)</span><span>Sea Level: 1.225</span><span>10.00</span></div>
+        </div>
+
+        <div class="slider-item">
+          <div class="slider-top">
+            <span class="slider-label">Gravity (g)</span>
+            <span class="slider-val" id="lbl-g">9.81 m/s² (1.00 g)</span>
+          </div>
+          <input type="range" id="sl-g" min="0.00" max="25.00" step="0.01" value="9.81" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.00 (0g Space)</span><span>Earth: 9.81</span><span>25.00 m/s²</span></div>
+          <button id="btn-zero-g-tab" class="btn" style="margin-top: 4px; width: 100%; font-size: 0.71rem;" onclick="toggleZeroGravity()">
+            Toggle Zero-G (Space Mode: g = 0 m/s²)
+          </button>
         </div>
       </div>
     </div>
@@ -967,6 +979,9 @@
         <button class="btn" onclick="setCameraView('side')">Side Elevation View</button>
         <button id="btn-wobble-mag" class="btn" onclick="toggleWobbleMagnification()">
           Wobble Magnification 1×
+        </button>
+        <button id="btn-zero-g" class="btn" onclick="toggleZeroGravity()" title="Toggle gravitational acceleration between Earth (9.81 m/s²) and Zero-G Space (0 m/s²)">
+          Zero-G (Space): OFF
         </button>
       </div>
 
@@ -1180,7 +1195,7 @@
   /*************************************************************************
    * 1. SIMULATION PARAMETERS & STATE (FROM PAPER SECTIONS 1, 3, 4)
    *************************************************************************/
-  const G_ACCEL = 9.81;
+  const DEFAULT_G_ACCEL = 9.81;
   const CD_BALL = 0.47;
   const CD_STRING = 1.0;
   const W_STRING = 0.002;
@@ -1200,6 +1215,7 @@
     kwrist: 2500,     // Wrist translational stiffness (N/m)
     muk: 0.80,        // Skin kinetic friction coefficient
     rho: 1.225,       // Air density (kg/m^3)
+    g: 9.81,          // Gravitational acceleration (m/s^2), 0 = Zero-G Space
     wobbleEnabled: true,
     idealMode: false,
     coaeMode: false
@@ -1211,6 +1227,7 @@
     speed: 1.0,
     theta: 0.0,
     magnifyWobble: false,
+    lastNonZeroG: DEFAULT_G_ACCEL,
     preset: 'paper',
     trajectory: [],
     summary: {
@@ -1392,7 +1409,10 @@
       const tq = calcTorques(radVal, curDrdt, wVal, isPost, p);
 
       // Gravity droop angle phi below horizontal plane y = 0: phi = atan2(g, max(0.001, r * w^2))
-      const phiRad = (p.idealMode || p.coaeMode) ? 0.0 : Math.atan2(G_ACCEL, Math.max(0.001, radVal * wVal * wVal));
+      // In Zero-G Space mode (g <= 0.0001), phiRad is strictly 0.0 rad (0.0 deg)
+      const phiRad = (p.idealMode || p.coaeMode || p.g <= 0.0001)
+              ? 0.0
+              : Math.atan2(p.g, Math.max(0.001, radVal * wVal * wVal));
 
       traj.push({
         t: timeVal,
@@ -1508,7 +1528,7 @@
         if (omega === 0.0 && stopTime === p.dtPull) {
           stopTime = curT;
         }
-        // Record 0.5s after full stop so the user sees the stationary vertical ball
+        // Record 0.5s after full stop so the user sees the stationary ball
         if (omega === 0.0 && curT >= stopTime + 0.5) {
           break;
         }
@@ -1600,6 +1620,7 @@
    * 3. THREE.JS 3D SCENE & REALISTIC ANATOMICAL HAND BELOW y = 0
    *************************************************************************/
   let scene, camera, renderer;
+  let floorGridMesh, spaceStarsMesh;
   let ringInitialMesh, ringFinalMesh, wobbleCircleMesh;
   let wristAnchorGroup, upperHandGroup, wristHaloMesh, pinchApertureRing, forearmMesh;
   let lowerPullHandGroup, tailStringLine, activeStringLine;
@@ -1651,9 +1672,12 @@
     scene.add(underLight);
 
     // Subtle reference floor grid below the lower pulling hand
-    const floorGrid = new THREE.GridHelper(1.8, 18, 0x1e293b, 0x0f172a);
-    floorGrid.position.y = -0.52;
-    scene.add(floorGrid);
+    floorGridMesh = new THREE.GridHelper(1.8, 18, 0x1e293b, 0x0f172a);
+    floorGridMesh.position.y = -0.52;
+    scene.add(floorGridMesh);
+
+    // 3D Starfield for Zero-G Space Mode (visible when params.g === 0)
+    buildSpaceStarfield();
 
     // Central vertical rotation axis line (x=0, z=0)
     const axisGeo = new THREE.BufferGeometry().setFromPoints([
@@ -1682,6 +1706,40 @@
     // Attach Pointer/Mouse/Wheel/Touch Controls
     attachCanvasControls(renderer.domElement);
     window.addEventListener('resize', onResizeViewport);
+  }
+
+  function buildSpaceStarfield() {
+    const starCount = 420;
+    const positions = new Float32Array(starCount * 3);
+    const colors = new Float32Array(starCount * 3);
+    for (let i = 0; i < starCount; i++) {
+      const u = Math.random();
+      const v = Math.random();
+      const theta = u * 2.0 * Math.PI;
+      const phi = Math.acos(2.0 * v - 1.0);
+      const rad = 2.4 + Math.random() * 4.5;
+      positions[i * 3]     = rad * Math.sin(phi) * Math.cos(theta);
+      positions[i * 3 + 1] = rad * Math.cos(phi);
+      positions[i * 3 + 2] = rad * Math.sin(phi) * Math.sin(theta);
+
+      // Subtle cool-white and sky-blue star tints
+      const tint = 0.75 + 0.25 * Math.random();
+      colors[i * 3]     = tint * 0.88;
+      colors[i * 3 + 1] = tint * 0.94;
+      colors[i * 3 + 2] = 1.0;
+    }
+    const starGeo = new THREE.BufferGeometry();
+    starGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    starGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    const starMat = new THREE.PointsMaterial({
+      size: 0.028,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.85
+    });
+    spaceStarsMesh = new THREE.Points(starGeo, starMat);
+    spaceStarsMesh.visible = (params.g <= 0.0001);
+    scene.add(spaceStarsMesh);
   }
 
   function createDashedCircle(radius, hexColor, dashSize, gapSize) {
@@ -2103,6 +2161,18 @@
   function updateThreeScene(snap, dtWall) {
     if (!snap || !scene) return;
 
+    const isZeroG = (params.g <= 0.0001);
+    if (spaceStarsMesh) {
+      spaceStarsMesh.visible = isZeroG;
+      if (isZeroG && sim.playing) {
+        spaceStarsMesh.rotation.y += dtWall * 0.015;
+      }
+    }
+    if (floorGridMesh && floorGridMesh.material) {
+      floorGridMesh.material.transparent = true;
+      floorGridMesh.material.opacity = isZeroG ? 0.25 : 1.0;
+    }
+
     const nominalLever = 0.08;
     const ell = params.ell;
 
@@ -2154,7 +2224,7 @@
     tailStringLine.geometry.attributes.position.needsUpdate = true;
     tailStringLine.computeLineDistances();
 
-    // Compute 3D Ball Position with Realistic Gravity Droop phi = atan2(g, r * omega^2)
+    // Compute 3D Ball Position with Gravity Droop phi = atan2(g, r * omega^2) (0 in Zero-G Space)
     const phi = snap.phiRad;
     const rHoriz = snap.r * Math.cos(phi);
     const rDrop = snap.r * Math.sin(phi);
@@ -2644,31 +2714,38 @@
     // Top-left 3D viewport phase badge
     const dot = document.getElementById('phase-dot');
     const txt = document.getElementById('phase-text');
+    const isZeroG = (params.g <= 0.0001);
+    const gSuffix = isZeroG ? ' [0G SPACE]' : '';
+
     if (params.coaeMode) {
       dot.style.background = '#f43f5e';
       dot.style.boxShadow = '0 0 8px #f43f5e';
       txt.style.color = '#fb7185';
-      txt.textContent = `BOGUS "COAE" SCENARIO (ω_f = ω_i(r_i/r_f), τ_net = 0)`;
+      txt.textContent = `BOGUS "COAE" SCENARIO (ω_f = ω_i(r_i/r_f), τ_net = 0)${gSuffix}`;
     } else if (snap.phase === 'PULLING') {
       dot.style.background = '#38bdf8';
       dot.style.boxShadow = '0 0 8px #38bdf8';
       txt.style.color = '#38bdf8';
-      txt.textContent = `PHASE 1: INWARD PULL (0 ≤ t ≤ ${params.dtPull.toFixed(1)}s)`;
+      txt.textContent = `PHASE 1: INWARD PULL (0 ≤ t ≤ ${params.dtPull.toFixed(1)}s)${gSuffix}`;
     } else if (snap.phase === 'DECAY') {
       dot.style.background = '#fbbf24';
       dot.style.boxShadow = '0 0 8px #fbbf24';
       txt.style.color = '#fbbf24';
-      txt.textContent = `PHASE 2: POST-PULL DECAY & STOP (t > ${params.dtPull.toFixed(1)}s)`;
+      txt.textContent = `PHASE 2: POST-PULL DECAY & STOP (t > ${params.dtPull.toFixed(1)}s)${gSuffix}`;
     } else if (snap.phase === 'STOPPED') {
       dot.style.background = '#f43f5e';
       dot.style.boxShadow = '0 0 8px #f43f5e';
       txt.style.color = '#f43f5e';
-      txt.textContent = `PHASE 3: STOPPED AT REST (ω = 0 RPM, HANGING AT φ = 90°)`;
+      if (isZeroG) {
+        txt.textContent = `PHASE 3: STOPPED AT REST (ω = 0 RPM, FLOATING IN 0G AT φ = 0°)`;
+      } else {
+        txt.textContent = `PHASE 3: STOPPED AT REST (ω = 0 RPM, HANGING AT φ = 90°)`;
+      }
     } else {
       dot.style.background = '#a78bfa';
       dot.style.boxShadow = '0 0 8px #a78bfa';
       txt.style.color = '#a78bfa';
-      txt.textContent = `IDEALIZED ZERO-TORQUE LIMIT (τ_net = 0, R = 0)`;
+      txt.textContent = `IDEALIZED ZERO-TORQUE LIMIT (τ_net = 0, R = 0)${gSuffix}`;
     }
 
     // Scrubber & time badges
@@ -2688,7 +2765,9 @@
 
     const fcStr = snap.Fc >= 100 ? Math.round(snap.Fc).toLocaleString() : snap.Fc.toFixed(2);
     document.getElementById('tel-fc').innerHTML = `${fcStr} <span style="font-size:0.7rem;">N</span>`;
-    document.getElementById('tel-sag').textContent = `Droop φ: ${((snap.phiRad * 180) / Math.PI).toFixed(1)}°`;
+    document.getElementById('tel-sag').textContent = isZeroG
+            ? `Droop φ: 0.0° (0g)`
+            : `Droop φ: ${((snap.phiRad * 180) / Math.PI).toFixed(1)}°`;
     document.getElementById('tel-ideal-fc').textContent = `Ideal: ${snap.FcIdeal >= 100 ? Math.round(snap.FcIdeal).toLocaleString() : snap.FcIdeal.toFixed(2)} N`;
 
     // Card 2: Angular Momentum Partition
@@ -2726,6 +2805,22 @@
     document.getElementById('chart-lbl-torque').textContent = `τ_net = ${snap.tauNet.toFixed(3)} N·m`;
   }
 
+  function updateZeroGButtonsUI() {
+    const isZeroG = (params.g <= 0.0001);
+    const btnTop = document.getElementById('btn-zero-g');
+    if (btnTop) {
+      btnTop.classList.toggle('btn-active', isZeroG);
+      btnTop.textContent = isZeroG ? 'Zero-G (Space): ON' : 'Zero-G (Space): OFF';
+    }
+    const btnTab = document.getElementById('btn-zero-g-tab');
+    if (btnTab) {
+      btnTab.classList.toggle('btn-active', isZeroG);
+      btnTab.textContent = isZeroG
+              ? 'Zero-G Space Mode: ON (Click for Earth 9.81 m/s²)'
+              : 'Toggle Zero-G (Space Mode: g = 0 m/s²)';
+    }
+  }
+
   function syncSlidersToLabels() {
     const w_i = (params.omegaRPM_i * 2 * Math.PI) / 60.0;
     document.getElementById('lbl-omega-i').textContent = `${params.omegaRPM_i} RPM (${w_i.toFixed(1)} rad/s)`;
@@ -2745,6 +2840,12 @@
     document.getElementById('lbl-muk').textContent = params.muk.toFixed(2);
     document.getElementById('lbl-rgrip').textContent = `${(params.rgrip * 1000).toFixed(1)} mm (${params.rgrip.toFixed(4)} m)`;
     document.getElementById('lbl-rho').textContent = `${params.rho.toFixed(3)} kg/m³`;
+
+    const isZeroG = (params.g <= 0.0001);
+    document.getElementById('lbl-g').textContent = isZeroG
+            ? `0.00 m/s² (0g Space)`
+            : `${params.g.toFixed(2)} m/s² (${(params.g / DEFAULT_G_ACCEL).toFixed(2)} g)`;
+    updateZeroGButtonsUI();
   }
 
   function onSliderChange() {
@@ -2768,10 +2869,30 @@
     params.muk = parseFloat(document.getElementById('sl-muk').value);
     params.rgrip = parseFloat(document.getElementById('sl-rgrip').value);
     params.rho = parseFloat(document.getElementById('sl-rho').value);
+    params.g = parseFloat(document.getElementById('sl-g').value);
+    if (params.g > 0.01) {
+      sim.lastNonZeroG = params.g;
+    }
     params.wobbleEnabled = (params.M > 0 || params.R0 > 0);
 
     syncSlidersToLabels();
     rebuildOrbitalReferenceRings();
+    recomputePhysicsTrajectory();
+    renderAllCharts();
+  }
+
+  function toggleZeroGravity() {
+    if (params.g > 0.0001) {
+      sim.lastNonZeroG = params.g;
+      params.g = 0.0;
+    } else {
+      params.g = (sim.lastNonZeroG > 0.01) ? sim.lastNonZeroG : DEFAULT_G_ACCEL;
+    }
+    const slG = document.getElementById('sl-g');
+    if (slG) {
+      slG.value = params.g;
+    }
+    syncSlidersToLabels();
     recomputePhysicsTrajectory();
     renderAllCharts();
   }
@@ -2803,6 +2924,8 @@
     params.kwrist = 2500;
     params.muk = 0.80;
     params.rho = 1.225;
+    params.g = DEFAULT_G_ACCEL;
+    sim.lastNonZeroG = DEFAULT_G_ACCEL;
     params.wobbleEnabled = true;
     params.idealMode = false;
     params.coaeMode = false;
@@ -2821,6 +2944,7 @@
       params.cwrist = 0.0;
       params.muk = 0.0;
       params.rho = 0.0;
+      params.g = 0.0;
       params.wobbleEnabled = false;
       params.idealMode = true;
     } else if (presetKey === 'coae') {
@@ -2829,6 +2953,7 @@
       params.cwrist = 0.0;
       params.muk = 0.0;
       params.rho = 0.0;
+      params.g = 0.0;
       params.wobbleEnabled = false;
       params.idealMode = false;
       params.coaeMode = true;
@@ -2849,6 +2974,7 @@
     document.getElementById('sl-muk').value = params.muk;
     document.getElementById('sl-rgrip').value = params.rgrip;
     document.getElementById('sl-rho').value = params.rho;
+    document.getElementById('sl-g').value = params.g;
 
     ['paper', 'zerogrip', 'fixedpivot', 'ideal', 'coae'].forEach((k) => {
       const el = document.getElementById('preset-' + k);
