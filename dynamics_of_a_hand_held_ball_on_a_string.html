@@ -894,6 +894,9 @@
           <button id="btn-zerog-tab" class="btn" style="margin-top: 4px; width: 100%; font-size: 0.71rem;" onclick="toggleZeroGravity()">
             <span id="zerog-tab-text">Toggle Zero-G (Space Mode: g = 0 m/s²)</span>
           </button>
+          <button id="btn-grav-mode-tab" class="btn" style="margin-top: 4px; width: 100%; font-size: 0.71rem;" onclick="toggleGravityModel()">
+            <span id="grav-mode-tab-text">Gravity ODE: Paper Planar Model (Default)</span>
+          </button>
         </div>
       </div>
     </div>
@@ -982,6 +985,9 @@
         </button>
         <button id="btn-zerog-top" class="btn" onclick="toggleZeroGravity()" title="Toggle gravitational acceleration between Earth (9.81 m/s²) and Zero-G Space (0 m/s²)">
           <span id="zerog-top-text">Zero-G (Space): OFF</span>
+        </button>
+        <button id="btn-grav-mode-top" class="btn" onclick="toggleGravityModel()" title="Toggle between the Paper's Planar ODE Model (default) and the Realistic 3D Conical Gravity Coupled ODE Model">
+          <span id="grav-mode-top-text">Gravity ODE: Paper Planar</span>
         </button>
       </div>
 
@@ -1100,9 +1106,9 @@
 
         <!-- String Tension Fc -->
         <div class="metric-card">
-          <div class="metric-label">String Tension F<sub>c</sub></div>
+          <div class="metric-label" id="tel-fc-label">String Tension F<sub>c</sub></div>
           <div class="metric-primary" style="color: var(--accent-rose);" id="tel-fc">3.95 <span style="font-size:0.7rem;">N</span></div>
-          <div class="metric-sub" id="tel-sag">Droop φ: 14.0°</div>
+          <div class="metric-sub" id="tel-sag">Droop φ: 7.1°</div>
           <div class="metric-sub" style="color: var(--accent-amber); margin-top: 2px;" id="tel-ideal-fc">Ideal: 3.95 N</div>
         </div>
       </div>
@@ -1135,7 +1141,7 @@
 
       <div class="kv-list">
         <div class="kv-row">
-          <span><i class="legend-dot" style="background: var(--accent-sky);"></i>Ball Share L<sub>ball</sub> (m r² ω)</span>
+          <span><i class="legend-dot" style="background: var(--accent-sky);"></i>Ball Share L<sub>ball</sub></span>
           <span class="kv-val" style="color: var(--accent-sky);" id="tel-l-ball">0.1571 N·m·s (99.2%)</span>
         </div>
         <div class="kv-row">
@@ -1201,22 +1207,23 @@
   const W_STRING = 0.002;
 
   const params = {
-    m: 0.05,          // Ball mass (kg)
-    d: 0.04,          // Ball diameter (m)
-    M: 1.0,           // Co-orbiting hand & distal forearm mass (kg)
-    ri: 0.50,         // Initial string radius (m)
-    rf: 0.05,         // Final string radius (m)
-    R0: 0.01,         // Baseline hand wobble radius (m)
-    rgrip: 0.002,     // Finger pinch guide radius (m)
-    ell: 0.08,        // Wrist-to-pinch lever distance (m)
-    dtPull: 1.0,      // Duration of uniform radial reduction (s)
-    omegaRPM_i: 120,  // Initial angular velocity (RPM)
-    cwrist: 0.10,     // Wrist viscous damping (N*m*s/rad)
-    kwrist: 2500,     // Wrist translational stiffness (N/m)
-    muk: 0.80,        // Skin kinetic friction coefficient
-    rho: 1.225,       // Air density (kg/m^3)
-    g: 9.81,          // Gravitational acceleration (m/s^2), 0 = Zero-G Space
-    savedG: 9.81,     // Saved non-zero gravitational acceleration for Space Mode toggle
+    m: 0.05,               // Ball mass (kg)
+    d: 0.04,               // Ball diameter (m)
+    M: 1.0,                // Co-orbiting hand & distal forearm mass (kg)
+    ri: 0.50,              // Initial string radius (m)
+    rf: 0.05,              // Final string radius (m)
+    R0: 0.01,              // Baseline hand wobble radius (m)
+    rgrip: 0.002,          // Finger pinch guide radius (m)
+    ell: 0.08,             // Wrist-to-pinch lever distance (m)
+    dtPull: 1.0,           // Duration of uniform radial reduction (s)
+    omegaRPM_i: 120,       // Initial angular velocity (RPM)
+    cwrist: 0.10,          // Wrist viscous damping (N*m*s/rad)
+    kwrist: 2500,          // Wrist translational stiffness (N/m)
+    muk: 0.80,             // Skin kinetic friction coefficient
+    rho: 1.225,            // Air density (kg/m^3)
+    g: 9.81,               // Gravitational acceleration (m/s^2), 0 = Zero-G Space
+    savedG: 9.81,          // Saved non-zero gravitational acceleration for Space Mode toggle
+    gravityCoupled: false, // Default false = Paper Planar ODE Model; true = 3D Conical Gravity Coupled ODE Model
     wobbleEnabled: true,
     idealMode: false,
     coaeMode: false
@@ -1252,17 +1259,63 @@
   /*************************************************************************
    * 2. RIGOROUS PHYSICS ENGINE (COUPLED RK4 + BIOMECHANICAL GOVERNOR)
    *************************************************************************/
+  /**
+   * Computes both visual 3D droop angle and dynamical conical state.
+   * When params.gravityCoupled === false (default), the ODE uses the Paper's Planar Model
+   * (cosPhi = 1, rHoriz = r, Ttot = m * r * omega^2).
+   * When params.gravityCoupled === true, gravity g couples into the conical dynamics:
+   * rHoriz = r * cos(phi), FcHoriz = m * rHoriz * omega^2, and Ttot = sqrt(FcHoriz^2 + (m*g)^2).
+   */
+  function calcConicalState(r, omega, p) {
+    const phiVis = (p.idealMode || p.coaeMode || p.g <= 1e-6)
+            ? 0.0
+            : Math.atan2(p.g, Math.max(0.001, r * omega * omega));
+
+    if (!p.gravityCoupled || p.idealMode || p.coaeMode || p.g <= 1e-6) {
+      const FcPlanar = p.m * r * omega * omega;
+      return {
+        phiVis,
+        phiDyn: 0.0,
+        cosPhi: 1.0,
+        sinPhi: 0.0,
+        rHoriz: r,
+        FcHoriz: FcPlanar,
+        Ttot: FcPlanar
+      };
+    }
+
+    const cosPhi = Math.cos(phiVis);
+    const sinPhi = Math.sin(phiVis);
+    const rHoriz = r * cosPhi;
+    const FcHoriz = p.m * rHoriz * omega * omega;
+    const weight = p.m * p.g;
+    const Ttot = (omega > 1e-8) ? Math.hypot(FcHoriz, weight) : weight;
+
+    return {
+      phiVis,
+      phiDyn: phiVis,
+      cosPhi,
+      sinPhi,
+      rHoriz,
+      FcHoriz,
+      Ttot
+    };
+  }
+
   function calcWobbleRadius(r, omega, p) {
     if (p.idealMode || p.coaeMode || !p.wobbleEnabled || (p.M === 0 && p.R0 === 0)) {
       return 0.0;
     }
-    const Fc = p.m * r * omega * omega;
-    return p.R0 + (Fc / p.kwrist);
+    const cs = calcConicalState(r, omega, p);
+    return p.R0 + (cs.FcHoriz / p.kwrist);
   }
 
   function calcTorques(r, drdt, omega, isPostPull, p) {
     const drdtAbs = Math.abs(drdt);
-    const tauSpinUp = (drdt < 0 && omega > 0) ? (2.0 * p.m * r * drdtAbs * omega) : 0.0;
+    const cs = calcConicalState(r, omega, p);
+    const tauSpinUp = (drdt < 0 && omega > 0)
+            ? (2.0 * p.m * r * (cs.cosPhi * cs.cosPhi) * drdtAbs * omega)
+            : 0.0;
 
     if (p.idealMode || p.coaeMode || omega <= 1e-8) {
       return {
@@ -1278,11 +1331,12 @@
 
     const rBall = 0.5 * p.d;
     const areaBall = Math.PI * rBall * rBall;
-    const tauDragBall = -0.5 * p.rho * CD_BALL * areaBall * Math.pow(r, 3) * omega * omega;
-    const tauDragString = -0.125 * p.rho * CD_STRING * W_STRING * Math.pow(r, 4) * omega * omega;
+    const rEff = cs.rHoriz;
+    const tauDragBall = -0.5 * p.rho * CD_BALL * areaBall * Math.pow(rEff, 3) * omega * omega;
+    const tauDragString = -0.125 * p.rho * CD_STRING * W_STRING * Math.pow(rEff, 4) * omega * omega;
 
-    const Fc = p.m * r * omega * omega;
-    const tauFric = -p.muk * Fc * p.rgrip;
+    // In Planar mode cs.Ttot = m*r*omega^2; in 3D Coupled Gravity mode cs.Ttot = sqrt(FcHoriz^2 + (m*g)^2)
+    const tauFric = -p.muk * cs.Ttot * p.rgrip;
 
     const R = calcWobbleRadius(r, omega, p);
     const tauDamp = -p.cwrist * Math.pow(R / p.ell, 2) * omega;
@@ -1310,7 +1364,6 @@
   function solveLocalEquilibriumOmega(r, drdt, p) {
     if (p.idealMode || p.coaeMode || drdt >= 0) return Infinity;
     const drdtAbs = Math.abs(drdt);
-    const spinFactor = 2.0 * p.m * r * drdtAbs;
 
     const rBall = 0.5 * p.d;
     const areaBall = Math.PI * rBall * rBall;
@@ -1318,26 +1371,49 @@
     const cStr = 0.125 * p.rho * CD_STRING * W_STRING * Math.pow(r, 4);
     const cFric = p.muk * p.m * r * p.rgrip;
 
-    // Check if zero resistive torques exist
     if (p.cwrist <= 1e-9 && cBall + cStr + cFric <= 1e-12) {
       return Infinity;
     }
 
-    function fRate(w) {
-      const R = calcWobbleRadius(r, w, p);
-      const dampTerm = p.cwrist * Math.pow(R / p.ell, 2);
-      const quadTerm = (cBall + cStr + cFric) * w;
-      return spinFactor - (dampTerm + quadTerm);
+    // Default Paper Planar Mode
+    if (!p.gravityCoupled || p.g <= 1e-6) {
+      const spinFactor = 2.0 * p.m * r * drdtAbs;
+      function fRatePlanar(w) {
+        const R = calcWobbleRadius(r, w, p);
+        const dampTerm = p.cwrist * Math.pow(R / p.ell, 2);
+        const quadTerm = (cBall + cStr + cFric) * w;
+        return spinFactor - (dampTerm + quadTerm);
+      }
+
+      if (fRatePlanar(0.001) <= 0) return 0.0;
+
+      let lo = 0.001;
+      let hi = 100000.0;
+      if (fRatePlanar(hi) > 0) return Infinity;
+      for (let iter = 0; iter < 65; iter++) {
+        const mid = 0.5 * (lo + hi);
+        if (fRatePlanar(mid) > 0) lo = mid;
+        else hi = mid;
+      }
+      return 0.5 * (lo + hi);
     }
 
-    if (fRate(0.001) <= 0) return 0.0;
+    // 3D Conical Gravity Coupled Mode
+    function fTorqueCoupled(w) {
+      const tq = calcTorques(r, drdt, w, false, p);
+      return tq.tauSpinUp + tq.tauNet;
+    }
 
-    let lo = 0.001;
+    let lo = Math.max(1.0, Math.sqrt((1.5 * p.g) / Math.max(0.005, r)));
     let hi = 100000.0;
-    if (fRate(hi) > 0) return Infinity;
+    if (fTorqueCoupled(lo) <= 0) {
+      // At high gravity / small radius where resistive torque already exceeds spin-up, let RK4 decelerate naturally
+      return Infinity;
+    }
+    if (fTorqueCoupled(hi) > 0) return Infinity;
     for (let iter = 0; iter < 65; iter++) {
       const mid = 0.5 * (lo + hi);
-      if (fRate(mid) > 0) lo = mid;
+      if (fTorqueCoupled(mid) > 0) lo = mid;
       else hi = mid;
     }
     return 0.5 * (lo + hi);
@@ -1363,19 +1439,47 @@
     let omegaBound_f = p.coaeMode ? (omega_i * (p.ri / p.rf)) : omegaIdeal_f;
     let FcBound_f = p.m * p.rf * omegaBound_f * omegaBound_f;
     if (!p.idealMode && !p.coaeMode && p.wobbleEnabled && p.cwrist > 1e-6) {
-      Req_bound = p.ell * Math.sqrt((2.0 * p.m * p.rf * drdtAbs) / p.cwrist);
-      if (Req_bound > p.R0) {
-        FcBound_f = p.kwrist * (Req_bound - p.R0);
-        omegaBound_f = Math.sqrt(FcBound_f / (p.m * p.rf));
+      if (!p.gravityCoupled || p.g <= 1e-6) {
+        Req_bound = p.ell * Math.sqrt((2.0 * p.m * p.rf * drdtAbs) / p.cwrist);
+        if (Req_bound > p.R0) {
+          FcBound_f = p.kwrist * (Req_bound - p.R0);
+          omegaBound_f = Math.sqrt(FcBound_f / (p.m * p.rf));
+        } else {
+          FcBound_f = 0.0;
+          omegaBound_f = 0.0;
+        }
       } else {
-        FcBound_f = 0.0;
-        omegaBound_f = 0.0;
+        // Coupled 3D Conical Gravity analytical wrist-damping bound at r = r_f
+        const spinBase = 2.0 * p.m * p.rf * drdtAbs;
+        const fWristBound = (w) => {
+          const cs = calcConicalState(p.rf, w, p);
+          const R = p.R0 + (cs.FcHoriz / p.kwrist);
+          return spinBase * (cs.cosPhi * cs.cosPhi) - p.cwrist * Math.pow(R / p.ell, 2);
+        };
+        let lo = Math.max(0.5, Math.sqrt(p.g / Math.max(0.005, p.rf)));
+        let hi = 100000.0;
+        if (fWristBound(lo) <= 0) {
+          omegaBound_f = 0.0;
+          Req_bound = p.R0;
+          FcBound_f = p.m * p.g;
+        } else {
+          for (let iter = 0; iter < 60; iter++) {
+            const mid = 0.5 * (lo + hi);
+            if (fWristBound(mid) > 0) lo = mid;
+            else hi = mid;
+          }
+          omegaBound_f = 0.5 * (lo + hi);
+          const csB = calcConicalState(p.rf, omegaBound_f, p);
+          Req_bound = p.R0 + (csB.FcHoriz / p.kwrist);
+          FcBound_f = csB.Ttot;
+        }
       }
     }
 
     // Initial system angular momentum L_sys,i at t = 0
+    const cs_i = calcConicalState(p.ri, omega_i, p);
     const R_i = calcWobbleRadius(p.ri, omega_i, p);
-    const I_ball_i = p.m * p.ri * p.ri;
+    const I_ball_i = p.m * cs_i.rHoriz * cs_i.rHoriz;
     const I_hand_i = p.M * R_i * R_i;
     const L_sys_i = (I_ball_i + I_hand_i) * omega_i;
     const L_ball_i = I_ball_i * omega_i;
@@ -1393,28 +1497,27 @@
     function pushSnapshot(timeVal, radVal, wVal, phaseName, thetaVal) {
       const isPost = timeVal > p.dtPull + 1e-6;
       const curDrdt = isPost ? 0.0 : drdtPull;
+      const cs = calcConicalState(radVal, wVal, p);
       const R = calcWobbleRadius(radVal, wVal, p);
-      const Fc = p.m * radVal * wVal * wVal;
+      const Fc = cs.Ttot;
 
       const rRatio = p.ri / radVal;
       const wIdeal = omega_i * rRatio * rRatio;
       const FcIdeal = p.m * radVal * wIdeal * wIdeal;
 
-      const I_ball = p.m * radVal * radVal;
+      const I_ball = p.m * cs.rHoriz * cs.rHoriz;
       const I_hand = p.M * R * R;
       const L_ball = I_ball * wVal;
       const L_hand = I_hand * wVal;
       const L_sys = L_ball + L_hand;
 
       const tq = calcTorques(radVal, curDrdt, wVal, isPost, p);
-
-      // Gravity droop angle phi below horizontal plane y = 0: phi = atan2(g, max(0.001, r * w^2))
-      // In Zero-G Space mode (g <= 1e-6), phiRad is strictly 0.0 rad (0.0 deg)
-      const phiRad = (p.idealMode || p.coaeMode || p.g <= 1e-6) ? 0.0 : Math.atan2(p.g, Math.max(0.001, radVal * wVal * wVal));
+      const phiRad = cs.phiVis;
 
       traj.push({
         t: timeVal,
         r: radVal,
+        rHoriz: cs.rHoriz,
         omega: wVal,
         theta: thetaVal,
         rpm: (wVal * 60.0) / (2.0 * Math.PI),
@@ -1424,6 +1527,7 @@
         R,
         deltaR: Math.max(0.0, R - (p.wobbleEnabled && !p.idealMode && !p.coaeMode ? p.R0 : 0.0)),
         Fc,
+        FcHoriz: cs.FcHoriz,
         L_ball,
         L_hand,
         L_sys,
@@ -1436,9 +1540,21 @@
     // Differential equation d(omega)/dt = (tau_spin-up + tau_net) / I_eff
     function accelOmega(radVal, curDrdt, wVal, isPost) {
       if (wVal <= 0.0) return 0.0;
+      const cs = calcConicalState(radVal, wVal, p);
       const R = calcWobbleRadius(radVal, wVal, p);
-      const yieldTerm = (p.wobbleEnabled && !p.idealMode && !p.coaeMode) ? ((p.m * radVal * wVal * wVal) / p.kwrist) : 0.0;
-      const I_eff = p.m * radVal * radVal + p.M * R * R + 4.0 * p.M * R * yieldTerm;
+      const yieldTerm = (p.wobbleEnabled && !p.idealMode && !p.coaeMode) ? (cs.FcHoriz / p.kwrist) : 0.0;
+
+      let I_ball_eff;
+      if (!p.gravityCoupled || p.idealMode || p.coaeMode || p.g <= 1e-6) {
+        I_ball_eff = p.m * radVal * radVal;
+      } else {
+        const rBall = 0.5 * p.d;
+        const I_sphere = 0.4 * p.m * rBall * rBall;
+        const cos2Floor = Math.max(0.15, cs.cosPhi * cs.cosPhi);
+        I_ball_eff = Math.max(I_sphere, p.m * radVal * radVal * cos2Floor * (1.0 + 2.0 * cs.sinPhi * cs.sinPhi));
+      }
+
+      const I_eff = I_ball_eff + p.M * R * R + 4.0 * p.M * R * yieldTerm;
       const tq = calcTorques(radVal, curDrdt, wVal, isPost, p);
       return (tq.tauSpinUp + tq.tauNet) / Math.max(1e-7, I_eff);
     }
@@ -1539,9 +1655,10 @@
     sim.trajectory = traj;
 
     // Compute analytical bound momentum fractions (Paper Eq. 21)
-    const I_bound_f = p.m * p.rf * p.rf + p.M * Req_bound * Req_bound;
+    const csBound = calcConicalState(p.rf, omegaBound_f, p);
+    const I_bound_f = p.m * csBound.rHoriz * csBound.rHoriz + p.M * Req_bound * Req_bound;
     const L_sys_bound_f = I_bound_f * omegaBound_f;
-    const L_ball_bound_f = (p.m * p.rf * p.rf) * omegaBound_f;
+    const L_ball_bound_f = (p.m * csBound.rHoriz * csBound.rHoriz) * omegaBound_f;
 
     sim.summary = {
       idealRPM: (omegaIdeal_f * 60.0) / (2.0 * Math.PI),
@@ -1591,6 +1708,7 @@
     return {
       t: timeSec,
       r: lerp(p0.r, p1.r),
+      rHoriz: lerp(p0.rHoriz, p1.rHoriz),
       omega: lerp(p0.omega, p1.omega),
       theta: lerp(p0.theta, p1.theta),
       rpm: lerp(p0.rpm, p1.rpm),
@@ -1600,6 +1718,7 @@
       R: lerp(p0.R, p1.R),
       deltaR: lerp(p0.deltaR, p1.deltaR),
       Fc: lerp(p0.Fc, p1.Fc),
+      FcHoriz: lerp(p0.FcHoriz, p1.FcHoriz),
       L_ball: lerp(p0.L_ball, p1.L_ball),
       L_hand: lerp(p0.L_hand, p1.L_hand),
       L_sys: lerp(p0.L_sys, p1.L_sys),
@@ -2253,7 +2372,7 @@
       arrowVel.visible = true;
       arrowFc.visible = true;
       const tanDir = new THREE.Vector3(-Math.sin(theta), 0.0, Math.cos(theta)).normalize();
-      const vLen = Math.min(0.24, 0.05 + snap.r * snap.omega * 0.032);
+      const vLen = Math.min(0.24, 0.05 + rHoriz * snap.omega * 0.032);
       arrowVel.position.copy(ballPos);
       arrowVel.setDirection(tanDir);
       arrowVel.setLength(vLen, 0.026, 0.015);
@@ -2717,23 +2836,25 @@
     const dot = document.getElementById('phase-dot');
     const txt = document.getElementById('phase-text');
     const isZeroG = (params.g <= 1e-6);
-    const gSuffix = isZeroG ? ' [0G SPACE]' : '';
+    const modeTag = isZeroG
+            ? ' [0G SPACE]'
+            : (params.gravityCoupled ? ' [3D GRAVITY COUPLED]' : ' [PAPER PLANAR ODE]');
 
     if (params.coaeMode) {
       dot.style.background = '#f43f5e';
       dot.style.boxShadow = '0 0 8px #f43f5e';
       txt.style.color = '#fb7185';
-      txt.textContent = `BOGUS "COAE" SCENARIO (ω_f = ω_i(r_i/r_f), τ_net = 0)${gSuffix}`;
+      txt.textContent = `BOGUS "COAE" SCENARIO (ω_f = ω_i(r_i/r_f), τ_net = 0)${modeTag}`;
     } else if (snap.phase === 'PULLING') {
       dot.style.background = '#38bdf8';
       dot.style.boxShadow = '0 0 8px #38bdf8';
       txt.style.color = '#38bdf8';
-      txt.textContent = `PHASE 1: INWARD PULL (0 ≤ t ≤ ${params.dtPull.toFixed(1)}s)${gSuffix}`;
+      txt.textContent = `PHASE 1: INWARD PULL (0 ≤ t ≤ ${params.dtPull.toFixed(1)}s)${modeTag}`;
     } else if (snap.phase === 'DECAY') {
       dot.style.background = '#fbbf24';
       dot.style.boxShadow = '0 0 8px #fbbf24';
       txt.style.color = '#fbbf24';
-      txt.textContent = `PHASE 2: POST-PULL DECAY & STOP (t > ${params.dtPull.toFixed(1)}s)${gSuffix}`;
+      txt.textContent = `PHASE 2: POST-PULL DECAY & STOP (t > ${params.dtPull.toFixed(1)}s)${modeTag}`;
     } else if (snap.phase === 'STOPPED') {
       dot.style.background = '#f43f5e';
       dot.style.boxShadow = '0 0 8px #f43f5e';
@@ -2741,13 +2862,13 @@
       if (isZeroG) {
         txt.textContent = `PHASE 3: STOPPED AT REST (ω = 0 RPM, FLOATING IN 0G AT φ = 0°)`;
       } else {
-        txt.textContent = `PHASE 3: STOPPED AT REST (ω = 0 RPM, HANGING AT φ = 90°)`;
+        txt.textContent = `PHASE 3: STOPPED AT REST (ω = 0 RPM, HANGING AT φ = 90°)${params.gravityCoupled ? ' [3D GRAVITY]' : ''}`;
       }
     } else {
       dot.style.background = '#a78bfa';
       dot.style.boxShadow = '0 0 8px #a78bfa';
       txt.style.color = '#a78bfa';
-      txt.textContent = `IDEALIZED ZERO-TORQUE LIMIT (τ_net = 0, R = 0)${gSuffix}`;
+      txt.textContent = `IDEALIZED ZERO-TORQUE LIMIT (τ_net = 0, R = 0)${modeTag}`;
     }
 
     // Scrubber & time badges
@@ -2765,6 +2886,12 @@
     document.getElementById('tel-R').textContent = `Wobble R: ${(snap.R * 1000).toFixed(2)} mm`;
     document.getElementById('tel-dR').textContent = `Yield ΔR: +${(snap.deltaR * 1000).toFixed(2)} mm`;
 
+    const fcLabelEl = document.getElementById('tel-fc-label');
+    if (fcLabelEl) {
+      fcLabelEl.innerHTML = (params.gravityCoupled && !isZeroG)
+              ? 'Total Tension T<sub>tot</sub>'
+              : 'String Tension F<sub>c</sub>';
+    }
     const fcStr = snap.Fc >= 100 ? Math.round(snap.Fc).toLocaleString() : snap.Fc.toFixed(2);
     document.getElementById('tel-fc').innerHTML = `${fcStr} <span style="font-size:0.7rem;">N</span>`;
     document.getElementById('tel-sag').textContent = isZeroG
@@ -2829,6 +2956,31 @@
               ? `Zero-G Space Mode: ON (Restore g = ${params.savedG.toFixed(2)} m/s²)`
               : 'Toggle Zero-G (Space Mode: g = 0 m/s²)';
     }
+
+    const btnModeTop = document.getElementById('btn-grav-mode-top');
+    const txtModeTop = document.getElementById('grav-mode-top-text');
+    if (btnModeTop) btnModeTop.classList.toggle('btn-active', params.gravityCoupled);
+    if (txtModeTop) {
+      txtModeTop.textContent = params.gravityCoupled
+              ? 'Gravity ODE: 3D Coupled'
+              : 'Gravity ODE: Paper Planar';
+    }
+
+    const btnModeTab = document.getElementById('btn-grav-mode-tab');
+    const txtModeTab = document.getElementById('grav-mode-tab-text');
+    if (btnModeTab) btnModeTab.classList.toggle('btn-active', params.gravityCoupled);
+    if (txtModeTab) {
+      txtModeTab.textContent = params.gravityCoupled
+              ? 'Gravity ODE: 3D Conical Gravity Coupled (Active)'
+              : 'Gravity ODE: Paper Planar Model (Default)';
+    }
+  }
+
+  function toggleGravityModel() {
+    params.gravityCoupled = !params.gravityCoupled;
+    updateGravityUI();
+    recomputePhysicsTrajectory();
+    renderAllCharts();
   }
 
   function syncSlidersToLabels() {
@@ -2932,6 +3084,9 @@
     params.rho = 1.225;
     params.g = DEFAULT_G_ACCEL;
     params.savedG = DEFAULT_G_ACCEL;
+    if (presetKey === 'paper') {
+      params.gravityCoupled = false;
+    }
     params.wobbleEnabled = true;
     params.idealMode = false;
     params.coaeMode = false;
