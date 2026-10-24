@@ -965,8 +965,8 @@
         <button class="btn" onclick="setCameraView('perspective')">Perspective</button>
         <button class="btn" onclick="setCameraView('top')">Top-Down Wobble View</button>
         <button class="btn" onclick="setCameraView('side')">Side Elevation View</button>
-        <button id="btn-wobble-mag" class="btn btn-active" onclick="toggleWobbleMagnification()">
-          Wobble Magnification 5×: ON
+        <button id="btn-wobble-mag" class="btn" onclick="toggleWobbleMagnification()">
+          Wobble Magnification 1×
         </button>
       </div>
 
@@ -1210,7 +1210,7 @@
     time: 0.0,
     speed: 1.0,
     theta: 0.0,
-    magnifyWobble: true,
+    magnifyWobble: false,
     preset: 'paper',
     trajectory: [],
     summary: {
