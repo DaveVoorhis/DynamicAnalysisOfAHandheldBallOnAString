@@ -757,8 +757,8 @@
             <span class="slider-label">Initial Velocity (ω<sub>i</sub>)</span>
             <span class="slider-val" id="lbl-omega-i">120 RPM (12.6 rad/s)</span>
           </div>
-          <input type="range" id="sl-omega-i" min="30" max="300" step="5" value="120" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>30 RPM</span><span>Default: 120 RPM</span><span>300 RPM</span></div>
+          <input type="range" id="sl-omega-i" min="5" max="1200" step="5" value="120" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>5 RPM</span><span>Default: 120 RPM</span><span>1200 RPM</span></div>
         </div>
 
         <div class="slider-item">
@@ -766,8 +766,8 @@
             <span class="slider-label">Initial String Radius (r<sub>i</sub>)</span>
             <span class="slider-val" id="lbl-ri">0.50 m</span>
           </div>
-          <input type="range" id="sl-ri" min="0.20" max="1.00" step="0.01" value="0.50" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>0.20 m</span><span>Default: 0.50 m</span><span>1.00 m</span></div>
+          <input type="range" id="sl-ri" min="0.05" max="3.00" step="0.01" value="0.50" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.05 m</span><span>Default: 0.50 m</span><span>3.00 m</span></div>
         </div>
 
         <div class="slider-item">
@@ -775,8 +775,8 @@
             <span class="slider-label">Final String Radius (r<sub>f</sub>)</span>
             <span class="slider-val" id="lbl-rf">0.050 m (10.0×)</span>
           </div>
-          <input type="range" id="sl-rf" min="0.02" max="0.25" step="0.005" value="0.05" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>0.02 m</span><span>Default: 0.05 m</span><span>0.25 m</span></div>
+          <input type="range" id="sl-rf" min="0.005" max="1.500" step="0.005" value="0.05" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.005 m</span><span>Default: 0.05 m</span><span>1.50 m</span></div>
         </div>
 
         <div class="slider-item">
@@ -784,8 +784,8 @@
             <span class="slider-label">Pull Duration (Δt)</span>
             <span class="slider-val" id="lbl-dt">1.00 s (|dr/dt|=0.45 m/s)</span>
           </div>
-          <input type="range" id="sl-dt" min="0.20" max="3.00" step="0.05" value="1.00" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>0.20 s</span><span>Default: 1.00 s</span><span>3.00 s</span></div>
+          <input type="range" id="sl-dt" min="0.05" max="30.00" step="0.05" value="1.00" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.05 s</span><span>Default: 1.00 s</span><span>30.00 s</span></div>
         </div>
 
         <div class="slider-item">
@@ -793,8 +793,8 @@
             <span class="slider-label">Ball Mass (m)</span>
             <span class="slider-val" id="lbl-m">0.050 kg (50 g)</span>
           </div>
-          <input type="range" id="sl-m" min="0.010" max="0.200" step="0.005" value="0.050" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>10 g</span><span>Default: 50 g</span><span>200 g</span></div>
+          <input type="range" id="sl-m" min="0.001" max="1.000" step="0.001" value="0.050" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>1 g</span><span>Default: 50 g</span><span>1000 g (1 kg)</span></div>
         </div>
 
         <div class="slider-item">
@@ -802,8 +802,8 @@
             <span class="slider-label">Ball Diameter (d)</span>
             <span class="slider-val" id="lbl-d">0.040 m (4.0 cm)</span>
           </div>
-          <input type="range" id="sl-d" min="0.010" max="0.100" step="0.005" value="0.040" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>1.0 cm</span><span>Default: 4.0 cm</span><span>10.0 cm</span></div>
+          <input type="range" id="sl-d" min="0.002" max="0.300" step="0.002" value="0.040" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.2 cm</span><span>Default: 4.0 cm</span><span>30.0 cm</span></div>
         </div>
       </div>
 
@@ -814,8 +814,8 @@
             <span class="slider-label">Co-Orbiting Hand Mass (M)</span>
             <span class="slider-val" id="lbl-M">1.00 kg</span>
           </div>
-          <input type="range" id="sl-M" min="0.00" max="2.50" step="0.05" value="1.00" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>0.0 kg</span><span>Default: 1.00 kg</span><span>2.50 kg</span></div>
+          <input type="range" id="sl-M" min="0.00" max="10.00" step="0.05" value="1.00" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.0 kg</span><span>Default: 1.00 kg</span><span>10.00 kg</span></div>
         </div>
 
         <div class="slider-item">
@@ -823,8 +823,8 @@
             <span class="slider-label">Baseline Hand Wobble (R<sub>0</sub>)</span>
             <span class="slider-val" id="lbl-R0">10.0 mm (0.010 m)</span>
           </div>
-          <input type="range" id="sl-R0" min="0.000" max="0.030" step="0.001" value="0.010" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>0 mm</span><span>Default: 10.0 mm</span><span>30 mm</span></div>
+          <input type="range" id="sl-R0" min="0.000" max="0.100" step="0.001" value="0.010" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0 mm</span><span>Default: 10.0 mm</span><span>100 mm</span></div>
         </div>
 
         <div class="slider-item">
@@ -832,8 +832,8 @@
             <span class="slider-label">Wrist Damping (c<sub>wrist</sub>)</span>
             <span class="slider-val" id="lbl-cwrist">0.100 N·m·s/rad</span>
           </div>
-          <input type="range" id="sl-cwrist" min="0.000" max="0.300" step="0.005" value="0.100" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>0.00</span><span>Default: 0.10</span><span>0.30</span></div>
+          <input type="range" id="sl-cwrist" min="0.000" max="2.000" step="0.005" value="0.100" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.00</span><span>Default: 0.10</span><span>2.00</span></div>
         </div>
 
         <div class="slider-item">
@@ -841,8 +841,8 @@
             <span class="slider-label">Wrist Yield Stiffness (k<sub>wrist</sub>)</span>
             <span class="slider-val" id="lbl-kwrist">2500 N/m</span>
           </div>
-          <input type="range" id="sl-kwrist" min="500" max="10000" step="100" value="2500" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>500 N/m</span><span>Default: 2500 N/m</span><span>10000 N/m</span></div>
+          <input type="range" id="sl-kwrist" min="50" max="50000" step="50" value="2500" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>50 N/m</span><span>Default: 2500 N/m</span><span>50000 N/m</span></div>
         </div>
 
         <div class="slider-item">
@@ -850,8 +850,8 @@
             <span class="slider-label">Wrist-to-Pinch Lever (ℓ)</span>
             <span class="slider-val" id="lbl-ell">0.080 m (8.0 cm)</span>
           </div>
-          <input type="range" id="sl-ell" min="0.040" max="0.150" step="0.005" value="0.080" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>4.0 cm</span><span>Default: 8.0 cm</span><span>15.0 cm</span></div>
+          <input type="range" id="sl-ell" min="0.010" max="0.300" step="0.005" value="0.080" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>1.0 cm</span><span>Default: 8.0 cm</span><span>30.0 cm</span></div>
         </div>
       </div>
 
@@ -862,8 +862,8 @@
             <span class="slider-label">Skin Friction Coeff (μ<sub>k</sub>)</span>
             <span class="slider-val" id="lbl-muk">0.80</span>
           </div>
-          <input type="range" id="sl-muk" min="0.00" max="1.50" step="0.05" value="0.80" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>0.00</span><span>Dry Skin: 0.80</span><span>1.50</span></div>
+          <input type="range" id="sl-muk" min="0.00" max="5.00" step="0.05" value="0.80" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.00</span><span>Dry Skin: 0.80</span><span>5.00</span></div>
         </div>
 
         <div class="slider-item">
@@ -871,8 +871,8 @@
             <span class="slider-label">Pinch Guide Radius (r<sub>grip</sub>)</span>
             <span class="slider-val" id="lbl-rgrip">2.0 mm (0.002 m)</span>
           </div>
-          <input type="range" id="sl-rgrip" min="0.000" max="0.010" step="0.0005" value="0.002" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>0.0 mm</span><span>Default: 2.0 mm</span><span>10.0 mm</span></div>
+          <input type="range" id="sl-rgrip" min="0.000" max="0.050" step="0.0005" value="0.002" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.0 mm</span><span>Default: 2.0 mm</span><span>50.0 mm</span></div>
         </div>
 
         <div class="slider-item">
@@ -880,8 +880,8 @@
             <span class="slider-label">Air Density (ρ)</span>
             <span class="slider-val" id="lbl-rho">1.225 kg/m³</span>
           </div>
-          <input type="range" id="sl-rho" min="0.000" max="2.000" step="0.025" value="1.225" oninput="onSliderChange()" />
-          <div class="slider-minmax"><span>0.00 (Vacuum)</span><span>Sea Level: 1.225</span><span>2.00</span></div>
+          <input type="range" id="sl-rho" min="0.000" max="10.000" step="0.025" value="1.225" oninput="onSliderChange()" />
+          <div class="slider-minmax"><span>0.00 (Vacuum)</span><span>Sea Level: 1.225</span><span>10.00</span></div>
         </div>
       </div>
     </div>
@@ -1316,8 +1316,9 @@
     if (fRate(0.001) <= 0) return 0.0;
 
     let lo = 0.001;
-    let hi = 30000.0;
-    for (let iter = 0; iter < 60; iter++) {
+    let hi = 100000.0;
+    if (fRate(hi) > 0) return Infinity;
+    for (let iter = 0; iter < 65; iter++) {
       const mid = 0.5 * (lo + hi);
       if (fRate(mid) > 0) lo = mid;
       else hi = mid;
@@ -1443,17 +1444,22 @@
         } else if (p.coaeMode) {
           omega = omega_i * (p.ri / r);
         } else {
+          const wEq = solveLocalEquilibriumOmega(r, drdtPull, p);
+          const wasAboveEq = isFinite(wEq) && (omega >= wEq);
           const k1 = accelOmega(r0, drdtPull, omega, false);
           const k2 = accelOmega(rMid, drdtPull, Math.max(0.0, omega + 0.5 * h * k1), false);
           const k3 = accelOmega(rMid, drdtPull, Math.max(0.0, omega + 0.5 * h * k2), false);
           const k4 = accelOmega(r, drdtPull, Math.max(0.0, omega + h * k3), false);
           omega = Math.max(0.0, omega + (h / 6.0) * (k1 + 2.0 * k2 + 2.0 * k3 + k4));
 
-          // Coupled biomechanical governor enforcement as r approaches r_f (Paper Section 4)
-          const wEq = solveLocalEquilibriumOmega(r, drdtPull, p);
-          if (isFinite(wEq) && omega > wEq) {
-            const alpha = Math.min(1.0, h / 0.02);
-            omega = omega + (wEq - omega) * alpha;
+          // Coupled biomechanical governor enforcement & stiff-step overshoot protection
+          if (isFinite(wEq)) {
+            if (wasAboveEq && omega < wEq) {
+              omega = wEq;
+            } else if (omega > wEq) {
+              const alpha = Math.min(1.0, h / 0.02);
+              omega = omega + (wEq - omega) * alpha;
+            }
           }
         }
         theta += 0.5 * (prevOmega + omega) * h;
@@ -1465,12 +1471,14 @@
 
     // PHASE 2: POST-PULL DECAY & STOP (t > dtPull, r = r_f, dr/dt = 0)
     let stopTime = p.dtPull;
-    const maxPostDuration = 12.0;
+    const hasAnyDissipation = (p.cwrist > 0 || p.muk > 0 || p.rho > 0);
+    const maxPostDuration = hasAnyDissipation ? Math.max(12.0, p.dtPull * 2.0, 60.0) : Math.max(2.5, p.dtPull * 0.5);
     const maxPostSteps = Math.round(maxPostDuration / dtStep);
 
     if (p.idealMode || p.coaeMode) {
       const coastPhase = p.coaeMode ? 'COAE_COAST' : 'IDEAL_COAST';
-      for (let step = 1; step <= Math.round(2.5 / dtStep); step++) {
+      const idealCoastDuration = Math.max(2.5, p.dtPull * 0.5);
+      for (let step = 1; step <= Math.round(idealCoastDuration / dtStep); step++) {
         const curT = p.dtPull + step * dtStep;
         theta += omega * dtStep;
         pushSnapshot(curT, p.rf, omega, coastPhase, theta);
@@ -1506,7 +1514,7 @@
         }
       }
       if (omega > 0.0) {
-        stopTime = p.dtPull + maxPostDuration;
+        stopTime = hasAnyDissipation ? (p.dtPull + maxPostDuration) : Infinity;
       }
     }
 
@@ -2287,7 +2295,7 @@
 
     canvasEl.addEventListener('wheel', (e) => {
       e.preventDefault();
-      camState.radius = Math.max(0.22, Math.min(3.2, camState.radius + e.deltaY * 0.001));
+      camState.radius = Math.max(0.10, Math.min(10.0, camState.radius + e.deltaY * 0.001));
       syncCameraPosition();
     }, { passive: false });
 
@@ -2744,7 +2752,7 @@
     params.coaeMode = false;
     params.omegaRPM_i = parseFloat(document.getElementById('sl-omega-i').value);
     params.ri = parseFloat(document.getElementById('sl-ri').value);
-    params.rf = Math.min(params.ri - 0.02, parseFloat(document.getElementById('sl-rf').value));
+    params.rf = Math.max(0.005, Math.min(params.ri - 0.005, parseFloat(document.getElementById('sl-rf').value)));
     document.getElementById('sl-rf').value = params.rf;
 
     params.dtPull = parseFloat(document.getElementById('sl-dt').value);
