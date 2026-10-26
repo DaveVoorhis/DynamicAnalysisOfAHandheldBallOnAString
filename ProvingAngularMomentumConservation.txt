@@ -1,0 +1,147 @@
+\documentclass[11pt, a4paper]{article}
+\usepackage[a4paper, margin=2.5cm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lmodern}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage[labelfont=bf,labelsep=period,font=small]{caption}
+\usepackage[colorlinks=true, urlcolor=blue, linkcolor=black, citecolor=blue]{hyperref}
+
+\begin{document}
+
+\begin{center}
+{\Large\bfseries On the conservation of angular momentum under varying position and momentum vectors\par}
+\vspace{2ex}
+\textbf{Dave Voorhis}$^1$ and \textbf{Google Gemini}$^2$\\[1ex]
+{\small$^1$ Independent Researcher, United Kingdom\\
+$^2$ Google, Mountain View, CA 94043, USA}
+\end{center}
+\vspace{2ex}
+
+
+\noindent\textbf{Abstract.} A rare misconception in classical mechanics is the assertion that the angular momentum vector, defined as $\mathbf{L} = \mathbf{r} \times \mathbf{p}$, must necessarily change if the magnitudes and directions of the position vector $\mathbf{r}$ and linear momentum vector $\mathbf{p}$ are changing over time. This paper provides a rigorous mathematical proof demonstrating that $\mathbf{L}$ can remain strictly conserved despite continuous, simultaneous variations in the magnitudes of both $\mathbf{r}$ and $\mathbf{p}$. We show that the cross-product geometry naturally enforces dynamical conservation under central forces or free linear motion.\\[1.2ex]
+\noindent\textbf{Keywords:} angular momentum, central forces, cross product, areal velocity, classical mechanics, physics education
+
+\vspace{3ex}
+
+\section{Introduction}
+In classical mechanics, the angular momentum $\mathbf{L}$ of a point mass about an origin is defined as the cross product of its position vector $\mathbf{r}$ and its linear momentum $\mathbf{p}$:
+\begin{equation}
+    \mathbf{L} = \mathbf{r} \times \mathbf{p}
+\end{equation}
+A rare misconception \cite{liyanage2017} asserts that if both $\mathbf{r}$ and $\mathbf{p}$ are changing with respect to time, the product $\mathbf{L}$ must also change, thereby invalidating the concept of conserved angular momentum in such dynamic systems. This assertion rests on a fundamental misunderstanding of vector calculus. In a vector cross product, the continuous variation of the constituent vectors does not mandate a variation in their product, provided their specific geometric relationship satisfies certain dynamic constraints.
+
+\section{Mathematical Proof of Conservation}
+To determine how angular momentum changes over time, we take the time derivative of $\mathbf{L}$. By applying the product rule for cross products, we obtain:
+\begin{equation}
+    \frac{d\mathbf{L}}{dt} = \frac{d}{dt} (\mathbf{r} \times \mathbf{p}) = \left( \frac{d\mathbf{r}}{dt} \times \mathbf{p} \right) + \left( \mathbf{r} \times \frac{d\mathbf{p}}{dt} \right)
+\end{equation}
+
+Let us evaluate the two terms on the right side of Equation 2 independently.
+
+First, recall the definition of velocity $\mathbf{v} = \frac{d\mathbf{r}}{dt}$ and linear momentum $\mathbf{p} = m\mathbf{v}$, where $m$ is the constant mass of the particle. The first term becomes:
+\begin{equation}
+    \frac{d\mathbf{r}}{dt} \times \mathbf{p} = \mathbf{v} \times (m\mathbf{v}) = m(\mathbf{v} \times \mathbf{v})
+\end{equation}
+Because the cross product of any vector with itself is exactly zero ($\mathbf{A} \times \mathbf{A} = 0$), the first term vanishes entirely: $m(\mathbf{v} \times \mathbf{v}) = \mathbf{0}$.
+
+Second, from Newton's Second Law, the time derivative of linear momentum is the net force acting on the particle, $\frac{d\mathbf{p}}{dt} = \mathbf{F}$. Substituting this into the second term of Equation 2 yields:
+\begin{equation}
+    \mathbf{r} \times \frac{d\mathbf{p}}{dt} = \mathbf{r} \times \mathbf{F} = \boldsymbol{\tau}
+\end{equation}
+where $\boldsymbol{\tau}$ is the net torque acting on the particle.
+
+Therefore, the general time evolution of angular momentum simplifies to:
+\begin{equation}
+    \frac{d\mathbf{L}}{dt} = \boldsymbol{\tau}
+\end{equation}
+
+\textbf{Conclusion of the proof:} If the net torque $\boldsymbol{\tau} = \mathbf{0}$, then $\frac{d\mathbf{L}}{dt} = \mathbf{0}$, which means $\mathbf{L}$ is a constant vector. This conservation holds entirely independently of whether $\mathbf{r}$ and $\mathbf{p}$ are changing, as long as the cross product of $\mathbf{r}$ and the applied force $\mathbf{F}$ is zero.
+
+\section{Algebraic and Geometric Perspective}
+The conservation of angular momentum can also be understood purely algebraically and geometrically by examining what the cross product inherently represents. Geometrically, the magnitude of a cross product $|\mathbf{r} \times \mathbf{p}|$ is equivalent to the area of the parallelogram formed by the vectors $\mathbf{r}$ and $\mathbf{p}$.
+
+\begin{figure}[h]
+\centering
+\begin{tikzpicture}[scale=1.2]
+    % Origin
+    \coordinate (O) at (0,0);
+
+    % Arbitrary path to show |r| is changing, correcting the circular misconception
+    \draw[dashed, gray!80, thick] (3.5, -0.5) .. controls (3, 0.5) and (2.8, 1.2) .. (2.598, 1.5) .. controls (2.2, 2.1) and (1.2, 3) .. (-0.5, 3.5);
+    \node[gray!80!black, right] at (3.5, -0.5) {Arbitrary Trajectory};
+
+    \fill (O) circle (1.5pt) node[below left] {$O$};
+
+    % Vectors
+    \coordinate (R) at (2.598, 1.5);
+    \coordinate (dR) at (-1, 1.732); % Tangent vector dR
+    \coordinate (RplusdR) at (1.598, 3.232); % R + dR
+
+    % Swept area shading
+    \fill[red!10] (O) -- (R) -- (RplusdR) -- cycle;
+    \node at (1.4, 1.4) [red!80!black] {$dA$};
+
+    % Parallelogram completion
+    \draw[dashed, blue!60] (O) -- (dR);
+    \draw[dashed, blue!60] (dR) -- (RplusdR);
+
+    % Draw vectors
+    \draw[->, thick] (O) -- (R) node[midway, below right] {$\mathbf{r}$ (position)};
+    \draw[->, thick] (O) -- (RplusdR) node[midway, left] {$\mathbf{r} + d\mathbf{r}$};
+
+    % Momentum vector p extending along the same line as dr
+    \draw[->, very thick, green!60!black] (R) -- ++(-1.5, 2.598) node[above right] {$\mathbf{p} = m\mathbf{v}$};
+
+    \draw[->, thick, red!80!black] (R) -- (RplusdR) node[midway, right] {$d\mathbf{r} = \mathbf{v} dt$};
+    \draw[->, thick, blue!80!black] (O) -- (dR) node[midway, left] {$d\mathbf{r}$};
+\end{tikzpicture}
+\caption{Geometric representation of the swept area $dA$. The area of the shaded triangle ($dA$) is exactly half the area of the parallelogram formed by $\mathbf{r}$ and $d\mathbf{r}$. Because the momentum vector $\mathbf{p} = m\mathbf{v}$ is collinear with the tangential displacement $d\mathbf{r}$, the magnitude of the cross product $\mathbf{r} \times \mathbf{p}$ scales directly with this swept area.}
+\label{fig:areal_velocity}
+\end{figure}
+
+Consider the area $A$ swept out by the position vector $\mathbf{r}$ as the particle moves through space. In a differential time interval $dt$, the particle undergoes a displacement $d\mathbf{r} = \mathbf{v}dt$. The differential triangular area $dA$ swept out by the position vector is exactly half the area of the parallelogram formed by $\mathbf{r}$ and $d\mathbf{r}$:
+\begin{equation}
+    dA = \frac{1}{2} |\mathbf{r} \times d\mathbf{r}| = \frac{1}{2} |\mathbf{r} \times \mathbf{v}| dt
+\end{equation}
+Dividing by $dt$, the areal velocity (the rate at which area is swept out by the position vector) is:
+\begin{equation}
+    \frac{dA}{dt} = \frac{1}{2} |\mathbf{r} \times \mathbf{v}|
+\end{equation}
+Since linear momentum is $\mathbf{p} = m\mathbf{v}$, we can substitute $\mathbf{v} = \mathbf{p}/m$ into the areal velocity equation:
+\begin{equation}
+    \frac{dA}{dt} = \frac{1}{2m} |\mathbf{r} \times \mathbf{p}| = \frac{|\mathbf{L}|}{2m}
+\end{equation}
+Algebraically, this demonstrates that the magnitude of the angular momentum, $|\mathbf{L}|$, is exactly $2m$ times the areal velocity $\frac{dA}{dt}$. Therefore, asserting that $\mathbf{L}$ must change if $\mathbf{r}$ and $\mathbf{p}$ change is mathematically equivalent to asserting that the swept area per unit time must change. Geometrically, as long as a particle moves such that it sweeps out equal areas in equal times (which is geometrically true for any central force or uniform linear motion), the areal velocity $\frac{dA}{dt}$ is constant. Thus, the algebraic value of $\mathbf{L}$ must remain perfectly conserved, irrespective of the fluctuating individual magnitudes and directions of $\mathbf{r}$ and $\mathbf{p}$.
+
+\section{Physical Examples}
+To make this mathematically abstract concept concrete, we consider two common physical scenarios where $\mathbf{r}$ and $\mathbf{p}$ change, yet $\mathbf{L}$ remains perfectly conserved.
+
+\subsection{Example 1: A Free Particle in Linear Motion}
+Consider a particle moving in a straight line at a constant velocity $\mathbf{v}$ that does not pass through the origin.
+\begin{itemize}
+    \item The momentum $\mathbf{p} = m\mathbf{v}$ is constant.
+    \item The position vector $\mathbf{r}$ is continuously changing in both magnitude and direction as the particle moves along its path.
+\end{itemize}
+Despite $\mathbf{r}$ continuously changing in both magnitude and direction, the magnitude of angular momentum is $L = |\mathbf{r}| |\mathbf{p}| \sin(\theta)$, where $\theta$ is the angle between $\mathbf{r}$ and $\mathbf{p}$. Geometrically, the term $|\mathbf{r}| \sin(\theta)$ resolves exactly to the perpendicular distance (often called the impact parameter, $b$) from the origin to the linear path. Because this perpendicular distance $b$ is rigorously constant for a straight line, and the linear momentum $p = m|\mathbf{v}|$ is constant, their product $L = p b$ remains perfectly conserved.
+
+\subsection{Example 2: Planetary Orbits (Central Forces)}
+Consider a planet in an elliptical orbit around a star.
+\begin{itemize}
+    \item The position vector $\mathbf{r}$ continuously changes in magnitude (distance to the star) and direction.
+    \item The momentum vector $\mathbf{p}$ continuously changes in magnitude (orbital speed) and direction.
+\end{itemize}
+Gravity is a central force, meaning the force vector $\mathbf{F}$ is always directed strictly anti-parallel to the position vector $\mathbf{r}$. Therefore, the cross product $\mathbf{r} \times \mathbf{F} = \mathbf{0}$. By Equation 5, the torque is zero, and $\mathbf{L}$ is exactly conserved. The changes in $\mathbf{r}$ and $\mathbf{p}$ precisely compensate for each other geometrically, a phenomenon famously codified as Kepler's Second Law (equal areas swept in equal times).
+
+\section{Summary}
+The assertion that $\mathbf{L} = \mathbf{r} \times \mathbf{p}$ must change if $\mathbf{r}$ and $\mathbf{p}$ change is mathematically incorrect. The cross product is a geometric operation; as long as the dynamic changes in $\mathbf{r}$ and $\mathbf{p}$ are constrained such that no net torque is applied, the resultant vector $\mathbf{L}$ remains absolutely conserved.
+
+\begin{thebibliography}{1}
+\bibitem{liyanage2017}
+Liyanage P 2017 In the angular momentum equation $\mathbf{L} = \mathbf{r} \times \mathbf{p}$, which one of the remaining variables' magnitudes is correctly conserved when the magnitude of the radius changes? \textit{ResearchGate Preprint} 321824496, \url{https://www.researchgate.net/publication/321824496_In_the_angular_momentum_equation_L_r_x_p_which_one_of_the_remaining_variables'_magnitudes_is_correctly_conserved_when_the_magnitude_of_the_radius_changes}
+\end{thebibliography}
+
+\end{document}
