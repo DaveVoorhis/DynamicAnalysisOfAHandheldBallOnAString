@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Conservation of Angular Momentum: Varying Position and Momentum Vectors</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Inter, Merriweather (Academic Serif), and JetBrains Mono (Telemetry/Math) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Merriweather', 'serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            slate: {
+              850: '#151e2e',
+              925: '#0b111e',
+              950: '#060a12',
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    /* Scientific Instrument Scrollbars & Range Sliders */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0b111e;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      background: transparent;
+      cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-runnable-track {
+      height: 6px;
+      border-radius: 999px;
+      background: #1e293b;
+      border: 1px solid #334155;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #38bdf8;
+      border: 2px solid #0f172a;
+      margin-top: -6px;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+      transition: transform 0.15s ease, background-color 0.15s ease;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover {
+      transform: scale(1.18);
+      background: #7dd3fc;
+    }
+
+    .math-var {
+      font-family: 'Merriweather', Georgia, serif;
+      font-style: italic;
+    }
+    .math-vec {
+      font-family: 'Merriweather', Georgia, serif;
+      font-weight: 700;
+    }
+
+    /* Subtle grid background for the main physics canvas */
+    .lab-grid-bg {
+      background-color: #070b14;
+      background-image: 
+        radial-gradient(circle at 50% 50%, rgba(56, 189, 248, 0.05) 0%, transparent 70%),
+        linear-gradient(to right, rgba(30, 41, 59, 0.35) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(30, 41, 59, 0.35) 1px, transparent 1px);
+      background-size: 100% 100%, 32px 32px, 32px 32px;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-sky-500/30 selection:text-sky-200 min-h-screen flex flex-col">
+
+  <!-- TOP ACADEMIC & LABORATORY HEADER -->
+  <header class="border-b border-slate-800/80 bg-slate-925/95 backdrop-blur-md sticky top-0 z-30">
+    <div class="max-w-[1600px] mx-auto px-4 sm:px-6 py-3 flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3">
+      <!-- Title & Byline -->
+      <div class="flex items-start sm:items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 via-sky-500/20 to-emerald-500/20 border border-amber-400/40 flex items-center justify-center shrink-0 shadow-inner">
+          <span class="font-serif font-bold text-amber-300 text-base tracking-tight">L=r×p</span>
+        </div>
+        <div>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="px-2 py-0.5 text-[11px] font-mono uppercase tracking-wider bg-sky-500/15 text-sky-300 border border-sky-500/30 rounded-md">Interactive Physics Demonstration</span>
+            <span class="text-xs text-slate-300 font-medium">Dave Voorhis &amp; Google Gemini</span>
+          </div>
+          <h1 class="text-sm sm:text-base md:text-lg font-serif font-bold text-slate-100 leading-snug mt-0.5">
+            Conservation of Angular Momentum: Varying Position and Momentum Vectors
+          </h1>
+        </div>
+      </div>
+
+      <!-- Scenario Tabs & External Full Paper Link -->
+      <div class="flex flex-wrap items-center justify-between xl:justify-end gap-2">
+        <div class="inline-flex flex-wrap rounded-xl bg-slate-900 p-1 border border-slate-800 gap-1" role="tablist">
+          <button id="tab-orbit" type="button" onclick="switchScenario('orbit')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+            <span>1. Elliptical Orbit (<span class="math-vec">F</span> ∥ −<span class="math-vec">r</span>)</span>
+          </button>
+          <button id="tab-linear" type="button" onclick="switchScenario('linear')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>2. Free Particle in Linear Motion (<span class="math-vec">F</span> = <span class="math-vec">0</span>)</span>
+          </button>
+          <button id="tab-proof" type="button" onclick="switchScenario('proof')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            <span>3. Geometric &amp; Vector Calculus Proof (Fig. 1 &amp; Eq. 2)</span>
+          </button>
+        </div>
+
+        <a href="https://reldb.org/c/index.php/misconception-correction/" target="_blank" rel="noopener noreferrer" class="px-3.5 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/40 text-xs sm:text-sm font-semibold transition flex items-center gap-1.5 shrink-0 shadow-sm">
+          <span>Read Full Paper ↗</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE GRID -->
+  <main class="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-4 grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
+
+    <!-- LEFT / CENTER COLUMN: INTERACTIVE VECTOR CANVAS + TELEMETRY CARDS (8 cols on XL) -->
+    <div class="xl:col-span-8 flex flex-col gap-4">
+
+      <!-- SCENARIO BANNER & PLAYBACK BAR -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div class="space-y-1">
+          <div class="flex flex-wrap items-center gap-2">
+            <span id="scenario-badge" class="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">Section 4.2 &amp; Section 3 • Central Force Orbit</span>
+            <span id="conservation-status-badge" class="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+              <span>dL/dt = 0 (|L| Strictly Conserved)</span>
+            </span>
+          </div>
+          <p id="scenario-description" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+            Both <span class="text-sky-400 font-semibold">|<span class="math-vec">r</span>|</span> and <span class="text-emerald-400 font-semibold">|<span class="math-vec">p</span>|</span> vary continuously in magnitude and direction. Because gravity is a central force (<span class="math-vec text-rose-400">F</span> ∥ −<span class="math-vec text-sky-400">r</span>), net torque <span class="math-vec">τ</span> = <span class="math-vec">r</span> × <span class="math-vec">F</span> = <span class="math-vec">0</span>, so the cross-product parallelogram area <span class="text-amber-300 font-semibold">|<span class="math-vec">L</span>| = |<span class="math-vec">r</span> × <span class="math-vec">p</span>|</span> remains strictly invariant.
+          </p>
+        </div>
+
+        <!-- Playback & Quick Reset Controls -->
+        <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+          <button id="btn-play-pause" type="button" onclick="togglePlay()" class="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs sm:text-sm transition flex items-center gap-1.5 shadow-lg shadow-sky-500/20">
+            <svg id="icon-pause" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
+            <svg id="icon-play" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <span id="play-label">Pause</span>
+          </button>
+          <button type="button" onclick="stepSimulation()" title="Step forward by dt" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-mono transition flex items-center gap-1">
+            <span>Step</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+          <button type="button" onclick="resetScenario()" title="Reset parameters" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-mono transition flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>Reset</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- INTERACTIVE 2D VECTOR & GEOMETRY CANVAS -->
+      <div class="relative rounded-2xl border border-slate-800 lab-grid-bg overflow-hidden shadow-2xl">
+        <!-- Floating Vector Color Legend Top-Left -->
+        <div class="absolute top-3 left-3 z-10 flex flex-wrap gap-1.5 pointer-events-none">
+          <div class="px-2.5 py-1 rounded-lg bg-slate-900/90 backdrop-blur border border-slate-700/80 text-[11px] font-mono flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-sm bg-sky-400 inline-block"></span>
+            <span class="text-sky-300 font-bold">r</span>
+            <span class="text-slate-400">Position</span>
+          </div>
+          <div class="px-2.5 py-1 rounded-lg bg-slate-900/90 backdrop-blur border border-slate-700/80 text-[11px] font-mono flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-sm bg-emerald-400 inline-block"></span>
+            <span class="text-emerald-300 font-bold">p = mv</span>
+            <span class="text-slate-400">Momentum</span>
+          </div>
+          <div class="px-2.5 py-1 rounded-lg bg-slate-900/90 backdrop-blur border border-slate-700/80 text-[11px] font-mono flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-sm bg-amber-400/60 border border-amber-300 inline-block"></span>
+            <span class="text-amber-300 font-bold">|r × p| = |L|</span>
+            <span class="text-slate-400">Parallelogram Area</span>
+          </div>
+          <div class="px-2.5 py-1 rounded-lg bg-slate-900/90 backdrop-blur border border-slate-700/80 text-[11px] font-mono flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-sm bg-rose-400/40 border border-rose-400 inline-block"></span>
+            <span class="text-rose-300 font-bold">dA</span>
+            <span class="text-slate-400">Swept Area</span>
+          </div>
+          <div class="px-2.5 py-1 rounded-lg bg-slate-900/90 backdrop-blur border border-slate-700/80 text-[11px] font-mono flex items-center gap-1.5">
+            <span class="w-2.5 h-2.5 rounded-sm bg-rose-500 inline-block"></span>
+            <span class="text-rose-400 font-bold">F</span>
+            <span class="text-slate-400">Force</span>
+          </div>
+        </div>
+
+        <!-- Floating Canvas Interaction Hint Bottom-Left -->
+        <div class="absolute bottom-3 left-3 z-10 pointer-events-none">
+          <div class="px-2.5 py-1 rounded-lg bg-slate-900/85 backdrop-blur border border-slate-800 text-[11px] text-slate-300 font-mono">
+            Interactive: Drag the particle directly on the canvas or adjust sliders on the right
+          </div>
+        </div>
+
+        <!-- Main Simulation Canvas Container -->
+        <div id="simCanvasContainer" class="w-full h-[430px] sm:h-[500px] relative select-none">
+          <canvas id="simCanvas" class="w-full h-full block cursor-grab active:cursor-grabbing touch-none"></canvas>
+        </div>
+      </div>
+
+      <!-- VISUAL OVERLAY TOGGLE BAR -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2">
+        <span class="text-xs font-mono uppercase tracking-wider text-slate-400 px-1">Visual Overlays:</span>
+        <div class="flex flex-wrap items-center gap-2">
+          <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 cursor-pointer text-xs select-none">
+            <input type="checkbox" id="chk-parallelogram" checked onchange="updateOverlays()" class="rounded text-amber-500 focus:ring-0 bg-slate-900 border-slate-600">
+            <span class="text-amber-300 font-medium">Cross-Product Parallelogram (|<span class="math-vec">r</span> × <span class="math-vec">p</span>| = |<span class="math-vec">L</span>|)</span>
+          </label>
+          <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 cursor-pointer text-xs select-none">
+            <input type="checkbox" id="chk-swept" checked onchange="updateOverlays()" class="rounded text-rose-500 focus:ring-0 bg-slate-900 border-slate-600">
+            <span class="text-rose-300 font-medium">Equal-Time Swept Area Sectors (<span class="math-var">dA</span>)</span>
+          </label>
+          <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 cursor-pointer text-xs select-none">
+            <input type="checkbox" id="chk-lever" checked onchange="updateOverlays()" class="rounded text-purple-500 focus:ring-0 bg-slate-900 border-slate-600">
+            <span class="text-purple-300 font-medium">Perpendicular Lever Arm (<span class="math-var">r</span><sub>⊥</sub> = |<span class="math-vec">r</span>|sinθ)</span>
+          </label>
+          <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 cursor-pointer text-xs select-none">
+            <input type="checkbox" id="chk-differential" checked onchange="updateOverlays()" class="rounded text-sky-500 focus:ring-0 bg-slate-900 border-slate-600">
+            <span class="text-sky-300 font-medium">Fig. 1 Differentials (<span class="math-vec">dr</span>, <span class="math-vec">r</span>+<span class="math-vec">dr</span>)</span>
+          </label>
+          <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 cursor-pointer text-xs select-none">
+            <input type="checkbox" id="chk-force" checked onchange="updateOverlays()" class="rounded text-rose-500 focus:ring-0 bg-slate-900 border-slate-600">
+            <span class="text-rose-400 font-medium">Force Vector (<span class="math-vec">F</span>)</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- LIVE TELEMETRY READOUT GAUGES (6 CARDS) -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        <!-- Card 1: |r| -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-slate-400">Position |<span class="math-vec text-sky-400">r</span>|</span>
+            <span id="badge-r-state" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping"></span>VARYING
+            </span>
+          </div>
+          <div id="val-r" class="text-lg sm:text-xl font-mono font-bold text-sky-400 my-1">1.500</div>
+          <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+            <div id="bar-r" class="bg-sky-400 h-full transition-all duration-75" style="width: 50%"></div>
+          </div>
+        </div>
+
+        <!-- Card 2: |p| -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-slate-400">Momentum |<span class="math-vec text-emerald-400">p</span>|</span>
+            <span id="badge-p-state" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>VARYING
+            </span>
+          </div>
+          <div id="val-p" class="text-lg sm:text-xl font-mono font-bold text-emerald-400 my-1">1.200</div>
+          <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+            <div id="bar-p" class="bg-emerald-400 h-full transition-all duration-75" style="width: 50%"></div>
+          </div>
+        </div>
+
+        <!-- Card 3: Angle theta & sin(theta) -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-slate-400">Angle ∠(<span class="math-vec">r</span>,<span class="math-vec">p</span>)</span>
+            <span id="val-sin-theta" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/15 text-purple-300">sinθ=1.00</span>
+          </div>
+          <div id="val-theta" class="text-lg sm:text-xl font-mono font-bold text-purple-300 my-1">90.0°</div>
+          <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+            <div id="bar-sin" class="bg-purple-400 h-full transition-all duration-75" style="width: 100%"></div>
+          </div>
+        </div>
+
+        <!-- Card 4: Perpendicular Lever Arm r_perp = |r|sin(theta) -->
+        <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono text-slate-400">Lever <span class="math-var">r</span><sub>⊥</sub>=|<span class="math-vec">r</span>|sinθ</span>
+            <span class="text-[10px] font-mono text-fuchsia-300">b</span>
+          </div>
+          <div id="val-r-perp" class="text-lg sm:text-xl font-mono font-bold text-fuchsia-300 my-1">1.500</div>
+          <div id="sub-p-perp" class="text-[11px] font-mono text-slate-400 truncate">p<sub>⊥</sub> = |p|sinθ = 1.200</div>
+        </div>
+
+        <!-- Card 5: Angular Momentum |L| = |r x p| -->
+        <div class="bg-gradient-to-br from-amber-500/15 via-slate-900 to-slate-900 border border-amber-500/50 rounded-xl p-3 flex flex-col justify-between shadow-lg shadow-amber-500/5">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-semibold text-amber-300">|<span class="math-vec">L</span>| = |<span class="math-vec">r</span> × <span class="math-vec">p</span>|</span>
+            <span id="badge-L-state" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40">INVARIANT</span>
+          </div>
+          <div id="val-L" class="text-lg sm:text-xl font-mono font-bold text-amber-300 my-1">1.800</div>
+          <div class="text-[11px] font-mono text-amber-200/80 truncate">|r||p|sinθ Conserved</div>
+        </div>
+
+        <!-- Card 6: Areal Velocity dA/dt = |L|/(2m) -->
+        <div class="bg-gradient-to-br from-rose-500/15 via-slate-900 to-slate-900 border border-rose-500/40 rounded-xl p-3 flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-mono font-semibold text-rose-300">dA/dt = |<span class="math-vec">L</span>|/2m</span>
+            <span id="badge-dA-state" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300">CONSTANT</span>
+          </div>
+          <div id="val-dAdt" class="text-lg sm:text-xl font-mono font-bold text-rose-300 my-1">0.900</div>
+          <div class="text-[11px] font-mono text-rose-200/80 truncate">Eq. (8) Areal Velocity</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: CONTROLS, EQUATION (2) EVALUATOR & REAL-TIME STRIP CHART (4 cols on XL) -->
+    <div class="xl:col-span-4 flex flex-col gap-4">
+
+      <!-- PARAMETER CONTROLS CARD -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <div>
+            <h2 id="controls-title" class="text-sm sm:text-base font-semibold text-slate-100">Interactive System Parameters</h2>
+            <p id="controls-subtitle" class="text-xs text-slate-400">Modify geometry &amp; dynamics in real time</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="slider-speed" class="text-[11px] font-mono text-slate-400">Speed:</label>
+            <input id="slider-speed" type="range" min="0.2" max="2.5" step="0.1" value="1.0" oninput="onSpeedChange(this.value)" class="w-16" title="Animation Speed">
+            <span id="lbl-speed" class="text-xs font-mono text-sky-400 w-8 text-right">1.0×</span>
+          </div>
+        </div>
+
+        <!-- TAB 1 CONTROLS: ELLIPTICAL ORBIT -->
+        <div id="controls-orbit" class="space-y-3.5">
+          <!-- Quick Orbit Presets -->
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-[11px] font-mono text-slate-400 mr-1">Presets:</span>
+            <button type="button" onclick="setOrbitPreset(0.0, 1.65, 1.0)" class="px-2 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-mono text-slate-300 border border-slate-700 transition">Circle (e=0)</button>
+            <button type="button" onclick="setOrbitPreset(0.50, 1.70, 1.0)" class="px-2 py-1 rounded-lg bg-sky-500/20 hover:bg-sky-500/30 text-xs font-mono text-sky-300 border border-sky-500/40 transition">Kepler Ellipse (e=0.50)</button>
+            <button type="button" onclick="setOrbitPreset(0.75, 1.85, 1.0)" class="px-2 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-xs font-mono text-amber-300 border border-amber-500/40 transition">High Eccentricity (e=0.75)</button>
+          </div>
+
+          <!-- Orbital Eccentricity e (0.0 to 0.75) -->
+          <div>
+            <div class="flex justify-between text-xs font-mono mb-1">
+              <label for="slider-e" class="text-slate-300">Orbital Eccentricity (<span class="math-var">e</span>)</label>
+              <span id="lbl-e" class="text-sky-400 font-semibold">0.50</span>
+            </div>
+            <input id="slider-e" type="range" min="0.00" max="0.75" step="0.01" value="0.50" oninput="onOrbitParamChange()" class="w-full">
+            <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-0.5">
+              <span>0.00 (Circular)</span>
+              <span>0.75 (Large |r| &amp; |p| swings)</span>
+            </div>
+          </div>
+
+          <!-- Semi-major axis a & Particle Mass m -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <label for="slider-a" class="text-slate-300">Semi-Major Axis (<span class="math-var">a</span>)</label>
+                <span id="lbl-a" class="text-sky-400 font-semibold">1.70 AU</span>
+              </div>
+              <input id="slider-a" type="range" min="1.10" max="2.30" step="0.05" value="1.70" oninput="onOrbitParamChange()" class="w-full">
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <label for="slider-m-orbit" class="text-slate-300">Particle Mass (<span class="math-var">m</span>)</label>
+                <span id="lbl-m-orbit" class="text-emerald-400 font-semibold">1.00 kg</span>
+              </div>
+              <input id="slider-m-orbit" type="range" min="0.50" max="2.50" step="0.10" value="1.00" oninput="onOrbitParamChange()" class="w-full">
+            </div>
+          </div>
+
+          <!-- Interactive True Anomaly Scrubber -->
+          <div class="pt-2 border-t border-slate-800/80">
+            <div class="flex justify-between text-xs font-mono mb-1">
+              <label for="slider-anomaly" class="text-slate-300">Scrub Orbital True Anomaly (ν)</label>
+              <span id="lbl-anomaly" class="text-amber-300 font-semibold">35°</span>
+            </div>
+            <input id="slider-anomaly" type="range" min="0" max="360" step="1" value="35" oninput="onScrubOrbitAnomaly(this.value)" class="w-full">
+          </div>
+        </div>
+
+        <!-- TAB 2 CONTROLS: FREE PARTICLE IN LINEAR MOTION -->
+        <div id="controls-linear" class="space-y-3.5 hidden">
+          <!-- Impact Parameter b -->
+          <div>
+            <div class="flex justify-between text-xs font-mono mb-1">
+              <label for="slider-b" class="text-slate-300">Impact Parameter (<span class="math-var">b</span> = |<span class="math-vec">r</span>|sinθ)</label>
+              <span id="lbl-b" class="text-fuchsia-400 font-semibold">1.35 m</span>
+            </div>
+            <input id="slider-b" type="range" min="0.40" max="2.20" step="0.05" value="1.35" oninput="onLinearParamChange()" class="w-full">
+            <p class="text-[11px] text-slate-400 mt-0.5">Perpendicular distance from Origin <span class="math-var">O</span> to straight line <span class="math-var">y = b</span>.</p>
+          </div>
+
+          <!-- Constant Speed |v| & Mass m -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <label for="slider-v-linear" class="text-slate-300">Speed (|<span class="math-vec">v</span>|)</label>
+                <span id="lbl-v-linear" class="text-emerald-400 font-semibold">1.40 m/s</span>
+              </div>
+              <input id="slider-v-linear" type="range" min="0.50" max="2.50" step="0.10" value="1.40" oninput="onLinearParamChange()" class="w-full">
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <label for="slider-m-linear" class="text-slate-300">Mass (<span class="math-var">m</span>)</label>
+                <span id="lbl-m-linear" class="text-emerald-400 font-semibold">1.00 kg</span>
+              </div>
+              <input id="slider-m-linear" type="range" min="0.50" max="2.50" step="0.10" value="1.00" oninput="onLinearParamChange()" class="w-full">
+            </div>
+          </div>
+
+          <!-- Position x along trajectory -->
+          <div class="pt-2 border-t border-slate-800/80">
+            <div class="flex justify-between text-xs font-mono mb-1">
+              <label for="slider-linear-x" class="text-slate-300">Position <span class="math-var">x</span> along Trajectory (<span class="math-var">y = b</span>)</label>
+              <span id="lbl-linear-x" class="text-amber-300 font-semibold">-1.20 m</span>
+            </div>
+            <input id="slider-linear-x" type="range" min="-2.60" max="2.60" step="0.02" value="-1.20" oninput="onScrubLinearX(this.value)" class="w-full">
+          </div>
+        </div>
+
+        <!-- TAB 3 CONTROLS: GEOMETRIC & VECTOR CALCULUS PROOF (FIG. 1 & EQ. 2) -->
+        <div id="controls-proof" class="space-y-3.5 hidden">
+          <!-- Constraint Mode Toggle: Torque-Free vs Unconstrained/Applied Torque -->
+          <div class="p-2.5 rounded-xl bg-slate-950/90 border border-slate-800 space-y-2">
+            <div class="text-[11px] font-mono uppercase tracking-wider text-slate-400">Dynamic Constraint Mode (Eq. 5):</div>
+            <div class="grid grid-cols-2 gap-2">
+              <button id="btn-mode-conserved" type="button" onclick="setProofTorqueMode(false)" class="px-2.5 py-2 rounded-lg text-xs font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 transition text-center">
+                Torque-Free (τ = 0)<br><span class="text-[10px] font-normal opacity-85">|p|sinθ ∝ 1/|r| (|L| Fixed)</span>
+              </button>
+              <button id="btn-mode-torque" type="button" onclick="setProofTorqueMode(true)" class="px-2.5 py-2 rounded-lg text-xs font-mono font-semibold bg-slate-800 text-slate-400 border border-slate-700 transition text-center">
+                Applied Torque (τ ≠ 0)<br><span class="text-[10px] font-normal opacity-85">Unconstrained / F⊥ ≠ 0</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Sliders for |r| and angle of r -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <label for="slider-proof-r" class="text-slate-300">Radius |<span class="math-vec">r</span>|</label>
+                <span id="lbl-proof-r" class="text-sky-400 font-semibold">1.65</span>
+              </div>
+              <input id="slider-proof-r" type="range" min="0.80" max="2.40" step="0.02" value="1.65" oninput="onProofParamChange('r')" class="w-full">
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <label for="slider-proof-rangle" class="text-slate-300">Angle of <span class="math-vec">r</span> (φ)</label>
+                <span id="lbl-proof-rangle" class="text-sky-400 font-semibold">30°</span>
+              </div>
+              <input id="slider-proof-rangle" type="range" min="5" max="85" step="1" value="30" oninput="onProofParamChange('rangle')" class="w-full">
+            </div>
+          </div>
+
+          <!-- Sliders for |p| and angle theta between r and p -->
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <label for="slider-proof-p" class="text-slate-300">Momentum |<span class="math-vec">p</span>|</label>
+                <span id="lbl-proof-p" class="text-emerald-400 font-semibold">1.28</span>
+              </div>
+              <input id="slider-proof-p" type="range" min="0.50" max="2.60" step="0.02" value="1.28" oninput="onProofParamChange('p')" class="w-full">
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <label for="slider-proof-theta" class="text-slate-300">Angle ∠(<span class="math-vec">r</span>,<span class="math-vec">p</span>) θ</label>
+                <span id="lbl-proof-theta" class="text-purple-300 font-semibold">112°</span>
+              </div>
+              <input id="slider-proof-theta" type="range" min="30" max="150" step="1" value="112" oninput="onProofParamChange('theta')" class="w-full">
+            </div>
+          </div>
+
+          <!-- Differential time step dt & Optional Non-Central Force F_perp -->
+          <div class="grid grid-cols-2 gap-3 pt-1 border-t border-slate-800/80">
+            <div>
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <label for="slider-proof-dt" class="text-slate-300">Fig. 1 Step (<span class="math-var">dt</span>)</label>
+                <span id="lbl-proof-dt" class="text-rose-300 font-semibold">0.45 s</span>
+              </div>
+              <input id="slider-proof-dt" type="range" min="0.15" max="0.80" step="0.02" value="0.45" oninput="onProofParamChange('dt')" class="w-full">
+            </div>
+            <div id="proof-torque-slider-wrap" class="opacity-40 pointer-events-none transition-opacity">
+              <div class="flex justify-between text-xs font-mono mb-1">
+                <label for="slider-proof-fperp" class="text-rose-300">Torque Force <span class="math-var">F</span><sub>⊥</sub></label>
+                <span id="lbl-proof-fperp" class="text-rose-400 font-semibold">0.00 N</span>
+              </div>
+              <input id="slider-proof-fperp" type="range" min="-1.00" max="1.00" step="0.05" value="0.00" oninput="onProofParamChange('fperp')" class="w-full">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP-BY-STEP VECTOR CALCULUS EVALUATOR (EQUATION 2) -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xs font-mono uppercase tracking-wider text-amber-300 font-semibold">
+            Section 2 Proof • Equation (2) Live Evaluator
+          </h3>
+          <span class="text-[11px] font-mono text-slate-400">dL/dt = (dr/dt × p) + (r × dp/dt)</span>
+        </div>
+
+        <div class="p-3 rounded-xl bg-slate-950 border border-slate-800/90 font-mono text-xs space-y-2.5">
+          <!-- Term 1: (dr/dt x p) = m(v x v) = 0 -->
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <div class="text-slate-200">
+                1. (<span class="text-sky-400">dr/dt</span> × <span class="text-emerald-400">p</span>) = <span class="math-var">m</span>(<span class="text-emerald-400">v</span> × <span class="text-emerald-400">v</span>)
+              </div>
+              <div class="text-[10px] text-slate-400">Eq. (3): Cross product of collinear vectors is identically zero</div>
+            </div>
+            <span class="px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-300 font-bold shrink-0">= 0.000</span>
+          </div>
+
+          <!-- Term 2: (r x dp/dt) = (r x F) = tau -->
+          <div class="flex items-center justify-between gap-2 pt-2 border-t border-slate-800/60">
+            <div>
+              <div class="text-slate-200">
+                2. (<span class="text-sky-400">r</span> × <span class="text-emerald-400">dp/dt</span>) = <span class="text-sky-400">r</span> × <span class="text-rose-400">F</span> = <span class="text-rose-300 font-bold">τ</span>
+              </div>
+              <div id="calc-term2-sub" class="text-[10px] text-slate-400">Eq. (4): Central force F ∥ −r ⟹ sin(180°) = 0</div>
+            </div>
+            <span id="calc-term2-val" class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 font-bold shrink-0">= 0.000</span>
+          </div>
+
+          <!-- Total dL/dt Conclusion -->
+          <div class="pt-2 border-t border-slate-800 flex items-center justify-between text-xs">
+            <span class="text-slate-300 font-semibold">Eq. (5): <span class="text-amber-300">dL/dt = 0 + τ</span></span>
+            <span id="calc-total-dL" class="text-amber-300 font-bold">dL/dt = 0.000 (L Conserved)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- REAL-TIME SCROLLING TIME-SERIES STRIP CHART -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 sm:p-5 space-y-2.5">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-xs font-mono uppercase tracking-wider text-slate-200 font-semibold">
+              Real-Time Strip Chart: |r(t)|, |p(t)| vs. |L(t)|
+            </h3>
+            <p class="text-[11px] text-slate-400">Gold line |L(t)| remains flat while |r(t)| and |p(t)| fluctuate</p>
+          </div>
+          <button type="button" onclick="clearHistoryChart()" class="text-[11px] font-mono text-slate-400 hover:text-slate-200 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 transition">Clear</button>
+        </div>
+
+        <div id="chartCanvasContainer" class="w-full h-40 bg-slate-950 rounded-xl border border-slate-800/90 overflow-hidden relative">
+          <canvas id="chartCanvas" class="w-full h-full block"></canvas>
+        </div>
+
+        <!-- Strip Chart Legend -->
+        <div class="flex flex-wrap items-center justify-between text-[11px] font-mono pt-1 px-1">
+          <span class="flex items-center gap-1.5 text-sky-400"><span class="w-2.5 h-0.5 bg-sky-400 inline-block"></span>|r(t)|</span>
+          <span class="flex items-center gap-1.5 text-emerald-400"><span class="w-2.5 h-0.5 bg-emerald-400 inline-block"></span>|p(t)|</span>
+          <span class="flex items-center gap-1.5 text-purple-300"><span class="w-2.5 h-0.5 bg-purple-400 inline-block"></span>sin θ(t)</span>
+          <span class="flex items-center gap-1.5 text-amber-300 font-bold"><span class="w-3 h-1 bg-amber-400 inline-block rounded-full"></span>|L(t)| = |r × p|</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- SELF-CONTAINED SIMULATION & RENDERING SCRIPT -->
+  <script>
+    // ============================================================================
+    // 1. GLOBAL APPLICATION STATE
+    // ============================================================================
+    const state = {
+      scenario: 'orbit', // 'orbit' | 'linear' | 'proof'
+      playing: true,
+      speedMultiplier: 1.0,
+      lastTimestamp: 0,
+
+      // Canvas logical CSS dimensions (updated on resize with devicePixelRatio)
+      simWidth: 800,
+      simHeight: 500,
+      chartWidth: 400,
+      chartHeight: 160,
+
+      // Current coordinate transform cache for mouse/touch dragging
+      viewTransform: {
+        originX: 400,
+        originY: 250,
+        scale: 80
+      },
+
+      // Visual overlay toggles
+      overlays: {
+        parallelogram: true,
+        swept: true,
+        lever: true,
+        differential: true,
+        force: true
+      },
+
+      // Tab 1: Elliptical Orbit (Keplerian Central Force F || -r)
+      orbit: {
+        e: 0.50,          // Eccentricity (0.0 to 0.75)
+        a: 1.70,          // Semi-major axis
+        m: 1.00,          // Particle Mass
+        gm: 1.65,         // Central gravitational parameter GM
+        meanAnomaly: 0.5, // Mean anomaly M (radians)
+        trueAnomaly: 0.6, // True anomaly nu (radians)
+        sweptWedges: []   // Precomputed equal-time Kepler sectors
+      },
+
+      // Tab 2: Free Particle in Linear Motion (y = b, F = 0)
+      linear: {
+        b: 1.35,          // Impact parameter b (perpendicular height y = b)
+        v: 1.40,          // Constant speed |v|
+        m: 1.00,          // Mass m
+        x: -1.20,         // Current horizontal position x along y = b
+        xMax: 2.60
+      },
+
+      // Tab 3: Geometric & Vector Calculus Proof (Fig. 1 & Eq. 2)
+      proof: {
+        torqueMode: false, // false = Torque-Free (|L| conserved), true = Unconstrained / Applied Torque
+        rMag: 1.65,        // Position magnitude |r|
+        rAngleDeg: 30,     // Angle of r from +x axis (degrees, matching Fig. 1)
+        pMag: 1.28,        // Momentum magnitude |p|
+        thetaDeg: 112,     // Angle between r and p (degrees)
+        dt: 0.45,          // Differential time step dt for Figure 1 vectors
+        m: 1.00,           // Mass
+        conservedL: 1.96,  // Target conserved |L| when torqueMode === false
+        fPerp: 0.00,       // Non-central perpendicular force F_perp
+        oscPhase: 0.0      // Phase for gentle oscillation of |r| when playing
+      },
+
+      // Instantaneous computed physical quantities
+      telemetry: {
+        rVec: { x: 1.5, y: 0 },
+        pVec: { x: 0, y: 1.2 },
+        vVec: { x: 0, y: 1.2 },
+        fVec: { x: -1.0, y: 0 },
+        rMag: 1.5,
+        pMag: 1.2,
+        vMag: 1.2,
+        fMag: 1.0,
+        thetaRad: Math.PI / 2,
+        thetaDeg: 90,
+        sinTheta: 1.0,
+        rPerp: 1.5,
+        pPerp: 1.2,
+        LMag: 1.8,
+        dAdt: 0.9,
+        torque: 0.0
+      },
+
+      // Real-time scrolling strip chart history
+      history: [],
+      maxHistory: 240,
+      isDraggingCanvas: false
+    };
+
+    // Canvas Context References
+    const simCanvas = document.getElementById('simCanvas');
+    const simCtx = simCanvas.getContext('2d');
+    const chartCanvas = document.getElementById('chartCanvas');
+    const chartCtx = chartCanvas.getContext('2d');
+
+    // ============================================================================
+    // 2. HIGH-DPI CANVAS RESIZING
+    // ============================================================================
+    function resizeCanvases() {
+      const dpr = window.devicePixelRatio || 1;
+
+      const simContainer = document.getElementById('simCanvasContainer');
+      if (simContainer) {
+        const rect = simContainer.getBoundingClientRect();
+        state.simWidth = Math.max(300, rect.width);
+        state.simHeight = Math.max(300, rect.height);
+        simCanvas.width = Math.round(state.simWidth * dpr);
+        simCanvas.height = Math.round(state.simHeight * dpr);
+        simCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      const chartContainer = document.getElementById('chartCanvasContainer');
+      if (chartContainer) {
+        const cRect = chartContainer.getBoundingClientRect();
+        state.chartWidth = Math.max(200, cRect.width);
+        state.chartHeight = Math.max(100, cRect.height);
+        chartCanvas.width = Math.round(state.chartWidth * dpr);
+        chartCanvas.height = Math.round(state.chartHeight * dpr);
+        chartCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+    }
+
+    // ============================================================================
+    // 3. KEPLER EQUATION SOLVER & ORBITAL DYNAMICS
+    // ============================================================================
+    function solveKeplerEquation(M, e) {
+      let E = M;
+      for (let i = 0; i < 8; i++) {
+        const f = E - e * Math.sin(E) - M;
+        const fPrime = 1 - e * Math.cos(E);
+        E = E - f / fPrime;
+      }
+      return E;
+    }
+
+    function computeOrbitStateAtTrueAnomaly(nu, a, e, m, gm) {
+      const pSemiLatus = a * (1 - e * e);
+      const rMag = pSemiLatus / (1 + e * Math.cos(nu));
+
+      const rx = rMag * Math.cos(nu);
+      const ry = rMag * Math.sin(nu);
+
+      // Specific angular momentum h = sqrt(GM * a * (1 - e^2))
+      const h = Math.sqrt(gm * pSemiLatus);
+
+      // Polar velocity components
+      const vr = (gm / h) * e * Math.sin(nu);
+      const vTheta = (gm / h) * (1 + e * Math.cos(nu));
+
+      // Cartesian velocity components
+      const vx = vr * Math.cos(nu) - vTheta * Math.sin(nu);
+      const vy = vr * Math.sin(nu) + vTheta * Math.cos(nu);
+
+      // Central gravitational force F = - (GMm / r^2) r_hat
+      const fMag = (gm * m) / (rMag * rMag);
+      const fx = -fMag * Math.cos(nu);
+      const fy = -fMag * Math.sin(nu);
+
+      return {
+        rVec: { x: rx, y: ry },
+        vVec: { x: vx, y: vy },
+        pVec: { x: m * vx, y: m * vy },
+        fVec: { x: fx, y: fy }
+      };
+    }
+
+    function generateEqualTimeOrbitWedges() {
+      const { a, e, m, gm } = state.orbit;
+      const numSectors = 12;
+      const wedges = [];
+
+      for (let k = 0; k < numSectors; k++) {
+        const M1 = (k / numSectors) * Math.PI * 2;
+        const M2 = ((k + 0.42) / numSectors) * Math.PI * 2;
+        const pts = [];
+        const subSteps = 10;
+        for (let s = 0; s <= subSteps; s++) {
+          const M = M1 + (M2 - M1) * (s / subSteps);
+          const E = solveKeplerEquation(M, e);
+          const nu = 2 * Math.atan2(
+            Math.sqrt(1 + e) * Math.sin(E / 2),
+            Math.sqrt(1 - e) * Math.cos(E / 2)
+          );
+          const st = computeOrbitStateAtTrueAnomaly(nu, a, e, m, gm);
+          pts.push(st.rVec);
+        }
+        wedges.push(pts);
+      }
+      state.orbit.sweptWedges = wedges;
+    }
+
+    // ============================================================================
+    // 4. PHYSICS UPDATE STEP FOR ALL THREE SCENARIOS
+    // ============================================================================
+    function updatePhysics(dt) {
+      const effDt = dt * state.speedMultiplier;
+
+      if (state.scenario === 'orbit') {
+        const orb = state.orbit;
+        const n = Math.sqrt(orb.gm / Math.pow(orb.a, 3));
+
+        if (state.playing && !state.isDraggingCanvas && effDt > 0) {
+          orb.meanAnomaly = (orb.meanAnomaly + n * effDt * 0.95) % (Math.PI * 2);
+          const E = solveKeplerEquation(orb.meanAnomaly, orb.e);
+          orb.trueAnomaly = 2 * Math.atan2(
+            Math.sqrt(1 + orb.e) * Math.sin(E / 2),
+            Math.sqrt(1 - orb.e) * Math.cos(E / 2)
+          );
+          if (orb.trueAnomaly < 0) orb.trueAnomaly += Math.PI * 2;
+
+          const deg = Math.round((orb.trueAnomaly * 180) / Math.PI);
+          document.getElementById('slider-anomaly').value = deg;
+          document.getElementById('lbl-anomaly').textContent = deg + '°';
+        }
+
+        const st = computeOrbitStateAtTrueAnomaly(orb.trueAnomaly, orb.a, orb.e, orb.m, orb.gm);
+        updateTelemetryFromVectors(st.rVec, st.pVec, st.vVec, st.fVec, orb.m);
+
+      } else if (state.scenario === 'linear') {
+        const lin = state.linear;
+        if (state.playing && !state.isDraggingCanvas && effDt > 0) {
+          lin.x += lin.v * effDt * 0.85;
+          if (lin.x > lin.xMax) lin.x = -lin.xMax;
+          document.getElementById('slider-linear-x').value = lin.x.toFixed(2);
+          document.getElementById('lbl-linear-x').textContent = lin.x.toFixed(2) + ' m';
+        }
+
+        // Straight-line motion along y = b
+        const rVec = { x: lin.x, y: lin.b };
+        const vVec = { x: lin.v, y: 0 };
+        const pVec = { x: lin.m * lin.v, y: 0 };
+        const fVec = { x: 0, y: 0 };
+
+        updateTelemetryFromVectors(rVec, pVec, vVec, fVec, lin.m);
+
+      } else if (state.scenario === 'proof') {
+        const prf = state.proof;
+        if (state.playing && !state.isDraggingCanvas && effDt > 0) {
+          prf.oscPhase += effDt * 1.1;
+          // Smoothly oscillate |r| and angle of r so the user sees |r| changing while |L| stays constant
+          prf.rMag = 1.60 + 0.45 * Math.sin(prf.oscPhase);
+          prf.thetaDeg = 108 + 24 * Math.cos(prf.oscPhase * 0.8);
+          prf.rAngleDeg = 32 + 12 * Math.sin(prf.oscPhase * 0.5);
+
+          document.getElementById('slider-proof-r').value = prf.rMag.toFixed(2);
+          document.getElementById('lbl-proof-r').textContent = prf.rMag.toFixed(2);
+          document.getElementById('slider-proof-theta').value = Math.round(prf.thetaDeg);
+          document.getElementById('lbl-proof-theta').textContent = Math.round(prf.thetaDeg) + '°';
+          document.getElementById('slider-proof-rangle').value = Math.round(prf.rAngleDeg);
+          document.getElementById('lbl-proof-rangle').textContent = Math.round(prf.rAngleDeg) + '°';
+        }
+
+        const rAngleRad = (prf.rAngleDeg * Math.PI) / 180;
+        const thetaRad = (prf.thetaDeg * Math.PI) / 180;
+        const sinTheta = Math.sin(thetaRad);
+
+        if (!prf.torqueMode) {
+          // Torque-free constraint: |p| sin(theta) = |L| / |r|
+          prf.pMag = prf.conservedL / Math.max(0.15, prf.rMag * sinTheta);
+          prf.fPerp = 0;
+          document.getElementById('slider-proof-p').value = Math.min(2.6, Math.max(0.5, prf.pMag)).toFixed(2);
+          document.getElementById('lbl-proof-p').textContent = prf.pMag.toFixed(2);
+        } else {
+          // Applied torque mode: if F_perp != 0 and playing, |L| evolves according to dL/dt = tau
+          if (state.playing && effDt > 0 && Math.abs(prf.fPerp) > 1e-3) {
+            const tau = prf.rMag * prf.fPerp;
+            prf.conservedL = Math.max(0.35, Math.min(3.6, prf.conservedL + tau * effDt * 0.45));
+            prf.pMag = prf.conservedL / Math.max(0.15, prf.rMag * sinTheta);
+            document.getElementById('slider-proof-p').value = Math.min(2.6, Math.max(0.5, prf.pMag)).toFixed(2);
+            document.getElementById('lbl-proof-p').textContent = prf.pMag.toFixed(2);
+          } else {
+            prf.conservedL = prf.rMag * prf.pMag * sinTheta;
+          }
+        }
+
+        const rVec = {
+          x: prf.rMag * Math.cos(rAngleRad),
+          y: prf.rMag * Math.sin(rAngleRad)
+        };
+        const pAngleRad = rAngleRad + thetaRad;
+        const pVec = {
+          x: prf.pMag * Math.cos(pAngleRad),
+          y: prf.pMag * Math.sin(pAngleRad)
+        };
+        const vVec = {
+          x: pVec.x / prf.m,
+          y: pVec.y / prf.m
+        };
+
+        // Central radial force + optional perpendicular force F_perp
+        const fRadial = -1.05;
+        const fPerp = prf.torqueMode ? prf.fPerp : 0;
+        const fVec = {
+          x: fRadial * Math.cos(rAngleRad) - fPerp * Math.sin(rAngleRad),
+          y: fRadial * Math.sin(rAngleRad) + fPerp * Math.cos(rAngleRad)
+        };
+
+        updateTelemetryFromVectors(rVec, pVec, vVec, fVec, prf.m);
+      }
+
+      // Record strip chart sample when animating or scrubbing
+      if (state.playing || state.isDraggingCanvas || dt === 0) {
+        if (dt > 0 || state.isDraggingCanvas) {
+          pushHistorySample();
+        }
+      }
+    }
+
+    function pushHistorySample() {
+      state.history.push({
+        r: state.telemetry.rMag,
+        p: state.telemetry.pMag,
+        sin: state.telemetry.sinTheta,
+        L: state.telemetry.LMag
+      });
+      if (state.history.length > state.maxHistory) {
+        state.history.shift();
+      }
+    }
+
+    function updateTelemetryFromVectors(rVec, pVec, vVec, fVec, m) {
+      const rMag = Math.hypot(rVec.x, rVec.y);
+      const pMag = Math.hypot(pVec.x, pVec.y);
+      const vMag = Math.hypot(vVec.x, vVec.y);
+      const fMag = Math.hypot(fVec.x, fVec.y);
+
+      const Lz = rVec.x * pVec.y - rVec.y * pVec.x;
+      const LMag = Math.abs(Lz);
+
+      const dotRP = rVec.x * pVec.x + rVec.y * pVec.y;
+      const cosTheta = Math.max(-1, Math.min(1, dotRP / Math.max(1e-6, rMag * pMag)));
+      const thetaRad = Math.acos(cosTheta);
+      const thetaDeg = (thetaRad * 180) / Math.PI;
+      const sinTheta = Math.sin(thetaRad);
+
+      const rPerp = rMag * sinTheta;
+      const pPerp = pMag * sinTheta;
+      const dAdt = LMag / (2 * m);
+      const torque = rVec.x * fVec.y - rVec.y * fVec.x;
+
+      state.telemetry = {
+        rVec, pVec, vVec, fVec,
+        rMag, pMag, vMag, fMag,
+        thetaRad, thetaDeg, sinTheta,
+        rPerp, pPerp, LMag, dAdt, torque
+      };
+
+      updateTelemetryDOM();
+    }
+
+    // ============================================================================
+    // 5. DOM TELEMETRY & LIVE EQUATION (2) EVALUATOR UPDATES
+    // ============================================================================
+    function updateTelemetryDOM() {
+      const t = state.telemetry;
+
+      document.getElementById('val-r').textContent = t.rMag.toFixed(3);
+      document.getElementById('val-p').textContent = t.pMag.toFixed(3);
+      document.getElementById('val-theta').textContent = t.thetaDeg.toFixed(1) + '°';
+      document.getElementById('val-sin-theta').textContent = 'sinθ=' + t.sinTheta.toFixed(3);
+      document.getElementById('val-r-perp').textContent = t.rPerp.toFixed(3);
+      document.getElementById('sub-p-perp').innerHTML = `p<sub>⊥</sub> = |p|sinθ = ${t.pPerp.toFixed(3)}`;
+      document.getElementById('val-L').textContent = t.LMag.toFixed(3);
+      document.getElementById('val-dAdt').textContent = t.dAdt.toFixed(3);
+
+      document.getElementById('bar-r').style.width = Math.min(100, (t.rMag / 3.0) * 100) + '%';
+      document.getElementById('bar-p').style.width = Math.min(100, (t.pMag / 3.0) * 100) + '%';
+      document.getElementById('bar-sin').style.width = Math.min(100, t.sinTheta * 100) + '%';
+
+      const isCircular = state.scenario === 'orbit' && state.orbit.e < 0.005;
+      const badgeR = document.getElementById('badge-r-state');
+      const badgeP = document.getElementById('badge-p-state');
+
+      if (isCircular) {
+        badgeR.innerHTML = 'CONST (e=0)';
+      } else {
+        badgeR.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping"></span>VARYING';
+      }
+
+      if (state.scenario === 'linear') {
+        badgeP.innerHTML = 'CONSTANT';
+      } else if (isCircular) {
+        badgeP.innerHTML = 'CONST (e=0)';
+      } else {
+        badgeP.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>VARYING';
+      }
+
+      const absTau = Math.abs(t.torque);
+      const isConserved = !(state.scenario === 'proof' && state.proof.torqueMode) || absTau < 1e-3;
+
+      const term2ValEl = document.getElementById('calc-term2-val');
+      const term2SubEl = document.getElementById('calc-term2-sub');
+      const totalDLEl = document.getElementById('calc-total-dL');
+      const statusBadge = document.getElementById('conservation-status-badge');
+      const badgeLState = document.getElementById('badge-L-state');
+      const badgeDAState = document.getElementById('badge-dA-state');
+
+      if (isConserved) {
+        term2ValEl.textContent = '= 0.000';
+        term2ValEl.className = 'px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 font-bold shrink-0';
+        term2SubEl.textContent =
+          state.scenario === 'linear'
+            ? 'Eq. (4): Free particle (F = 0) ⟹ r × F = 0'
+            : 'Eq. (4): Central force (F ∥ −r) ⟹ sin(180°) = 0';
+        totalDLEl.textContent = 'dL/dt = 0.000 (L Conserved)';
+        totalDLEl.className = 'text-amber-300 font-bold';
+        badgeLState.textContent = 'INVARIANT';
+        badgeDAState.textContent = 'CONSTANT';
+        statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span><span>dL/dt = 0 (|L| Strictly Conserved)</span>';
+        statusBadge.className = 'text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1.5';
+      } else {
+        const sign = t.torque >= 0 ? '+' : '';
+        term2ValEl.textContent = `= ${sign}${t.torque.toFixed(3)}`;
+        term2ValEl.className = 'px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold shrink-0';
+        term2SubEl.textContent = 'Non-central force F⊥ applied: τ = r × F ≠ 0!';
+        totalDLEl.textContent = `dL/dt = ${sign}${t.torque.toFixed(3)} (Changing)`;
+        totalDLEl.className = 'text-rose-400 font-bold';
+        badgeLState.textContent = 'CHANGING (τ≠0)';
+        badgeDAState.textContent = 'CHANGING';
+        statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping"></span><span>dL/dt = τ ≠ 0 (External Torque Applied)</span>';
+        statusBadge.className = 'text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1.5';
+      }
+    }
+
+    // ============================================================================
+    // 6. MAIN 2D VECTOR & GEOMETRY CANVAS RENDERER
+    // ============================================================================
+    function renderSimulationCanvas() {
+      const width = state.simWidth;
+      const height = state.simHeight;
+      simCtx.clearRect(0, 0, width, height);
+
+      // Compute origin & scale per scenario
+      let originX = width * 0.50;
+      let originY = height * 0.52;
+      if (state.scenario === 'orbit') {
+        originX = width * (0.50 + state.orbit.e * 0.15);
+        originY = height * 0.52;
+      } else if (state.scenario === 'linear') {
+        originX = width * 0.50;
+        originY = height * 0.72;
+      } else if (state.scenario === 'proof') {
+        originX = width * 0.35;
+        originY = height * 0.70;
+      }
+
+      const scale = Math.min(width, height) * 0.175;
+      state.viewTransform = { originX, originY, scale };
+
+      const toScreen = (wx, wy) => ({
+        x: originX + wx * scale,
+        y: originY - wy * scale
+      });
+
+      // 1. Subtle Reference Axes through Origin O
+      simCtx.save();
+      simCtx.strokeStyle = 'rgba(148, 163, 184, 0.16)';
+      simCtx.lineWidth = 1;
+      simCtx.setLineDash([4, 4]);
+      simCtx.beginPath();
+      simCtx.moveTo(0, originY);
+      simCtx.lineTo(width, originY);
+      simCtx.moveTo(originX, 0);
+      simCtx.lineTo(originX, height);
+      simCtx.stroke();
+      simCtx.restore();
+
+      const t = state.telemetry;
+      const O = toScreen(0, 0);
+      const P = toScreen(t.rVec.x, t.rVec.y);
+      const pTipWorld = { x: t.rVec.x + t.pVec.x, y: t.rVec.y + t.pVec.y };
+      const P_Tip = toScreen(pTipWorld.x, pTipWorld.y);
+      const P_FromOrigin = toScreen(t.pVec.x, t.pVec.y);
+
+      // 2. Scenario-specific Trajectory & Equal-Time Swept Sectors
+      if (state.scenario === 'orbit') {
+        drawOrbitScenarioBackground(toScreen, O);
+      } else if (state.scenario === 'linear') {
+        drawLinearScenarioBackground(toScreen, O);
+      } else if (state.scenario === 'proof') {
+        drawProofScenarioBackground(toScreen, P);
+      }
+
+      // 3. Cross-Product Parallelogram |r x p| = |L|
+      if (state.overlays.parallelogram) {
+        simCtx.save();
+        simCtx.beginPath();
+        simCtx.moveTo(O.x, O.y);
+        simCtx.lineTo(P.x, P.y);
+        simCtx.lineTo(P_Tip.x, P_Tip.y);
+        simCtx.lineTo(P_FromOrigin.x, P_FromOrigin.y);
+        simCtx.closePath();
+
+        const grad = simCtx.createLinearGradient(O.x, O.y, P_Tip.x, P_Tip.y);
+        grad.addColorStop(0, 'rgba(251, 191, 36, 0.15)');
+        grad.addColorStop(1, 'rgba(245, 158, 11, 0.28)');
+        simCtx.fillStyle = grad;
+        simCtx.fill();
+
+        simCtx.strokeStyle = 'rgba(251, 191, 36, 0.75)';
+        simCtx.lineWidth = 1.5;
+        simCtx.setLineDash([5, 4]);
+        simCtx.stroke();
+        simCtx.setLineDash([]);
+
+        const cx = (O.x + P.x + P_Tip.x + P_FromOrigin.x) / 4;
+        const cy = (O.y + P.y + P_Tip.y + P_FromOrigin.y) / 4;
+        drawCanvasBadge(
+          simCtx,
+          `|r × p| = |L| = ${t.LMag.toFixed(2)}`,
+          cx,
+          cy,
+          'rgba(15, 23, 42, 0.88)',
+          '#fcd34d',
+          'rgba(251, 191, 36, 0.55)'
+        );
+        simCtx.restore();
+      }
+
+      // 4. Figure 1 Differential Swept Triangle dA = 1/2 |r x dr|
+      const dtStep = state.scenario === 'proof' ? state.proof.dt : 0.36;
+      const drWorld = { x: t.vVec.x * dtStep, y: t.vVec.y * dtStep };
+      const rPlusDrWorld = { x: t.rVec.x + drWorld.x, y: t.rVec.y + drWorld.y };
+      const R_Plus_dR = toScreen(rPlusDrWorld.x, rPlusDrWorld.y);
+      const dR_Origin = toScreen(drWorld.x, drWorld.y);
+
+      if (state.overlays.swept) {
+        simCtx.save();
+        simCtx.beginPath();
+        simCtx.moveTo(O.x, O.y);
+        simCtx.lineTo(P.x, P.y);
+        simCtx.lineTo(R_Plus_dR.x, R_Plus_dR.y);
+        simCtx.closePath();
+        simCtx.fillStyle = 'rgba(244, 63, 94, 0.28)';
+        simCtx.fill();
+        simCtx.strokeStyle = 'rgba(251, 113, 133, 0.8)';
+        simCtx.lineWidth = 1.3;
+        simCtx.stroke();
+
+        const triX = (O.x + P.x + R_Plus_dR.x) / 3;
+        const triY = (O.y + P.y + R_Plus_dR.y) / 3;
+        simCtx.font = 'italic bold 12px Merriweather, serif';
+        simCtx.fillStyle = '#fda4af';
+        simCtx.textAlign = 'center';
+        simCtx.fillText('dA', triX, triY + 4);
+        simCtx.restore();
+      }
+
+      // 5. Figure 1 Differential Vectors (r + dr, dr at tip, dr from origin with dashed blue parallelogram)
+      if (state.overlays.differential) {
+        simCtx.save();
+        simCtx.strokeStyle = 'rgba(96, 165, 250, 0.6)';
+        simCtx.lineWidth = 1.4;
+        simCtx.setLineDash([4, 4]);
+        simCtx.beginPath();
+        simCtx.moveTo(dR_Origin.x, dR_Origin.y);
+        simCtx.lineTo(R_Plus_dR.x, R_Plus_dR.y);
+        simCtx.stroke();
+        simCtx.restore();
+
+        drawVectorArrow(simCtx, O.x, O.y, R_Plus_dR.x, R_Plus_dR.y, '#94a3b8', 1.8, 'r + dr', -12, -8);
+        drawVectorArrow(simCtx, O.x, O.y, dR_Origin.x, dR_Origin.y, '#60a5fa', 2.0, 'dr', -14, 4);
+        drawVectorArrow(simCtx, P.x, P.y, R_Plus_dR.x, R_Plus_dR.y, '#fb7185', 2.4, 'dr = v dt', 12, 14);
+      }
+
+      // 6. Perpendicular Lever Arm r_perp = |r|sin(theta)
+      if (state.overlays.lever && t.pMag > 1e-4) {
+        const ux = t.pVec.x / t.pMag;
+        const uy = t.pVec.y / t.pMag;
+        const projScalar = -(t.rVec.x * ux + t.rVec.y * uy);
+        const footWorld = {
+          x: t.rVec.x + projScalar * ux,
+          y: t.rVec.y + projScalar * uy
+        };
+        const Foot = toScreen(footWorld.x, footWorld.y);
+
+        simCtx.save();
+        simCtx.strokeStyle = 'rgba(192, 132, 252, 0.45)';
+        simCtx.lineWidth = 1.2;
+        simCtx.setLineDash([3, 3]);
+        simCtx.beginPath();
+        simCtx.moveTo(P.x, P.y);
+        simCtx.lineTo(Foot.x, Foot.y);
+        simCtx.stroke();
+
+        simCtx.strokeStyle = '#c084fc';
+        simCtx.lineWidth = 2.0;
+        simCtx.setLineDash([5, 3]);
+        simCtx.beginPath();
+        simCtx.moveTo(O.x, O.y);
+        simCtx.lineTo(Foot.x, Foot.y);
+        simCtx.stroke();
+        simCtx.setLineDash([]);
+
+        // Right-angle square marker at Foot
+        const rightSize = 8;
+        const dxO = O.x - Foot.x;
+        const dyO = O.y - Foot.y;
+        const lenO = Math.hypot(dxO, dyO) || 1;
+        const nx = (dxO / lenO) * rightSize;
+        const ny = (dyO / lenO) * rightSize;
+        const tx = -ny;
+        const ty = nx;
+        simCtx.strokeStyle = '#c084fc';
+        simCtx.lineWidth = 1.3;
+        simCtx.beginPath();
+        simCtx.moveTo(Foot.x + nx, Foot.y + ny);
+        simCtx.lineTo(Foot.x + nx + tx, Foot.y + ny + ty);
+        simCtx.lineTo(Foot.x + tx, Foot.y + ty);
+        simCtx.stroke();
+
+        const midX = (O.x + Foot.x) / 2;
+        const midY = (O.y + Foot.y) / 2;
+        const lblText = state.scenario === 'linear'
+          ? `b = |r|sinθ = ${t.rPerp.toFixed(2)}`
+          : `r⊥ = |r|sinθ = ${t.rPerp.toFixed(2)}`;
+        drawCanvasBadge(
+          simCtx,
+          lblText,
+          midX,
+          midY,
+          'rgba(15, 23, 42, 0.88)',
+          '#e9d5ff',
+          'rgba(192, 132, 252, 0.5)'
+        );
+        simCtx.restore();
+      }
+
+      // 7. Primary Vectors: Position r, Momentum p = mv, and Force F
+      drawVectorArrow(simCtx, O.x, O.y, P.x, P.y, '#38bdf8', 3.0, `r (|r|=${t.rMag.toFixed(2)})`, 10, -10);
+      drawVectorArrow(simCtx, P.x, P.y, P_Tip.x, P_Tip.y, '#34d399', 3.2, `p = mv (|p|=${t.pMag.toFixed(2)})`, 12, -12);
+
+      if (state.overlays.force && t.fMag > 1e-3) {
+        const fScale = 0.55;
+        const F_Tip = toScreen(t.rVec.x + t.fVec.x * fScale, t.rVec.y + t.fVec.y * fScale);
+        drawVectorArrow(simCtx, P.x, P.y, F_Tip.x, F_Tip.y, '#f43f5e', 2.5, 'F', -14, 16);
+      }
+
+      // 8. Included Angle Arc theta between r and p
+      drawAngleArcBetweenVectors(simCtx, P, t.rVec, t.pVec, t.thetaDeg);
+
+      // 9. Origin O & Particle m
+      simCtx.save();
+      if (state.scenario === 'orbit') {
+        const starGrad = simCtx.createRadialGradient(O.x, O.y, 2, O.x, O.y, 18);
+        starGrad.addColorStop(0, '#fef08a');
+        starGrad.addColorStop(0.4, '#f59e0b');
+        starGrad.addColorStop(1, 'rgba(245, 158, 11, 0)');
+        simCtx.fillStyle = starGrad;
+        simCtx.beginPath();
+        simCtx.arc(O.x, O.y, 18, 0, Math.PI * 2);
+        simCtx.fill();
+      }
+      simCtx.fillStyle = '#f8fafc';
+      simCtx.beginPath();
+      simCtx.arc(O.x, O.y, 4.5, 0, Math.PI * 2);
+      simCtx.fill();
+      simCtx.font = 'bold 13px Merriweather, serif';
+      simCtx.fillStyle = '#e2e8f0';
+      simCtx.fillText('O', O.x - 16, O.y + 18);
+
+      const pGrad = simCtx.createRadialGradient(P.x, P.y, 2, P.x, P.y, 14);
+      pGrad.addColorStop(0, '#e0f2fe');
+      pGrad.addColorStop(0.5, '#38bdf8');
+      pGrad.addColorStop(1, 'rgba(56, 189, 248, 0)');
+      simCtx.fillStyle = pGrad;
+      simCtx.beginPath();
+      simCtx.arc(P.x, P.y, 14, 0, Math.PI * 2);
+      simCtx.fill();
+
+      simCtx.fillStyle = '#ffffff';
+      simCtx.strokeStyle = '#0284c7';
+      simCtx.lineWidth = 2;
+      simCtx.beginPath();
+      simCtx.arc(P.x, P.y, 6, 0, Math.PI * 2);
+      simCtx.fill();
+      simCtx.stroke();
+      simCtx.restore();
+    }
+
+    function drawOrbitScenarioBackground(toScreen, O) {
+      const { a, e } = state.orbit;
+
+      if (state.overlays.swept && state.orbit.sweptWedges.length > 0) {
+        simCtx.save();
+        state.orbit.sweptWedges.forEach((pts, idx) => {
+          simCtx.beginPath();
+          simCtx.moveTo(O.x, O.y);
+          pts.forEach((pt) => {
+            const sp = toScreen(pt.x, pt.y);
+            simCtx.lineTo(sp.x, sp.y);
+          });
+          simCtx.closePath();
+          simCtx.fillStyle = idx % 2 === 0 ? 'rgba(56, 189, 248, 0.07)' : 'rgba(244, 63, 94, 0.08)';
+          simCtx.fill();
+          simCtx.strokeStyle = 'rgba(148, 163, 184, 0.14)';
+          simCtx.lineWidth = 1;
+          simCtx.stroke();
+        });
+        simCtx.restore();
+      }
+
+      simCtx.save();
+      simCtx.beginPath();
+      const steps = 120;
+      for (let i = 0; i <= steps; i++) {
+        const nu = (i / steps) * Math.PI * 2;
+        const r = (a * (1 - e * e)) / (1 + e * Math.cos(nu));
+        const sp = toScreen(r * Math.cos(nu), r * Math.sin(nu));
+        if (i === 0) simCtx.moveTo(sp.x, sp.y);
+        else simCtx.lineTo(sp.x, sp.y);
+      }
+      simCtx.closePath();
+      simCtx.strokeStyle = 'rgba(148, 163, 184, 0.45)';
+      simCtx.lineWidth = 1.8;
+      simCtx.setLineDash([6, 4]);
+      simCtx.stroke();
+      simCtx.setLineDash([]);
+
+      const rPeri = a * (1 - e);
+      const rApo = a * (1 + e);
+      const periScreen = toScreen(rPeri, 0);
+      const apoScreen = toScreen(-rApo, 0);
+
+      simCtx.font = '11px JetBrains Mono, monospace';
+      simCtx.fillStyle = 'rgba(148, 163, 184, 0.75)';
+      simCtx.textAlign = 'left';
+      simCtx.fillText('Periapsis (min |r|, max |p|)', periScreen.x + 8, periScreen.y + 15);
+      simCtx.textAlign = 'right';
+      simCtx.fillText('Apoapsis (max |r|, min |p|)', apoScreen.x - 8, apoScreen.y + 15);
+      simCtx.restore();
+    }
+
+    function drawLinearScenarioBackground(toScreen, O) {
+      const lin = state.linear;
+
+      // Swept equal-base triangles along y = b
+      if (state.overlays.swept) {
+        simCtx.save();
+        for (let xVal = -2.4; xVal <= 1.8; xVal += 0.8) {
+          const p1 = toScreen(xVal, lin.b);
+          const p2 = toScreen(xVal + 0.4, lin.b);
+          simCtx.beginPath();
+          simCtx.moveTo(O.x, O.y);
+          simCtx.lineTo(p1.x, p1.y);
+          simCtx.lineTo(p2.x, p2.y);
+          simCtx.closePath();
+          simCtx.fillStyle = 'rgba(52, 211, 153, 0.08)';
+          simCtx.fill();
+          simCtx.strokeStyle = 'rgba(52, 211, 153, 0.22)';
+          simCtx.lineWidth = 1;
+          simCtx.stroke();
+        }
+        simCtx.restore();
+      }
+
+      const startPt = toScreen(-3.5, lin.b);
+      const endPt = toScreen(3.5, lin.b);
+
+      simCtx.save();
+      simCtx.beginPath();
+      simCtx.moveTo(startPt.x, startPt.y);
+      simCtx.lineTo(endPt.x, endPt.y);
+      simCtx.strokeStyle = 'rgba(148, 163, 184, 0.55)';
+      simCtx.lineWidth = 2;
+      simCtx.setLineDash([7, 5]);
+      simCtx.stroke();
+      simCtx.setLineDash([]);
+
+      simCtx.font = '11px JetBrains Mono, monospace';
+      simCtx.fillStyle = '#94a3b8';
+      simCtx.textAlign = 'right';
+      simCtx.fillText(`Straight-Line Path y = b = ${lin.b.toFixed(2)} m`, endPt.x - 20, endPt.y - 10);
+      simCtx.restore();
+    }
+
+    function drawProofScenarioBackground(toScreen, P) {
+      const t = state.telemetry;
+      const vLen = Math.hypot(t.vVec.x, t.vVec.y) || 1;
+      const tx = t.vVec.x / vLen;
+      const ty = t.vVec.y / vLen;
+      const nx = -ty;
+      const ny = tx;
+
+      const pStart = toScreen(t.rVec.x - tx * 1.4 - nx * 0.35, t.rVec.y - ty * 1.4 - ny * 0.35);
+      const cp1 = toScreen(t.rVec.x - tx * 0.5, t.rVec.y - ty * 0.5);
+      const cp2 = toScreen(t.rVec.x + tx * 0.7, t.rVec.y + ty * 0.7);
+      const pEnd = toScreen(t.rVec.x + tx * 1.65 - nx * 0.4, t.rVec.y + ty * 1.65 - ny * 0.4);
+
+      simCtx.save();
+      simCtx.strokeStyle = 'rgba(148, 163, 184, 0.6)';
+      simCtx.lineWidth = 2;
+      simCtx.setLineDash([6, 5]);
+      simCtx.beginPath();
+      simCtx.moveTo(pStart.x, pStart.y);
+      simCtx.quadraticCurveTo(cp1.x, cp1.y, P.x, P.y);
+      simCtx.quadraticCurveTo(cp2.x, cp2.y, pEnd.x, pEnd.y);
+      simCtx.stroke();
+      simCtx.setLineDash([]);
+
+      simCtx.font = '12px Merriweather, serif';
+      simCtx.fillStyle = '#94a3b8';
+      simCtx.fillText('Arbitrary Trajectory (Fig. 1)', pStart.x + 10, pStart.y + 16);
+      simCtx.restore();
+    }
+
+    // ============================================================================
+    // 7. VECTOR & BADGE DRAWING UTILITIES
+    // ============================================================================
+    function drawVectorArrow(ctx, x1, y1, x2, y2, color, lineWidth, label, labelOffsetX = 8, labelOffsetY = -8) {
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const len = Math.hypot(dx, dy);
+      if (len < 4) return;
+
+      const angle = Math.atan2(dy, dx);
+      const headLen = Math.min(12, Math.max(8, len * 0.22));
+
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = lineWidth;
+      ctx.lineCap = 'round';
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(x2 - headLen * Math.cos(angle - Math.PI / 6.5), y2 - headLen * Math.sin(angle - Math.PI / 6.5));
+      ctx.lineTo(x2 - headLen * Math.cos(angle + Math.PI / 6.5), y2 - headLen * Math.sin(angle + Math.PI / 6.5));
+      ctx.closePath();
+      ctx.fill();
+
+      if (label) {
+        ctx.font = '600 12px JetBrains Mono, monospace';
+        ctx.fillStyle = color;
+        ctx.shadowColor = 'rgba(2, 6, 23, 0.95)';
+        ctx.shadowBlur = 4;
+        ctx.fillText(label, x2 + labelOffsetX, y2 + labelOffsetY);
+      }
+      ctx.restore();
+    }
+
+    function drawAngleArcBetweenVectors(ctx, P, rVec, pVec, thetaDeg) {
+      const angR = Math.atan2(-rVec.y, rVec.x);
+      const angP = Math.atan2(-pVec.y, pVec.x);
+
+      ctx.save();
+      const rLen = Math.hypot(rVec.x, rVec.y) || 1;
+      const extX = P.x + (rVec.x / rLen) * 34;
+      const extY = P.y - (rVec.y / rLen) * 34;
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+      ctx.lineWidth = 1.2;
+      ctx.setLineDash([2, 3]);
+      ctx.beginPath();
+      ctx.moveTo(P.x, P.y);
+      ctx.lineTo(extX, extY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      ctx.strokeStyle = '#c084fc';
+      ctx.lineWidth = 1.8;
+      ctx.beginPath();
+      let diff = angP - angR;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      while (diff > Math.PI) diff -= Math.PI * 2;
+      ctx.arc(P.x, P.y, 24, angR, angR + diff, diff < 0);
+      ctx.stroke();
+
+      const midAng = angR + diff / 2;
+      const lblX = P.x + Math.cos(midAng) * 36;
+      const lblY = P.y + Math.sin(midAng) * 36;
+      ctx.font = '600 11px JetBrains Mono, monospace';
+      ctx.fillStyle = '#d8b4fe';
+      ctx.textAlign = 'center';
+      ctx.fillText(`θ=${Math.round(thetaDeg)}°`, lblX, lblY);
+      ctx.restore();
+    }
+
+    function drawCanvasBadge(ctx, text, x, y, bg, textColor, borderColor) {
+      ctx.save();
+      ctx.font = '600 11px JetBrains Mono, monospace';
+      const metrics = ctx.measureText(text);
+      const padX = 7;
+      const w = metrics.width + padX * 2;
+      const h = 20;
+      const rx = x - w / 2;
+      const ry = y - h / 2;
+
+      ctx.fillStyle = bg;
+      ctx.strokeStyle = borderColor;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(rx, ry, w, h, 6);
+      } else {
+        ctx.rect(rx, ry, w, h);
+      }
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = textColor;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, x, y + 0.5);
+      ctx.restore();
+    }
+
+    // ============================================================================
+    // 8. REAL-TIME STRIP CHART RENDERER
+    // ============================================================================
+    function renderHistoryChart() {
+      const w = state.chartWidth;
+      const h = state.chartHeight;
+      chartCtx.clearRect(0, 0, w, h);
+
+      chartCtx.save();
+      chartCtx.strokeStyle = 'rgba(51, 65, 85, 0.35)';
+      chartCtx.lineWidth = 1;
+      for (let i = 1; i <= 3; i++) {
+        const y = (h / 4) * i;
+        chartCtx.beginPath();
+        chartCtx.moveTo(0, y);
+        chartCtx.lineTo(w, y);
+        chartCtx.stroke();
+      }
+      chartCtx.restore();
+
+      if (state.history.length < 2) return;
+
+      const maxVal = 3.5;
+      const mapY = (val) => h - 10 - (Math.min(maxVal, Math.max(0, val)) / maxVal) * (h - 20);
+
+      const drawTrace = (key, color, lineWidth, isDashed = false) => {
+        chartCtx.save();
+        chartCtx.strokeStyle = color;
+        chartCtx.lineWidth = lineWidth;
+        if (isDashed) chartCtx.setLineDash([4, 3]);
+        chartCtx.beginPath();
+        state.history.forEach((pt, idx) => {
+          const x = (idx / (state.maxHistory - 1)) * w;
+          const y = mapY(pt[key]);
+          if (idx === 0) chartCtx.moveTo(x, y);
+          else chartCtx.lineTo(x, y);
+        });
+        chartCtx.stroke();
+        chartCtx.restore();
+      };
+
+      drawTrace('r', '#38bdf8', 1.8);
+      drawTrace('p', '#34d399', 1.8);
+      drawTrace('sin', '#c084fc', 1.4, true);
+      drawTrace('L', '#fbbf24', 3.0);
+    }
+
+    // ============================================================================
+    // 9. UI CONTROLS & SCENARIO SWITCHING
+    // ============================================================================
+    function switchScenario(scen) {
+      state.scenario = scen;
+
+      const tabs = {
+        orbit: document.getElementById('tab-orbit'),
+        linear: document.getElementById('tab-linear'),
+        proof: document.getElementById('tab-proof')
+      };
+      Object.keys(tabs).forEach((k) => {
+        if (k === scen) {
+          tabs[k].className =
+            'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm';
+        } else {
+          tabs[k].className =
+            'px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent';
+        }
+      });
+
+      document.getElementById('controls-orbit').classList.toggle('hidden', scen !== 'orbit');
+      document.getElementById('controls-linear').classList.toggle('hidden', scen !== 'linear');
+      document.getElementById('controls-proof').classList.toggle('hidden', scen !== 'proof');
+
+      const badgeEl = document.getElementById('scenario-badge');
+      const descEl = document.getElementById('scenario-description');
+
+      if (scen === 'orbit') {
+        badgeEl.textContent = 'Section 4.2 & Section 3 • Central Force Orbit';
+        descEl.innerHTML =
+          'Both <span class="text-sky-400 font-semibold">|<span class="math-vec">r</span>|</span> and <span class="text-emerald-400 font-semibold">|<span class="math-vec">p</span>|</span> vary continuously in magnitude and direction. Because gravity is a central force (<span class="math-vec text-rose-400">F</span> ∥ −<span class="math-vec text-sky-400">r</span>), net torque <span class="math-vec">τ</span> = <span class="math-vec">r</span> × <span class="math-vec">F</span> = <span class="math-vec">0</span>, so the cross-product parallelogram area <span class="text-amber-300 font-semibold">|<span class="math-vec">L</span>| = |<span class="math-vec">r</span> × <span class="math-vec">p</span>|</span> remains strictly invariant.';
+        generateEqualTimeOrbitWedges();
+      } else if (scen === 'linear') {
+        badgeEl.textContent = 'Section 4.1 • Free Particle in Linear Motion (y = b)';
+        descEl.innerHTML =
+          'A free particle moves along straight line <span class="font-mono text-slate-200">y = b</span> at constant momentum <span class="text-emerald-400 font-semibold"><span class="math-vec">p</span> = m<span class="math-vec">v</span></span> while position <span class="text-sky-400 font-semibold"><span class="math-vec">r</span>(t)</span> changes continuously in magnitude and direction. Because the perpendicular impact parameter <span class="text-fuchsia-300 font-semibold">b = |<span class="math-vec">r</span>|sinθ</span> is constant, the shearing parallelogram area <span class="text-amber-300 font-semibold">|<span class="math-vec">L</span>| = b|<span class="math-vec">p</span>|</span> is strictly conserved.';
+      } else if (scen === 'proof') {
+        badgeEl.textContent = 'Sections 2 & 3 • Figure 1 & Equation (2) Proof Explorer';
+        descEl.innerHTML =
+          'Interactive recreation of <span class="text-amber-300 font-semibold">Figure 1</span> and <span class="text-amber-300 font-semibold">Equation (2)</span>. Scrub <span class="text-sky-400 font-semibold">|<span class="math-vec">r</span>|</span> directly under the Torque-Free Constraint (<span class="math-vec">τ</span> = <span class="math-vec">0</span>) to see <span class="text-emerald-400 font-semibold">|<span class="math-vec">p</span>|sinθ ∝ 1/|<span class="math-vec">r</span>|</span> preserve <span class="text-amber-300 font-semibold">|<span class="math-vec">L</span>|</span>, or switch to Applied Torque (<span class="math-vec">τ</span> ≠ <span class="math-vec">0</span>).';
+      }
+
+      clearHistoryChart();
+      updatePhysics(0.016);
+    }
+
+    function onSpeedChange(val) {
+      state.speedMultiplier = parseFloat(val);
+      document.getElementById('lbl-speed').textContent = state.speedMultiplier.toFixed(1) + '×';
+    }
+
+    function onOrbitParamChange() {
+      const e = parseFloat(document.getElementById('slider-e').value);
+      const a = parseFloat(document.getElementById('slider-a').value);
+      const m = parseFloat(document.getElementById('slider-m-orbit').value);
+
+      state.orbit.e = e;
+      state.orbit.a = a;
+      state.orbit.m = m;
+
+      document.getElementById('lbl-e').textContent = e.toFixed(2);
+      document.getElementById('lbl-a').textContent = a.toFixed(2) + ' AU';
+      document.getElementById('lbl-m-orbit').textContent = m.toFixed(2) + ' kg';
+
+      generateEqualTimeOrbitWedges();
+      updatePhysics(0);
+      pushHistorySample();
+    }
+
+    function setOrbitPreset(e, a, m) {
+      document.getElementById('slider-e').value = e;
+      document.getElementById('slider-a').value = a;
+      document.getElementById('slider-m-orbit').value = m;
+      clearHistoryChart();
+      onOrbitParamChange();
+    }
+
+    function onScrubOrbitAnomaly(degVal) {
+      const rad = (parseFloat(degVal) * Math.PI) / 180;
+      state.orbit.trueAnomaly = rad;
+      const e = state.orbit.e;
+      const E = 2 * Math.atan2(
+        Math.sqrt(1 - e) * Math.sin(rad / 2),
+        Math.sqrt(1 + e) * Math.cos(rad / 2)
+      );
+      state.orbit.meanAnomaly = E - e * Math.sin(E);
+      if (state.orbit.meanAnomaly < 0) state.orbit.meanAnomaly += Math.PI * 2;
+
+      document.getElementById('lbl-anomaly').textContent = Math.round(degVal) + '°';
+      updatePhysics(0);
+      pushHistorySample();
+    }
+
+    function onLinearParamChange() {
+      const b = parseFloat(document.getElementById('slider-b').value);
+      const v = parseFloat(document.getElementById('slider-v-linear').value);
+      const m = parseFloat(document.getElementById('slider-m-linear').value);
+
+      state.linear.b = b;
+      state.linear.v = v;
+      state.linear.m = m;
+
+      document.getElementById('lbl-b').textContent = b.toFixed(2) + ' m';
+      document.getElementById('lbl-v-linear').textContent = v.toFixed(2) + ' m/s';
+      document.getElementById('lbl-m-linear').textContent = m.toFixed(2) + ' kg';
+
+      updatePhysics(0);
+      pushHistorySample();
+    }
+
+    function onScrubLinearX(val) {
+      state.linear.x = parseFloat(val);
+      document.getElementById('lbl-linear-x').textContent = state.linear.x.toFixed(2) + ' m';
+      updatePhysics(0);
+      pushHistorySample();
+    }
+
+    function setProofTorqueMode(enableTorque) {
+      state.proof.torqueMode = enableTorque;
+      const btnConserved = document.getElementById('btn-mode-conserved');
+      const btnTorque = document.getElementById('btn-mode-torque');
+      const sliderWrap = document.getElementById('proof-torque-slider-wrap');
+
+      if (!enableTorque) {
+        btnConserved.className =
+          'px-2.5 py-2 rounded-lg text-xs font-mono font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40 transition text-center';
+        btnTorque.className =
+          'px-2.5 py-2 rounded-lg text-xs font-mono font-semibold bg-slate-800 text-slate-400 border border-slate-700 transition text-center';
+        sliderWrap.classList.add('opacity-40', 'pointer-events-none');
+        state.proof.fPerp = 0;
+        document.getElementById('slider-proof-fperp').value = 0;
+        document.getElementById('lbl-proof-fperp').textContent = '0.00 N';
+      } else {
+        btnTorque.className =
+          'px-2.5 py-2 rounded-lg text-xs font-mono font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40 transition text-center';
+        btnConserved.className =
+          'px-2.5 py-2 rounded-lg text-xs font-mono font-semibold bg-slate-800 text-slate-400 border border-slate-700 transition text-center';
+        sliderWrap.classList.remove('opacity-40', 'pointer-events-none');
+        if (Math.abs(state.proof.fPerp) < 0.05) {
+          state.proof.fPerp = 0.45;
+          document.getElementById('slider-proof-fperp').value = 0.45;
+          document.getElementById('lbl-proof-fperp').textContent = '+0.45 N';
+        }
+      }
+      updatePhysics(0);
+      pushHistorySample();
+    }
+
+    function onProofParamChange(which) {
+      const prf = state.proof;
+      if (which === 'r' || which === 'rangle' || which === 'p' || which === 'theta') {
+        if (state.playing) togglePlay();
+      }
+
+      prf.rMag = parseFloat(document.getElementById('slider-proof-r').value);
+      prf.rAngleDeg = parseFloat(document.getElementById('slider-proof-rangle').value);
+      prf.pMag = parseFloat(document.getElementById('slider-proof-p').value);
+      prf.thetaDeg = parseFloat(document.getElementById('slider-proof-theta').value);
+      prf.dt = parseFloat(document.getElementById('slider-proof-dt').value);
+      prf.fPerp = parseFloat(document.getElementById('slider-proof-fperp').value);
+
+      const thetaRad = (prf.thetaDeg * Math.PI) / 180;
+      const sinTheta = Math.max(0.15, Math.sin(thetaRad));
+
+      if (!prf.torqueMode) {
+        if (which === 'p') {
+          // User adjusted |p| in conserved mode -> adjust |r| or update target |L|
+          prf.conservedL = prf.rMag * prf.pMag * sinTheta;
+        } else {
+          // User adjusted |r| or theta in conserved mode -> automatically update |p| to preserve |L|!
+          prf.pMag = prf.conservedL / (prf.rMag * sinTheta);
+          document.getElementById('slider-proof-p').value = Math.min(2.6, Math.max(0.5, prf.pMag)).toFixed(2);
+        }
+      } else {
+        prf.conservedL = prf.rMag * prf.pMag * sinTheta;
+      }
+
+      document.getElementById('lbl-proof-r').textContent = prf.rMag.toFixed(2);
+      document.getElementById('lbl-proof-rangle').textContent = Math.round(prf.rAngleDeg) + '°';
+      document.getElementById('lbl-proof-p').textContent = prf.pMag.toFixed(2);
+      document.getElementById('lbl-proof-theta').textContent = Math.round(prf.thetaDeg) + '°';
+      document.getElementById('lbl-proof-dt').textContent = prf.dt.toFixed(2) + ' s';
+      const sign = prf.fPerp > 0 ? '+' : '';
+      document.getElementById('lbl-proof-fperp').textContent = sign + prf.fPerp.toFixed(2) + ' N';
+
+      updatePhysics(0);
+      pushHistorySample();
+    }
+
+    function updateOverlays() {
+      state.overlays.parallelogram = document.getElementById('chk-parallelogram').checked;
+      state.overlays.swept = document.getElementById('chk-swept').checked;
+      state.overlays.lever = document.getElementById('chk-lever').checked;
+      state.overlays.differential = document.getElementById('chk-differential').checked;
+      state.overlays.force = document.getElementById('chk-force').checked;
+    }
+
+    function togglePlay() {
+      state.playing = !state.playing;
+      document.getElementById('icon-pause').classList.toggle('hidden', !state.playing);
+      document.getElementById('icon-play').classList.toggle('hidden', state.playing);
+      document.getElementById('play-label').textContent = state.playing ? 'Pause' : 'Play';
+    }
+
+    function stepSimulation() {
+      if (state.playing) togglePlay();
+      state.playing = true;
+      updatePhysics(0.06);
+      state.playing = false;
+    }
+
+    function resetScenario() {
+      clearHistoryChart();
+      if (state.scenario === 'orbit') {
+        setOrbitPreset(0.50, 1.70, 1.00);
+      } else if (state.scenario === 'linear') {
+        document.getElementById('slider-b').value = 1.35;
+        document.getElementById('slider-v-linear').value = 1.40;
+        document.getElementById('slider-m-linear').value = 1.00;
+        state.linear.x = -1.20;
+        onLinearParamChange();
+      } else if (state.scenario === 'proof') {
+        state.proof.conservedL = 1.96;
+        setProofTorqueMode(false);
+        document.getElementById('slider-proof-r').value = 1.65;
+        document.getElementById('slider-proof-rangle').value = 30;
+        document.getElementById('slider-proof-theta').value = 112;
+        document.getElementById('slider-proof-dt').value = 0.45;
+        onProofParamChange('dt');
+      }
+      if (!state.playing) togglePlay();
+    }
+
+    function clearHistoryChart() {
+      state.history = [];
+    }
+
+    // ============================================================================
+    // 10. DIRECT CANVAS POINTER / TOUCH DRAGGING INTERACTION
+    // ============================================================================
+    function setupCanvasInteractions() {
+      const getWorldCoords = (clientX, clientY) => {
+        const rect = simCanvas.getBoundingClientRect();
+        const px = clientX - rect.left;
+        const py = clientY - rect.top;
+        const { originX, originY, scale } = state.viewTransform;
+        return {
+          wx: (px - originX) / scale,
+          wy: (originY - py) / scale
+        };
+      };
+
+      const handlePointerDrag = (clientX, clientY) => {
+        const { wx, wy } = getWorldCoords(clientX, clientY);
+
+        if (state.scenario === 'orbit') {
+          let angle = Math.atan2(wy, wx);
+          if (angle < 0) angle += Math.PI * 2;
+          const deg = Math.round((angle * 180) / Math.PI);
+          document.getElementById('slider-anomaly').value = deg;
+          onScrubOrbitAnomaly(deg);
+        } else if (state.scenario === 'linear') {
+          const clampedX = Math.max(-state.linear.xMax, Math.min(state.linear.xMax, wx));
+          document.getElementById('slider-linear-x').value = clampedX.toFixed(2);
+          onScrubLinearX(clampedX);
+        } else if (state.scenario === 'proof') {
+          const rMag = Math.max(0.80, Math.min(2.40, Math.hypot(wx, wy)));
+          let rAngleDeg = (Math.atan2(wy, wx) * 180) / Math.PI;
+          rAngleDeg = Math.max(5, Math.min(85, rAngleDeg));
+          document.getElementById('slider-proof-r').value = rMag.toFixed(2);
+          document.getElementById('slider-proof-rangle').value = Math.round(rAngleDeg);
+          onProofParamChange('r');
+        }
+      };
+
+      simCanvas.addEventListener('pointerdown', (e) => {
+        state.isDraggingCanvas = true;
+        simCanvas.setPointerCapture(e.pointerId);
+        handlePointerDrag(e.clientX, e.clientY);
+      });
+
+      simCanvas.addEventListener('pointermove', (e) => {
+        if (!state.isDraggingCanvas) return;
+        handlePointerDrag(e.clientX, e.clientY);
+      });
+
+      const endDrag = () => {
+        state.isDraggingCanvas = false;
+      };
+      simCanvas.addEventListener('pointerup', endDrag);
+      simCanvas.addEventListener('pointercancel', endDrag);
+    }
+
+    // ============================================================================
+    // 11. MAIN ANIMATION LOOP & INITIALIZATION
+    // ============================================================================
+    function animateLoop(timestamp) {
+      if (!state.lastTimestamp) state.lastTimestamp = timestamp;
+      const dt = Math.min(0.05, (timestamp - state.lastTimestamp) / 1000);
+      state.lastTimestamp = timestamp;
+
+      updatePhysics(dt);
+      renderSimulationCanvas();
+      renderHistoryChart();
+
+      requestAnimationFrame(animateLoop);
+    }
+
+    window.addEventListener('resize', () => {
+      resizeCanvases();
+      renderSimulationCanvas();
+      renderHistoryChart();
+    });
+
+    window.onload = function () {
+      resizeCanvases();
+      generateEqualTimeOrbitWedges();
+      setupCanvasInteractions();
+      updatePhysics(0.016);
+      requestAnimationFrame(animateLoop);
+    };
+  </script>
+</body>
+</html>
