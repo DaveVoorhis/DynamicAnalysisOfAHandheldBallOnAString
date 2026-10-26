@@ -98,7 +98,7 @@
     }
 
     .badge-pill {
-      font-family: var(--font-mono);
+      font-family: var(--font-mono),serif;
       font-size: 0.68rem;
       font-weight: 600;
       padding: 2px 8px;
@@ -120,7 +120,7 @@
     }
 
     .btn {
-      font-family: var(--font-sans);
+      font-family: var(--font-sans),serif;
       font-size: 0.74rem;
       font-weight: 600;
       padding: 6px 11px;
@@ -220,7 +220,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-sky-500/30 selection:text-sky-200 min-h-screen flex flex-col">
 
-<!-- HEADER (Exact structural & visual match to dynamics_of_a_hand_held_ball_on_a_string_2.html) -->
+<!-- HEADER -->
 <header class="app-header">
   <div class="brand-group">
     <div class="brand-icon" aria-hidden="true">
@@ -278,16 +278,16 @@
         <div class="flex flex-wrap items-center gap-2">
           <span id="scenario-badge" class="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">Section 4.2 &amp; Figure 2 • Planetary Orbits (Central Forces)</span>
           <span id="conservation-status-badge" class="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1.5">
-              <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-              <span>dL/dt = 0 (L = |r||p|sinθ Conserved)</span>
-            </span>
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+            <span>dL/dt = 0 (L = |r||p|sinθ Conserved)</span>
+          </span>
         </div>
       </div>
 
       <!-- Bottom Row: Scenario Explanation & Transport Controls -->
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p id="scenario-description" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
-          As the planet orbits the star (<span class="text-amber-300 font-semibold">Figure 2</span>), it accelerates as it nears periapsis (<span class="text-sky-400 font-semibold">|r|</span> small, <span class="text-emerald-400 font-semibold">|p|</span> large) and decelerates toward apoapsis (<span class="text-sky-400 font-semibold">|r|</span> large, <span class="text-emerald-400 font-semibold">|p|</span> small), while the angle <span class="text-rose-400 font-semibold">θ</span> between <span class="font-mono text-slate-200">ext. r</span> and <span class="math-vec text-emerald-400">p</span> is only 90° at the apsides. All three variables—<span class="text-sky-400 font-semibold">|r|</span>, <span class="text-emerald-400 font-semibold">|p|</span>, and <span class="text-rose-400 font-semibold">sin(θ)</span>—continuously compensate to keep <span class="text-amber-300 font-semibold">L = |r||p|sin(θ)</span> strictly constant.
+          As the planet orbits the star (<span class="text-amber-300 font-semibold">Figure 2</span>), it accelerates as it nears periapsis (<span class="text-sky-400 font-semibold">|r|</span> small, <span class="text-emerald-400 font-semibold">|p|</span> large) and decelerates toward apoapsis (<span class="text-sky-400 font-semibold">|r|</span> large, <span class="text-emerald-400 font-semibold">|p|</span> small), while the angle <span class="text-rose-400 font-semibold">θ</span> between <span class="font-mono text-slate-200">ext. r</span> and <span class="math-vec text-emerald-400">p</span> is only 90° at the apsides. All three variables—<span class="text-sky-400 font-semibold">|r|</span>, <span class="text-emerald-400 font-semibold">|p|</span>, and <span class="text-rose-400 font-semibold">sin(θ)</span>—continuously compensate to keep <span class="text-amber-300 font-semibold">L = |r||p|sin(θ)</span> strictly constant, while rotational kinetic energy <span class="text-purple-300 font-semibold">K<sub>rot</sub> = L²/(2mr²)</span> surges near periapsis.
         </p>
 
         <!-- Playback & Quick Reset Controls -->
@@ -389,15 +389,15 @@
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-2.5">
         <div>
           <h3 class="text-xs sm:text-sm font-serif font-bold text-amber-300">
-            Dynamic Balancing of Variables (Figure 2): <span class="font-mono">L = |r| · |p| · sin(θ)</span>
+            Dynamic Balancing of Variables (Figure 2): <span class="font-mono">L = |r| · |p| · sin(θ)</span> &amp; <span class="font-mono text-purple-300">K<sub>rot</sub> = L² / (2mr²)</span>
           </h3>
           <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">
-            Bars show each factor normalized between its orbital <span class="font-mono text-slate-300">min</span> and <span class="font-mono text-slate-300">max</span>. Notice how <span class="text-sky-400 font-mono">|r|</span> and <span class="text-emerald-400 font-mono">|p|</span> move in opposite directions while <span class="text-rose-400 font-mono">sin(θ)</span> dips between apsides.
+            Bars show each factor normalized between its orbital <span class="font-mono text-slate-300">min</span> and <span class="font-mono text-slate-300">max</span>. Notice how <span class="text-sky-400 font-mono">|r|</span> and <span class="text-emerald-400 font-mono">|p|</span> move in opposite directions while <span class="text-rose-400 font-mono">sin(θ)</span> dips between apsides, and <span class="text-purple-300 font-mono">K<sub>rot</sub></span> varies as <span class="font-mono text-slate-300">1/|r|²</span>.
           </p>
         </div>
         <span id="bal-apsis-note" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[11px] shrink-0 self-start sm:self-center">
-            θ ≠ 90° (Non-Apsis)
-          </span>
+          θ ≠ 90° (Non-Apsis)
+        </span>
       </div>
 
       <!-- Single-Row Live Product Bar: |r| × |p| × sin(θ) = |L| -->
@@ -457,90 +457,127 @@
         </div>
       </div>
 
-      <!-- Product Result Bar -->
-      <div class="bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-slate-950 border border-amber-500/40 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 font-mono">
-        <div class="text-xs text-amber-200">
-          <span class="font-bold text-amber-300">Exact Instantaneous Product:</span>
-          <span id="bal-equation-str" class="ml-1 text-slate-200">|r|(1.500) × |p|(1.200) × sin(90.0°)(1.000)</span>
+      <!-- Product Result Bar & Rotational Kinetic Energy Bar -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-2.5 font-mono">
+        <div class="lg:col-span-7 bg-gradient-to-r from-amber-500/15 via-amber-500/10 to-slate-950 border border-amber-500/40 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2">
+          <div class="text-xs text-amber-200">
+            <span class="font-bold text-amber-300">Instantaneous Product:</span>
+            <span id="bal-equation-str" class="ml-1 text-slate-200">|r|(1.500) × |p|(1.200) × sin(90.0°)(1.000)</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-amber-300/90">L =</span>
+            <span id="bal-val-L" class="text-base sm:text-lg font-bold text-amber-300">1.800</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40 font-bold">CONSTANT</span>
+          </div>
         </div>
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-amber-300/90">L =</span>
-          <span id="bal-val-L" class="text-base sm:text-lg font-bold text-amber-300">1.800</span>
-          <span class="text-[10px] px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40 font-bold">CONSTANT</span>
+
+        <!-- Rotational Kinetic Energy K_rot = L^2 / (2 m r^2) = 1/2 I omega^2 -->
+        <div class="lg:col-span-5 bg-gradient-to-r from-purple-500/15 via-purple-500/10 to-slate-950 border border-purple-500/40 rounded-xl px-3.5 py-2 flex flex-col justify-center">
+          <div class="flex items-center justify-between gap-2">
+            <div class="text-xs text-purple-200">
+              <span class="font-bold text-purple-300">Rot. KE (K<sub>rot</sub> = ½Iω² = L²/2mr²):</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span id="bal-val-krot" class="text-sm sm:text-base font-bold text-purple-300">0.360</span>
+              <span id="bal-tag-krot" class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/30">∝ 1/|r|²</span>
+            </div>
+          </div>
+          <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1.5">
+            <div id="bal-bar-krot" class="bg-purple-400 h-full" style="width: 50%"></div>
+          </div>
+          <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+            <span id="bal-min-krot">min (apo)</span>
+            <span id="bal-sub-ktot" class="text-slate-300">K<sub>tot</sub> = 0.720</span>
+            <span id="bal-max-krot">max (peri)</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- LIVE TELEMETRY READOUT GAUGES (6 CARDS) -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+    <!-- LIVE TELEMETRY READOUT GAUGES (7 CARDS) -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 2xl:grid-cols-7 gap-2.5">
       <!-- Card 1: |r| -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-mono text-slate-400">Position |<span class="math-vec text-sky-400">r</span>|</span>
-          <span id="badge-r-state" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping"></span>VARYING
-            </span>
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between min-w-0">
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
+          <span class="text-xs font-mono text-slate-400 whitespace-nowrap">Pos. |<span class="math-vec text-sky-400">r</span>|</span>
+          <span id="badge-r-state" class="text-[10px] leading-none font-mono px-1.5 py-1 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30 inline-flex items-center gap-1 shrink-0 whitespace-nowrap">
+            <span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping"></span>VARYING
+          </span>
         </div>
-        <div id="val-r" class="text-lg sm:text-xl font-mono font-bold text-sky-400 my-1">1.500</div>
+        <div id="val-r" class="text-lg sm:text-xl font-mono font-bold text-sky-400 my-1.5">1.500</div>
         <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
           <div id="bar-r" class="bg-sky-400 h-full" style="width: 50%"></div>
         </div>
       </div>
 
       <!-- Card 2: |p| -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-mono text-slate-400">Momentum |<span class="math-vec text-emerald-400">p</span>|</span>
-          <span id="badge-p-state" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 flex items-center gap-1">
-              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>VARYING
-            </span>
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between min-w-0">
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
+          <span class="text-xs font-mono text-slate-400 whitespace-nowrap">Mom. |<span class="math-vec text-emerald-400">p</span>|</span>
+          <span id="badge-p-state" class="text-[10px] leading-none font-mono px-1.5 py-1 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 inline-flex items-center gap-1 shrink-0 whitespace-nowrap">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>VARYING
+          </span>
         </div>
-        <div id="val-p" class="text-lg sm:text-xl font-mono font-bold text-emerald-400 my-1">1.200</div>
+        <div id="val-p" class="text-lg sm:text-xl font-mono font-bold text-emerald-400 my-1.5">1.200</div>
         <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
           <div id="bar-p" class="bg-emerald-400 h-full" style="width: 50%"></div>
         </div>
       </div>
 
       <!-- Card 3: Angle theta & sin(theta) -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-mono text-slate-400">Angle θ</span>
-          <span id="val-sin-theta" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-300">sinθ=1.00</span>
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between min-w-0">
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
+          <span class="text-xs font-mono text-slate-400 whitespace-nowrap">Angle θ</span>
+          <span id="val-sin-theta" class="text-[10px] leading-none font-mono px-1.5 py-1 rounded bg-rose-500/15 text-rose-300 border border-rose-500/30 shrink-0 whitespace-nowrap">sinθ=1.00</span>
         </div>
-        <div id="val-theta" class="text-lg sm:text-xl font-mono font-bold text-rose-300 my-1">90.0°</div>
+        <div id="val-theta" class="text-lg sm:text-xl font-mono font-bold text-rose-300 my-1.5">90.0°</div>
         <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
           <div id="bar-sin" class="bg-rose-400 h-full" style="width: 100%"></div>
         </div>
       </div>
 
       <!-- Card 4: Perpendicular Lever Arm b = |r|sin(theta) -->
-      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-mono text-slate-400">Lever |<span class="math-vec">r</span>|sinθ</span>
-          <span class="text-[10px] font-mono text-purple-300">b</span>
+      <div class="bg-slate-900/90 border border-slate-800 rounded-xl p-3 flex flex-col justify-between min-w-0">
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
+          <span class="text-xs font-mono text-slate-400 whitespace-nowrap">Lever |<span class="math-vec">r</span>|sinθ</span>
+          <span class="text-[10px] leading-none font-mono px-1.5 py-1 rounded bg-purple-500/15 text-purple-300 border border-purple-500/30 shrink-0 whitespace-nowrap">b = r<sub>⊥</sub></span>
         </div>
-        <div id="val-r-perp" class="text-lg sm:text-xl font-mono font-bold text-purple-300 my-1">1.500</div>
+        <div id="val-r-perp" class="text-lg sm:text-xl font-mono font-bold text-purple-300 my-1.5">1.500</div>
         <div id="sub-p-perp" class="text-[11px] font-mono text-slate-400 truncate">p<sub>⊥</sub> = |p|sinθ = 1.200</div>
       </div>
 
-      <!-- Card 5: Angular Momentum |L| = |r||p|sin(theta) -->
-      <div class="bg-gradient-to-br from-amber-500/15 via-slate-900 to-slate-900 border border-amber-500/50 rounded-xl p-3 flex flex-col justify-between shadow-lg shadow-amber-500/5">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-mono font-semibold text-amber-300"><span class="math-var">L</span> = |<span class="math-vec">r</span>||<span class="math-vec">p</span>|sinθ</span>
-          <span id="badge-L-state" class="text-[10px] font-mono font-bold px-1.5 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40">INVARIANT</span>
+      <!-- Card 5: Rotational Kinetic Energy K_rot = L^2 / (2mr^2) -->
+      <div class="bg-gradient-to-br from-purple-500/15 via-slate-900 to-slate-900 border border-purple-500/40 rounded-xl p-3 flex flex-col justify-between min-w-0">
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
+          <span class="text-xs font-mono font-semibold text-purple-300 whitespace-nowrap">K<sub>rot</sub></span>
+          <span id="badge-krot-state" class="text-[10px] leading-none font-mono px-1.5 py-1 rounded bg-purple-500/20 text-purple-300 border border-purple-400/30 inline-flex items-center gap-1 shrink-0 whitespace-nowrap">
+            <span class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-ping"></span>VARYING
+          </span>
         </div>
-        <div id="val-L" class="text-lg sm:text-xl font-mono font-bold text-amber-300 my-1">1.800</div>
-        <div class="text-[11px] font-mono text-amber-200/80 truncate">|r × p| Conserved</div>
+        <div id="val-krot" class="text-lg sm:text-xl font-mono font-bold text-purple-300 my-1.5">0.360</div>
+        <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mb-1">
+          <div id="bar-krot" class="bg-purple-400 h-full" style="width: 50%"></div>
+        </div>
+        <div id="sub-i-omega" class="text-[10px] font-mono text-purple-200/80 truncate">I=2.25 • ω=0.53</div>
       </div>
 
-      <!-- Card 6: Areal Velocity dA/dt = |L|/(2m) -->
-      <div class="bg-gradient-to-br from-rose-500/15 via-slate-900 to-slate-900 border border-rose-500/40 rounded-xl p-3 flex flex-col justify-between">
-        <div class="flex items-center justify-between">
-          <span class="text-xs font-mono font-semibold text-rose-300">dA/dt = |<span class="math-vec">L</span>|/2m</span>
-          <span id="badge-dA-state" class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300">CONSTANT</span>
+      <!-- Card 6: Angular Momentum |L| = |r||p|sin(theta) -->
+      <div class="bg-gradient-to-br from-amber-500/15 via-slate-900 to-slate-900 border border-amber-500/50 rounded-xl p-3 flex flex-col justify-between shadow-lg shadow-amber-500/5 min-w-0">
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
+          <span class="text-xs font-mono font-semibold text-amber-300 whitespace-nowrap"><span class="math-var">L</span> = |<span class="math-vec">r</span>×<span class="math-vec">p</span>|</span>
+          <span id="badge-L-state" class="text-[10px] leading-none font-mono font-bold px-2 py-1 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40 shrink-0 whitespace-nowrap">CONSTANT</span></div>
+        <div id="val-L" class="text-lg sm:text-xl font-mono font-bold text-amber-300 my-1.5">1.800</div>
+        <div class="text-[11px] font-mono text-amber-200/80 truncate">|r||p|sinθ Conserved</div>
+      </div>
+
+      <!-- Card 7: Areal Velocity dA/dt = |L|/(2m) -->
+      <div class="bg-gradient-to-br from-rose-500/15 via-slate-900 to-slate-900 border border-rose-500/40 rounded-xl p-3 flex flex-col justify-between min-w-0 col-span-2 sm:col-span-1">
+        <div class="flex flex-wrap items-center justify-between gap-1.5">
+          <span class="text-xs font-mono font-semibold text-rose-300 whitespace-nowrap">dA/dt</span>
+          <span id="badge-dA-state" class="text-[10px] leading-none font-mono font-bold px-2 py-1 rounded bg-rose-500/20 text-rose-300 border border-rose-400/40 shrink-0 whitespace-nowrap">CONSTANT</span>
         </div>
-        <div id="val-dAdt" class="text-lg sm:text-xl font-mono font-bold text-rose-300 my-1">0.900</div>
-        <div class="text-[11px] font-mono text-rose-200/80 truncate">Eq. (8) Areal Velocity</div>
+        <div id="val-dAdt" class="text-lg sm:text-xl font-mono font-bold text-rose-300 my-1.5">0.900</div>
+        <div class="text-[11px] font-mono text-rose-200/80 truncate">|L| / 2m (Eq. 8)</div>
       </div>
     </div>
   </div>
@@ -581,7 +618,7 @@
           <input id="slider-e" type="range" min="0.00" max="0.75" step="0.01" value="0.55" oninput="onOrbitParamChange()" class="w-full">
           <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-0.5">
             <span>0.00 (Circular, θ=90°)</span>
-            <span>0.75 (Large |r|, |p|, θ swings)</span>
+            <span>0.75 (Large |r|, |p|, K_rot swings)</span>
           </div>
         </div>
 
@@ -769,9 +806,9 @@
       <div class="flex items-center justify-between">
         <div>
           <h3 class="text-xs font-mono uppercase tracking-wider text-slate-200 font-semibold">
-            Real-Time Strip Chart: |r(t)|, |p(t)|, sin(θ) vs. L(t)
+            Real-Time Strip Chart: |r|, |p|, sin(θ), K<sub>rot</sub> vs. L
           </h3>
-          <p class="text-[11px] text-slate-400">Gold line L = |r||p|sin(θ) stays flat while |r|, |p|, and sin(θ) fluctuate</p>
+          <p class="text-[11px] text-slate-400">Gold line L stays flat while |r|, |p|, sin(θ), and K<sub>rot</sub> fluctuate</p>
         </div>
         <button type="button" onclick="clearHistoryChart()" class="text-[11px] font-mono text-slate-400 hover:text-slate-200 px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 transition">Clear</button>
       </div>
@@ -781,11 +818,12 @@
       </div>
 
       <!-- Strip Chart Legend -->
-      <div class="flex flex-wrap items-center justify-between text-[11px] font-mono pt-1 px-1">
-        <span class="flex items-center gap-1.5 text-sky-400"><span class="w-2.5 h-0.5 bg-sky-400 inline-block"></span>|r(t)|</span>
-        <span class="flex items-center gap-1.5 text-emerald-400"><span class="w-2.5 h-0.5 bg-emerald-400 inline-block"></span>|p(t)|</span>
-        <span class="flex items-center gap-1.5 text-rose-300"><span class="w-2.5 h-0.5 bg-rose-400 inline-block"></span>sin θ(t)</span>
-        <span class="flex items-center gap-1.5 text-amber-300 font-bold"><span class="w-3 h-1 bg-amber-400 inline-block rounded-full"></span>L = |r||p|sinθ</span>
+      <div class="flex flex-wrap items-center justify-between text-[11px] font-mono pt-1 px-1 gap-y-1">
+        <span class="flex items-center gap-1 text-sky-400"><span class="w-2.5 h-0.5 bg-sky-400 inline-block"></span>|r(t)|</span>
+        <span class="flex items-center gap-1 text-emerald-400"><span class="w-2.5 h-0.5 bg-emerald-400 inline-block"></span>|p(t)|</span>
+        <span class="flex items-center gap-1 text-rose-300"><span class="w-2.5 h-0.5 bg-rose-400 inline-block"></span>sin θ</span>
+        <span class="flex items-center gap-1 text-purple-300"><span class="w-2.5 h-0.5 bg-purple-400 inline-block"></span>K<sub>rot</sub>(t)</span>
+        <span class="flex items-center gap-1 text-amber-300 font-bold"><span class="w-3 h-1 bg-amber-400 inline-block rounded-full"></span>L</span>
       </div>
     </div>
 
@@ -877,7 +915,11 @@
       pPerp: 1.2,
       LMag: 1.8,
       dAdt: 0.9,
-      torque: 0.0
+      torque: 0.0,
+      momentOfInertia: 2.25,
+      omega: 0.533,
+      kRot: 0.36,
+      kTot: 0.72
     },
 
     // Real-time scrolling strip chart history
@@ -1130,14 +1172,15 @@
   }
 
   /**
-   * Computes the exact [min, max] bounds of |r|, |p|, and sin(theta) for the active scenario
-   * and updates both the Figure 2 Dynamic Balancing bars and the 6 bottom telemetry card bars.
+   * Computes the exact [min, max] bounds of |r|, |p|, sin(theta), and K_rot for the active scenario
+   * and updates both the Figure 2 Dynamic Balancing bars and the 7 bottom telemetry card bars.
    */
   function updateAllProgressBars() {
     const t = state.telemetry;
     let rBarPct = 50;
     let pBarPct = 50;
     let sinBarPct = 50;
+    let kRotBarPct = 50;
 
     if (state.scenario === 'orbit') {
       const orb = state.orbit;
@@ -1152,41 +1195,56 @@
       const sinMin = Math.sqrt(Math.max(0, 1 - orb.e * orb.e));
       const sinMax = 1.0;
 
+      // Rotational KE bounds: K_rot = L^2 / (2 m r^2)
+      const kRotMin = (t.LMag * t.LMag) / Math.max(1e-6, 2 * orb.m * rMax * rMax);
+      const kRotMax = (t.LMag * t.LMag) / Math.max(1e-6, 2 * orb.m * rMin * rMin);
+
       rBarPct = normBarWidth(t.rMag, rMin, rMax, isCirc);
       pBarPct = normBarWidth(t.pMag, pApo, pPeri, isCirc);
       sinBarPct = isCirc ? 100 : normBarWidth(t.sinTheta, sinMin, sinMax, false);
+      kRotBarPct = normBarWidth(t.kRot, kRotMin, kRotMax, isCirc);
 
       // Update Figure 2 Dynamic Balancing Panel DOM
       document.getElementById('bal-val-r').textContent = t.rMag.toFixed(3);
       document.getElementById('bal-val-p').textContent = t.pMag.toFixed(3);
       document.getElementById('bal-val-sin').textContent = t.sinTheta.toFixed(3);
       document.getElementById('bal-val-L').textContent = t.LMag.toFixed(3);
+      document.getElementById('bal-val-krot').textContent = t.kRot.toFixed(3);
 
       document.getElementById('bal-bar-r').style.width = rBarPct.toFixed(1) + '%';
       document.getElementById('bal-bar-p').style.width = pBarPct.toFixed(1) + '%';
       document.getElementById('bal-bar-sin').style.width = sinBarPct.toFixed(1) + '%';
+      document.getElementById('bal-bar-krot').style.width = kRotBarPct.toFixed(1) + '%';
 
       document.getElementById('bal-min-r').textContent = `min ${rMin.toFixed(2)}`;
       document.getElementById('bal-max-r').textContent = `max ${rMax.toFixed(2)}`;
       document.getElementById('bal-min-p').textContent = `min ${pApo.toFixed(2)}`;
       document.getElementById('bal-max-p').textContent = `max ${pPeri.toFixed(2)}`;
       document.getElementById('bal-min-sin').textContent = `min ${sinMin.toFixed(3)}`;
+      document.getElementById('bal-min-krot').textContent = `min ${kRotMin.toFixed(2)}`;
+      document.getElementById('bal-max-krot').textContent = `max ${kRotMax.toFixed(2)}`;
+      document.getElementById('bal-sub-ktot').innerHTML = `K<sub>tot</sub> = ${t.kTot.toFixed(3)}`;
 
       // Descriptive qualitative tags matching Figure 2 text
       const rTagEl = document.getElementById('bal-tag-r');
       const pTagEl = document.getElementById('bal-tag-p');
+      const kRotTagEl = document.getElementById('bal-tag-krot');
       if (isCirc) {
         rTagEl.textContent = 'constant';
         pTagEl.textContent = 'constant';
+        kRotTagEl.textContent = 'constant';
       } else if (rBarPct < 38) {
         rTagEl.textContent = 'small (near star)';
         pTagEl.textContent = 'large (fast)';
+        kRotTagEl.textContent = 'high (∝ 1/r²)';
       } else if (rBarPct > 72) {
         rTagEl.textContent = 'large (far)';
         pTagEl.textContent = 'small (slow)';
+        kRotTagEl.textContent = 'low (∝ 1/r²)';
       } else {
         rTagEl.textContent = 'intermediate';
         pTagEl.textContent = 'intermediate';
+        kRotTagEl.textContent = '∝ 1/|r|²';
       }
 
       document.getElementById('bal-tag-theta').textContent = `θ = ${t.thetaDeg.toFixed(1)}°`;
@@ -1195,7 +1253,7 @@
 
       const apsisNoteEl = document.getElementById('bal-apsis-note');
       if (Math.abs(t.thetaDeg - 90) < 1.2) {
-        apsisNoteEl.textContent = 'θ ≈ 90.0° (At Apsis: sinθ = 1)';
+        apsisNoteEl.textContent = 'θ ≈ 90.0° (At Apsis: K_rot = K_tot)';
         apsisNoteEl.className = 'px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[11px] shrink-0 self-start sm:self-center';
       } else {
         apsisNoteEl.textContent = `θ = ${t.thetaDeg.toFixed(1)}° ≠ 90° (Non-Apsis)`;
@@ -1210,21 +1268,31 @@
       const sinMin = lin.b / rMax;
       const sinMax = 1.0;
 
+      const kRotMin = (t.LMag * t.LMag) / Math.max(1e-6, 2 * lin.m * rMax * rMax);
+      const kRotMax = (t.LMag * t.LMag) / Math.max(1e-6, 2 * lin.m * rMin * rMin);
+
       rBarPct = normBarWidth(t.rMag, rMin, rMax, false);
       pBarPct = 50; // |p| = m|v| is strictly constant in free linear motion
       sinBarPct = normBarWidth(t.sinTheta, sinMin, sinMax, false);
+      kRotBarPct = normBarWidth(t.kRot, kRotMin, kRotMax, false);
 
     } else if (state.scenario === 'proof') {
+      const prf = state.proof;
+      const kRotMin = (t.LMag * t.LMag) / Math.max(1e-6, 2 * prf.m * 2.40 * 2.40);
+      const kRotMax = (t.LMag * t.LMag) / Math.max(1e-6, 2 * prf.m * 0.80 * 0.80);
+
       // Slider bounds in Tab 3: |r| in [0.80, 2.40], |p| in [0.50, 2.60], theta in [30, 150] -> sin(theta) in [0.50, 1.00]
       rBarPct = normBarWidth(t.rMag, 0.80, 2.40, false);
       pBarPct = normBarWidth(t.pMag, 0.50, 2.60, false);
       sinBarPct = normBarWidth(t.sinTheta, 0.50, 1.00, false);
+      kRotBarPct = normBarWidth(t.kRot, kRotMin, kRotMax, false);
     }
 
-    // Apply synchronized widths to the 3 bottom telemetry card bars
+    // Apply synchronized widths to the bottom telemetry card bars
     document.getElementById('bar-r').style.width = rBarPct.toFixed(1) + '%';
     document.getElementById('bar-p').style.width = pBarPct.toFixed(1) + '%';
     document.getElementById('bar-sin').style.width = sinBarPct.toFixed(1) + '%';
+    document.getElementById('bar-krot').style.width = kRotBarPct.toFixed(1) + '%';
   }
 
   function pushHistorySample() {
@@ -1232,6 +1300,7 @@
       r: state.telemetry.rMag,
       p: state.telemetry.pMag,
       sin: state.telemetry.sinTheta,
+      kRot: state.telemetry.kRot,
       L: state.telemetry.LMag
     });
     if (state.history.length > state.maxHistory) {
@@ -1259,11 +1328,18 @@
     const dAdt = LMag / (2 * m);
     const torque = rVec.x * fVec.y - rVec.y * fVec.x;
 
+    // Rotational kinetic energy K_rot = 1/2 I omega^2 = L^2 / (2 m r^2) = p_perp^2 / (2m)
+    const momentOfInertia = m * rMag * rMag;
+    const omega = LMag / Math.max(1e-6, momentOfInertia);
+    const kRot = (LMag * LMag) / Math.max(1e-6, 2 * momentOfInertia);
+    const kTot = (pMag * pMag) / (2 * m);
+
     state.telemetry = {
       rVec, pVec, vVec, fVec,
       rMag, pMag, vMag, fMag,
       thetaRad, thetaDeg, sinTheta,
-      rPerp, pPerp, LMag, dAdt, torque
+      rPerp, pPerp, LMag, dAdt, torque,
+      momentOfInertia, omega, kRot, kTot
     };
 
     updateTelemetryDOM();
@@ -1282,17 +1358,22 @@
     document.getElementById('val-sin-theta').textContent = 'sinθ=' + t.sinTheta.toFixed(3);
     document.getElementById('val-r-perp').textContent = t.rPerp.toFixed(3);
     document.getElementById('sub-p-perp').innerHTML = `p<sub>⊥</sub> = |p|sinθ = ${t.pPerp.toFixed(3)}`;
+    document.getElementById('val-krot').textContent = t.kRot.toFixed(3);
+    document.getElementById('sub-i-omega').textContent = `I=${t.momentOfInertia.toFixed(2)} • ω=${t.omega.toFixed(2)}`;
     document.getElementById('val-L').textContent = t.LMag.toFixed(3);
     document.getElementById('val-dAdt').textContent = t.dAdt.toFixed(3);
 
     const isCircular = state.scenario === 'orbit' && state.orbit.e < 0.005;
     const badgeR = document.getElementById('badge-r-state');
     const badgeP = document.getElementById('badge-p-state');
+    const badgeKrot = document.getElementById('badge-krot-state');
 
     if (isCircular) {
       badgeR.innerHTML = 'CONST (e=0)';
+      badgeKrot.innerHTML = 'CONST (e=0)';
     } else {
       badgeR.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-sky-400 animate-ping"></span>VARYING';
+      badgeKrot.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-purple-400 animate-ping"></span>VARYING';
     }
 
     if (state.scenario === 'linear') {
@@ -1322,7 +1403,7 @@
                       : 'Eq. (4): Central force (F ∥ −r) ⟹ r × F = 0';
       totalDLEl.textContent = 'dL/dt = 0.000 (L Conserved)';
       totalDLEl.className = 'text-amber-300 font-bold';
-      badgeLState.textContent = 'INVARIANT';
+      badgeLState.textContent = 'CONSTANT';
       badgeDAState.textContent = 'CONSTANT';
       statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span><span>dL/dt = 0 (L = |r||p|sinθ Conserved)</span>';
       statusBadge.className = 'text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1.5';
@@ -1333,7 +1414,7 @@
       term2SubEl.textContent = 'Non-central force F⊥ applied: τ = r × F ≠ 0!';
       totalDLEl.textContent = `dL/dt = ${sign}${t.torque.toFixed(3)} (Changing)`;
       totalDLEl.className = 'text-rose-400 font-bold';
-      badgeLState.textContent = 'CHANGING (τ≠0)';
+      badgeLState.textContent = 'CHANGING';
       badgeDAState.textContent = 'CHANGING';
       statusBadge.innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-rose-400 animate-ping"></span><span>dL/dt = τ ≠ 0 (External Torque Applied)</span>';
       statusBadge.className = 'text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 flex items-center gap-1.5';
@@ -1892,6 +1973,7 @@
     drawTrace('r', '#38bdf8', 1.8);
     drawTrace('p', '#34d399', 1.8);
     drawTrace('sin', '#fb7185', 1.5, true);
+    drawTrace('kRot', '#c084fc', 1.8, true);
     drawTrace('L', '#fbbf24', 3.0);
   }
 
@@ -1936,7 +2018,7 @@
     if (scen === 'orbit') {
       badgeEl.textContent = 'Section 4.2 & Figure 2 • Planetary Orbits (Central Forces)';
       descEl.innerHTML =
-              'As the planet orbits the star (<span class="text-amber-300 font-semibold">Figure 2</span>), it accelerates as it nears periapsis (<span class="text-sky-400 font-semibold">|r|</span> small, <span class="text-emerald-400 font-semibold">|p|</span> large) and decelerates toward apoapsis (<span class="text-sky-400 font-semibold">|r|</span> large, <span class="text-emerald-400 font-semibold">|p|</span> small), while the angle <span class="text-rose-400 font-semibold">θ</span> between <span class="font-mono text-slate-200">ext. r</span> and <span class="math-vec text-emerald-400">p</span> is only 90° at the apsides. All three variables—<span class="text-sky-400 font-semibold">|r|</span>, <span class="text-emerald-400 font-semibold">|p|</span>, and <span class="text-rose-400 font-semibold">sin(θ)</span>—continuously compensate to keep <span class="text-amber-300 font-semibold">L = |r||p|sin(θ)</span> strictly constant.';
+              'As the planet orbits the star (<span class="text-amber-300 font-semibold">Figure 2</span>), it accelerates as it nears periapsis (<span class="text-sky-400 font-semibold">|r|</span> small, <span class="text-emerald-400 font-semibold">|p|</span> large) and decelerates toward apoapsis (<span class="text-sky-400 font-semibold">|r|</span> large, <span class="text-emerald-400 font-semibold">|p|</span> small), while the angle <span class="text-rose-400 font-semibold">θ</span> between <span class="font-mono text-slate-200">ext. r</span> and <span class="math-vec text-emerald-400">p</span> is only 90° at the apsides. All three variables—<span class="text-sky-400 font-semibold">|r|</span>, <span class="text-emerald-400 font-semibold">|p|</span>, and <span class="text-rose-400 font-semibold">sin(θ)</span>—continuously compensate to keep <span class="text-amber-300 font-semibold">L = |r||p|sin(θ)</span> strictly constant, while rotational kinetic energy <span class="text-purple-300 font-semibold">K<sub>rot</sub> = L²/(2mr²)</span> surges near periapsis.';
       generateEqualTimeOrbitWedges();
     } else if (scen === 'linear') {
       badgeEl.textContent = 'Section 4.1 • Example 1: Free Particle in Linear Motion (y = b)';
