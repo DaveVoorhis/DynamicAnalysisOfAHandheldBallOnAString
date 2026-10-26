@@ -52,7 +52,7 @@
       --font-mono: 'JetBrains Mono', 'Fira Code', 'SFMono-Regular', Consolas, monospace;
     }
 
-    /* Top Header (Matched to dynamics_of_a_hand_held_ball_on_a_string_2.html) */
+    /* Top Header (Identical to dynamics_of_a_hand_held_ball_on_a_string_2.html) */
     .app-header {
       background: rgba(15, 23, 42, 0.92);
       border-bottom: 1px solid var(--border-subtle);
@@ -220,7 +220,7 @@
 </head>
 <body class="bg-slate-950 text-slate-100 font-sans antialiased selection:bg-sky-500/30 selection:text-sky-200 min-h-screen flex flex-col">
 
-<!-- HEADER -->
+<!-- HEADER (Exact structural & visual match to dynamics_of_a_hand_held_ball_on_a_string_2.html) -->
 <header class="app-header">
   <div class="brand-group">
     <div class="brand-icon" aria-hidden="true">
@@ -243,23 +243,7 @@
     </div>
   </div>
 
-  <!-- Scenario Tabs & External Full Paper Link -->
   <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-    <div class="inline-flex flex-wrap rounded-xl bg-slate-900 p-1 border border-slate-800 gap-1" role="tablist">
-      <button id="tab-orbit" type="button" onclick="switchScenario('orbit')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm">
-        <span class="w-2 h-2 rounded-full bg-sky-400"></span>
-        <span>1. Planetary Orbit &amp; Fig. 2 Balancing (Sec 4.2)</span>
-      </button>
-      <button id="tab-linear" type="button" onclick="switchScenario('linear')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent">
-        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-        <span>2. Free Linear Motion (Sec 4.1)</span>
-      </button>
-      <button id="tab-proof" type="button" onclick="switchScenario('proof')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent">
-        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-        <span>3. Swept Area Fig. 1 &amp; Calculus Proof (Sec 2 &amp; 3)</span>
-      </button>
-    </div>
-
     <a class="btn btn-primary" href="https://reldb.org/c/index.php/misconception-correction/" target="_blank" rel="noopener noreferrer" style="text-decoration: none;">
       <span>Read Full Paper ↗</span>
     </a>
@@ -272,9 +256,25 @@
   <!-- LEFT / CENTER COLUMN: INTERACTIVE VECTOR CANVAS + TELEMETRY CARDS + FIG. 2 COMPARISON TABLE (8 cols on XL) -->
   <div class="xl:col-span-8 flex flex-col gap-4">
 
-    <!-- SCENARIO BANNER & PLAYBACK BAR -->
-    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 sm:px-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-      <div class="space-y-1">
+    <!-- SCENARIO TABS, BANNER & PLAYBACK BAR -->
+    <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3.5 sm:px-5 flex flex-col gap-3">
+      <!-- Top Row: Scenario Selector Tabs + Status Badge -->
+      <div class="flex flex-wrap items-center justify-between gap-2 pb-2.5 border-b border-slate-800/80">
+        <div class="inline-flex flex-wrap rounded-xl bg-slate-950 p-1 border border-slate-800 gap-1" role="tablist">
+          <button id="tab-orbit" type="button" onclick="switchScenario('orbit')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 bg-sky-500/20 text-sky-300 border border-sky-500/40 shadow-sm">
+            <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+            <span>1. Planetary Orbit &amp; Fig. 2 Balancing (Sec 4.2)</span>
+          </button>
+          <button id="tab-linear" type="button" onclick="switchScenario('linear')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>2. Free Linear Motion (Sec 4.1)</span>
+          </button>
+          <button id="tab-proof" type="button" onclick="switchScenario('proof')" class="px-3 py-1.5 rounded-lg text-xs font-medium transition-all flex items-center gap-1.5 text-slate-400 hover:text-slate-200 border border-transparent">
+            <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+            <span>3. Swept Area Fig. 1 &amp; Calculus Proof (Sec 2 &amp; 3)</span>
+          </button>
+        </div>
+
         <div class="flex flex-wrap items-center gap-2">
           <span id="scenario-badge" class="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 border border-sky-500/30">Section 4.2 &amp; Figure 2 • Planetary Orbits (Central Forces)</span>
           <span id="conservation-status-badge" class="text-[11px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1.5">
@@ -282,26 +282,30 @@
               <span>dL/dt = 0 (L = |r||p|sinθ Conserved)</span>
             </span>
         </div>
+      </div>
+
+      <!-- Bottom Row: Scenario Explanation & Transport Controls -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <p id="scenario-description" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
           As the planet orbits the star (<span class="text-amber-300 font-semibold">Figure 2</span>), it accelerates as it nears periapsis (<span class="text-sky-400 font-semibold">|r|</span> small, <span class="text-emerald-400 font-semibold">|p|</span> large) and decelerates toward apoapsis (<span class="text-sky-400 font-semibold">|r|</span> large, <span class="text-emerald-400 font-semibold">|p|</span> small), while the angle <span class="text-rose-400 font-semibold">θ</span> between <span class="font-mono text-slate-200">ext. r</span> and <span class="math-vec text-emerald-400">p</span> is only 90° at the apsides. All three variables—<span class="text-sky-400 font-semibold">|r|</span>, <span class="text-emerald-400 font-semibold">|p|</span>, and <span class="text-rose-400 font-semibold">sin(θ)</span>—continuously compensate to keep <span class="text-amber-300 font-semibold">L = |r||p|sin(θ)</span> strictly constant.
         </p>
-      </div>
 
-      <!-- Playback & Quick Reset Controls -->
-      <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
-        <button id="btn-play-pause" type="button" onclick="togglePlay()" class="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs sm:text-sm transition flex items-center gap-1.5 shadow-lg shadow-sky-500/20">
-          <svg id="icon-pause" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
-          <svg id="icon-play" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-          <span id="play-label">Pause</span>
-        </button>
-        <button type="button" onclick="stepSimulation()" title="Step forward by dt" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-mono transition flex items-center gap-1">
-          <span>Step</span>
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-        </button>
-        <button type="button" onclick="resetScenario()" title="Reset parameters" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-mono transition flex items-center gap-1">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          <span>Reset</span>
-        </button>
+        <!-- Playback & Quick Reset Controls -->
+        <div class="flex items-center gap-2 shrink-0 self-end sm:self-center">
+          <button id="btn-play-pause" type="button" onclick="togglePlay()" class="px-3.5 py-2 rounded-xl bg-sky-500 hover:bg-sky-400 text-slate-950 font-semibold text-xs sm:text-sm transition flex items-center gap-1.5 shadow-lg shadow-sky-500/20">
+            <svg id="icon-pause" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/></svg>
+            <svg id="icon-play" class="w-4 h-4 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+            <span id="play-label">Pause</span>
+          </button>
+          <button type="button" onclick="stepSimulation()" title="Step forward by dt" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-mono transition flex items-center gap-1">
+            <span>Step</span>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+          </button>
+          <button type="button" onclick="resetScenario()" title="Reset parameters" class="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-mono transition flex items-center gap-1">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            <span>Reset</span>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -388,7 +392,7 @@
             Dynamic Balancing of Variables (Figure 2): <span class="font-mono">L = |r| · |p| · sin(θ)</span>
           </h3>
           <p class="text-[11px] sm:text-xs text-slate-400 mt-0.5">
-            Angle <span class="text-rose-400 font-mono">θ</span> (between <span class="font-mono text-slate-300">ext. r</span> and <span class="text-emerald-400 font-mono">p</span>) is only 90° at periapsis and apoapsis. All three fluctuating variables continuously compensate for one another.
+            Bars show each factor normalized between its orbital <span class="font-mono text-slate-300">min</span> and <span class="font-mono text-slate-300">max</span>. Notice how <span class="text-sky-400 font-mono">|r|</span> and <span class="text-emerald-400 font-mono">|p|</span> move in opposite directions while <span class="text-rose-400 font-mono">sin(θ)</span> dips between apsides.
           </p>
         </div>
         <span id="bal-apsis-note" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[11px] shrink-0 self-start sm:self-center">
@@ -405,12 +409,12 @@
             <span id="bal-tag-r" class="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300">mid-orbit</span>
           </div>
           <div id="bal-val-r" class="text-base sm:text-lg font-bold text-sky-300">1.500</div>
-          <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1.5">
-            <div id="bal-bar-r" class="bg-sky-400 h-full transition-all duration-75" style="width: 50%"></div>
+          <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
+            <div id="bal-bar-r" class="bg-sky-400 h-full" style="width: 50%"></div>
           </div>
           <div class="flex justify-between text-[10px] text-slate-500 mt-1">
-            <span id="bal-min-r">r_min</span>
-            <span id="bal-max-r">r_max</span>
+            <span id="bal-min-r">min</span>
+            <span id="bal-max-r">max</span>
           </div>
         </div>
 
@@ -424,12 +428,12 @@
             <span id="bal-tag-p" class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300">mid-speed</span>
           </div>
           <div id="bal-val-p" class="text-base sm:text-lg font-bold text-emerald-300">1.200</div>
-          <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1.5">
-            <div id="bal-bar-p" class="bg-emerald-400 h-full transition-all duration-75" style="width: 50%"></div>
+          <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
+            <div id="bal-bar-p" class="bg-emerald-400 h-full" style="width: 50%"></div>
           </div>
           <div class="flex justify-between text-[10px] text-slate-500 mt-1">
-            <span id="bal-min-p">p_min</span>
-            <span id="bal-max-p">p_max</span>
+            <span id="bal-min-p">min</span>
+            <span id="bal-max-p">max</span>
           </div>
         </div>
 
@@ -443,12 +447,12 @@
             <span id="bal-tag-theta" class="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-300">θ = 90.0°</span>
           </div>
           <div id="bal-val-sin" class="text-base sm:text-lg font-bold text-rose-300">1.000</div>
-          <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1.5">
-            <div id="bal-bar-sin" class="bg-rose-400 h-full transition-all duration-75" style="width: 100%"></div>
+          <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
+            <div id="bal-bar-sin" class="bg-rose-400 h-full" style="width: 100%"></div>
           </div>
           <div class="flex justify-between text-[10px] text-slate-500 mt-1">
-            <span id="bal-min-sin">sin_min</span>
-            <span>1.000 (90°)</span>
+            <span id="bal-min-sin">min</span>
+            <span>max 1.00 (90°)</span>
           </div>
         </div>
       </div>
@@ -479,7 +483,7 @@
         </div>
         <div id="val-r" class="text-lg sm:text-xl font-mono font-bold text-sky-400 my-1">1.500</div>
         <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-          <div id="bar-r" class="bg-sky-400 h-full transition-all duration-75" style="width: 50%"></div>
+          <div id="bar-r" class="bg-sky-400 h-full" style="width: 50%"></div>
         </div>
       </div>
 
@@ -493,7 +497,7 @@
         </div>
         <div id="val-p" class="text-lg sm:text-xl font-mono font-bold text-emerald-400 my-1">1.200</div>
         <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-          <div id="bar-p" class="bg-emerald-400 h-full transition-all duration-75" style="width: 50%"></div>
+          <div id="bar-p" class="bg-emerald-400 h-full" style="width: 50%"></div>
         </div>
       </div>
 
@@ -505,7 +509,7 @@
         </div>
         <div id="val-theta" class="text-lg sm:text-xl font-mono font-bold text-rose-300 my-1">90.0°</div>
         <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
-          <div id="bar-sin" class="bg-rose-400 h-full transition-all duration-75" style="width: 100%"></div>
+          <div id="bar-sin" class="bg-rose-400 h-full" style="width: 100%"></div>
         </div>
       </div>
 
@@ -1027,7 +1031,6 @@
 
       const st = computeOrbitStateAtTrueAnomaly(orb.trueAnomaly, orb.a, orb.e, orb.m, orb.gm);
       updateTelemetryFromVectors(st.rVec, st.pVec, st.vVec, st.fVec, orb.m);
-      updateDynamicBalancingBar();
 
     } else if (state.scenario === 'linear') {
       const lin = state.linear;
@@ -1114,68 +1117,114 @@
     }
   }
 
-  function updateDynamicBalancingBar() {
-    const orb = state.orbit;
+  /**
+   * Helper that maps a value within [minVal, maxVal] to a visual bar width percentage [10%, 100%]
+   * so that every fluctuating variable's bar visibly expands and contracts across its full range.
+   */
+  function normBarWidth(val, minVal, maxVal, isConstant = false) {
+    if (isConstant || Math.abs(maxVal - minVal) < 1e-5) {
+      return 50;
+    }
+    const clamped = Math.max(0, Math.min(1, (val - minVal) / (maxVal - minVal)));
+    return 10 + clamped * 90;
+  }
+
+  /**
+   * Computes the exact [min, max] bounds of |r|, |p|, and sin(theta) for the active scenario
+   * and updates both the Figure 2 Dynamic Balancing bars and the 6 bottom telemetry card bars.
+   */
+  function updateAllProgressBars() {
     const t = state.telemetry;
+    let rBarPct = 50;
+    let pBarPct = 50;
+    let sinBarPct = 50;
 
-    // Periapsis (nu = 0) and Apoapsis (nu = pi) bounds
-    const rMin = orb.a * (1 - orb.e);
-    const rMax = orb.a * (1 + orb.e);
-    const pPeri = orb.m * Math.sqrt((orb.gm / orb.a) * ((1 + orb.e) / Math.max(1e-4, 1 - orb.e)));
-    const pApo = orb.m * Math.sqrt((orb.gm / orb.a) * ((1 - orb.e) / (1 + orb.e)));
-    const sinMin = Math.sqrt(Math.max(0, 1 - orb.e * orb.e));
+    if (state.scenario === 'orbit') {
+      const orb = state.orbit;
+      const isCirc = orb.e < 0.005;
 
-    // Proportions (0% to 100%)
-    const rSpan = Math.max(1e-4, rMax - rMin);
-    const pSpan = Math.max(1e-4, pPeri - pApo);
-    const rPct = orb.e < 0.005 ? 50 : ((t.rMag - rMin) / rSpan) * 100;
-    const pPct = orb.e < 0.005 ? 50 : ((t.pMag - pApo) / pSpan) * 100;
-    const sinPct = t.sinTheta * 100;
+      // Exact Keplerian orbital bounds between Periapsis (nu = 0) and Apoapsis (nu = pi)
+      const rMin = orb.a * (1 - orb.e);
+      const rMax = orb.a * (1 + orb.e);
+      const pApo = orb.m * Math.sqrt((orb.gm / orb.a) * ((1 - orb.e) / (1 + orb.e)));
+      const pPeri = orb.m * Math.sqrt((orb.gm / orb.a) * ((1 + orb.e) / Math.max(1e-4, 1 - orb.e)));
+      // At minor-axis crossings (cos(E) = 0), sin(theta) reaches its orbital minimum sqrt(1 - e^2)
+      const sinMin = Math.sqrt(Math.max(0, 1 - orb.e * orb.e));
+      const sinMax = 1.0;
 
-    document.getElementById('bal-val-r').textContent = t.rMag.toFixed(3);
-    document.getElementById('bal-val-p').textContent = t.pMag.toFixed(3);
-    document.getElementById('bal-val-sin').textContent = t.sinTheta.toFixed(3);
-    document.getElementById('bal-val-L').textContent = t.LMag.toFixed(3);
+      rBarPct = normBarWidth(t.rMag, rMin, rMax, isCirc);
+      pBarPct = normBarWidth(t.pMag, pApo, pPeri, isCirc);
+      sinBarPct = isCirc ? 100 : normBarWidth(t.sinTheta, sinMin, sinMax, false);
 
-    document.getElementById('bal-bar-r').style.width = Math.max(6, Math.min(100, rPct)) + '%';
-    document.getElementById('bal-bar-p').style.width = Math.max(6, Math.min(100, pPct)) + '%';
-    document.getElementById('bal-bar-sin').style.width = Math.max(6, Math.min(100, sinPct)) + '%';
+      // Update Figure 2 Dynamic Balancing Panel DOM
+      document.getElementById('bal-val-r').textContent = t.rMag.toFixed(3);
+      document.getElementById('bal-val-p').textContent = t.pMag.toFixed(3);
+      document.getElementById('bal-val-sin').textContent = t.sinTheta.toFixed(3);
+      document.getElementById('bal-val-L').textContent = t.LMag.toFixed(3);
 
-    document.getElementById('bal-min-r').textContent = `min ${rMin.toFixed(2)}`;
-    document.getElementById('bal-max-r').textContent = `max ${rMax.toFixed(2)}`;
-    document.getElementById('bal-min-p').textContent = `min ${pApo.toFixed(2)}`;
-    document.getElementById('bal-max-p').textContent = `max ${pPeri.toFixed(2)}`;
-    document.getElementById('bal-min-sin').textContent = `min ${sinMin.toFixed(2)}`;
+      document.getElementById('bal-bar-r').style.width = rBarPct.toFixed(1) + '%';
+      document.getElementById('bal-bar-p').style.width = pBarPct.toFixed(1) + '%';
+      document.getElementById('bal-bar-sin').style.width = sinBarPct.toFixed(1) + '%';
 
-    // Descriptive qualitative tags matching Figure 2 text
-    const rTagEl = document.getElementById('bal-tag-r');
-    const pTagEl = document.getElementById('bal-tag-p');
-    if (orb.e < 0.005) {
-      rTagEl.textContent = 'constant';
-      pTagEl.textContent = 'constant';
-    } else if (rPct < 33) {
-      rTagEl.textContent = 'small (near star)';
-      pTagEl.textContent = 'large (fast)';
-    } else if (rPct > 67) {
-      rTagEl.textContent = 'large (far)';
-      pTagEl.textContent = 'small (slow)';
-    } else {
-      rTagEl.textContent = 'intermediate';
-      pTagEl.textContent = 'intermediate';
+      document.getElementById('bal-min-r').textContent = `min ${rMin.toFixed(2)}`;
+      document.getElementById('bal-max-r').textContent = `max ${rMax.toFixed(2)}`;
+      document.getElementById('bal-min-p').textContent = `min ${pApo.toFixed(2)}`;
+      document.getElementById('bal-max-p').textContent = `max ${pPeri.toFixed(2)}`;
+      document.getElementById('bal-min-sin').textContent = `min ${sinMin.toFixed(3)}`;
+
+      // Descriptive qualitative tags matching Figure 2 text
+      const rTagEl = document.getElementById('bal-tag-r');
+      const pTagEl = document.getElementById('bal-tag-p');
+      if (isCirc) {
+        rTagEl.textContent = 'constant';
+        pTagEl.textContent = 'constant';
+      } else if (rBarPct < 38) {
+        rTagEl.textContent = 'small (near star)';
+        pTagEl.textContent = 'large (fast)';
+      } else if (rBarPct > 72) {
+        rTagEl.textContent = 'large (far)';
+        pTagEl.textContent = 'small (slow)';
+      } else {
+        rTagEl.textContent = 'intermediate';
+        pTagEl.textContent = 'intermediate';
+      }
+
+      document.getElementById('bal-tag-theta').textContent = `θ = ${t.thetaDeg.toFixed(1)}°`;
+      document.getElementById('bal-equation-str').textContent =
+              `|r|(${t.rMag.toFixed(3)}) × |p|(${t.pMag.toFixed(3)}) × sin(${t.thetaDeg.toFixed(1)}°)(${t.sinTheta.toFixed(3)})`;
+
+      const apsisNoteEl = document.getElementById('bal-apsis-note');
+      if (Math.abs(t.thetaDeg - 90) < 1.2) {
+        apsisNoteEl.textContent = 'θ ≈ 90.0° (At Apsis: sinθ = 1)';
+        apsisNoteEl.className = 'px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[11px] shrink-0 self-start sm:self-center';
+      } else {
+        apsisNoteEl.textContent = `θ = ${t.thetaDeg.toFixed(1)}° ≠ 90° (Non-Apsis)`;
+        apsisNoteEl.className = 'px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[11px] shrink-0 self-start sm:self-center';
+      }
+
+    } else if (state.scenario === 'linear') {
+      const lin = state.linear;
+      // Along straight line y = b for x in [-xMax, xMax], |r| ranges from b to sqrt(xMax^2 + b^2)
+      const rMin = lin.b;
+      const rMax = Math.hypot(lin.xMax, lin.b);
+      const sinMin = lin.b / rMax;
+      const sinMax = 1.0;
+
+      rBarPct = normBarWidth(t.rMag, rMin, rMax, false);
+      pBarPct = 50; // |p| = m|v| is strictly constant in free linear motion
+      sinBarPct = normBarWidth(t.sinTheta, sinMin, sinMax, false);
+
+    } else if (state.scenario === 'proof') {
+      // Slider bounds in Tab 3: |r| in [0.80, 2.40], |p| in [0.50, 2.60], theta in [30, 150] -> sin(theta) in [0.50, 1.00]
+      rBarPct = normBarWidth(t.rMag, 0.80, 2.40, false);
+      pBarPct = normBarWidth(t.pMag, 0.50, 2.60, false);
+      sinBarPct = normBarWidth(t.sinTheta, 0.50, 1.00, false);
     }
 
-    document.getElementById('bal-tag-theta').textContent = `θ = ${t.thetaDeg.toFixed(1)}°`;
-    document.getElementById('bal-equation-str').textContent =
-            `|r|(${t.rMag.toFixed(3)}) × |p|(${t.pMag.toFixed(3)}) × sin(${t.thetaDeg.toFixed(1)}°)(${t.sinTheta.toFixed(3)})`;
-
-    const apsisNoteEl = document.getElementById('bal-apsis-note');
-    if (Math.abs(t.thetaDeg - 90) < 1.2) {
-      apsisNoteEl.textContent = 'θ ≈ 90.0° (At Apsis: sinθ = 1)';
-      apsisNoteEl.className = 'px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[11px] shrink-0 self-start sm:self-center';
-    } else {
-      apsisNoteEl.textContent = `θ = ${t.thetaDeg.toFixed(1)}° ≠ 90° (Non-Apsis)`;
-      apsisNoteEl.className = 'px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[11px] shrink-0 self-start sm:self-center';
-    }
+    // Apply synchronized widths to the 3 bottom telemetry card bars
+    document.getElementById('bar-r').style.width = rBarPct.toFixed(1) + '%';
+    document.getElementById('bar-p').style.width = pBarPct.toFixed(1) + '%';
+    document.getElementById('bar-sin').style.width = sinBarPct.toFixed(1) + '%';
   }
 
   function pushHistorySample() {
@@ -1218,6 +1267,7 @@
     };
 
     updateTelemetryDOM();
+    updateAllProgressBars();
   }
 
   // ============================================================================
@@ -1234,10 +1284,6 @@
     document.getElementById('sub-p-perp').innerHTML = `p<sub>⊥</sub> = |p|sinθ = ${t.pPerp.toFixed(3)}`;
     document.getElementById('val-L').textContent = t.LMag.toFixed(3);
     document.getElementById('val-dAdt').textContent = t.dAdt.toFixed(3);
-
-    document.getElementById('bar-r').style.width = Math.min(100, (t.rMag / 3.0) * 100) + '%';
-    document.getElementById('bar-p').style.width = Math.min(100, (t.pMag / 3.0) * 100) + '%';
-    document.getElementById('bar-sin').style.width = Math.min(100, t.sinTheta * 100) + '%';
 
     const isCircular = state.scenario === 'orbit' && state.orbit.e < 0.005;
     const badgeR = document.getElementById('badge-r-state');
@@ -1568,7 +1614,7 @@
 
   function drawOrbitScenarioBackground(toScreen, O) {
     const orb = state.orbit;
-    const { a, e, m, gm } = orb;
+    const { a, e } = orb;
 
     // 1. Equal-Time Swept Area Sectors (Kepler's Second Law)
     if (state.overlays.swept && orb.sweptWedges.length > 0) {
