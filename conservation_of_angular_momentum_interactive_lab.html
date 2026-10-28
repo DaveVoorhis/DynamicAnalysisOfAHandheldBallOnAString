@@ -313,8 +313,8 @@
     <div class="relative rounded-2xl border border-slate-800 lab-grid-bg overflow-hidden shadow-2xl">
       <!-- Floating Canvas Interaction Hint Bottom-Left -->
       <div class="absolute bottom-3 left-3 z-10 pointer-events-none">
-        <div class="px-2.5 py-1 rounded-lg bg-slate-900/85 backdrop-blur border border-slate-800 text-[11px] text-slate-300 font-mono">
-          Interactive: Drag the particle directly on the canvas to scrub its position
+        <div id="canvas-drag-hint" class="px-2.5 py-1 rounded-lg bg-slate-900/85 backdrop-blur border border-slate-800 text-[11px] text-slate-300 font-mono">
+          Interactive: Drag the planet directly on the canvas to scrub its position
         </div>
       </div>
 
@@ -601,7 +601,7 @@
           </div>
         </div>
 
-        <!-- Semi-major axis a (1.2 to 2.5) & Particle Mass m (0.5 to 3.0 kg) -->
+        <!-- Semi-major axis a (1.2 to 2.5) & Planet Mass m (0.5 to 3.0 kg) -->
         <div class="grid grid-cols-2 gap-3">
           <div>
             <div class="flex justify-between text-xs font-mono mb-1">
@@ -612,7 +612,7 @@
           </div>
           <div>
             <div class="flex justify-between text-xs font-mono mb-1">
-              <label for="slider-m-orbit" class="text-slate-300">Particle Mass (<span class="math-var">m</span>)</label>
+              <label for="slider-m-orbit" class="text-slate-300">Planet Mass (<span class="math-var">m</span>)</label>
               <span id="lbl-m-orbit" class="text-emerald-400 font-semibold">1.00 kg</span>
             </div>
             <input id="slider-m-orbit" type="range" min="0.50" max="3.00" step="0.10" value="1.00" oninput="onOrbitParamChange()" class="w-full">
@@ -2002,6 +2002,13 @@
 
     const badgeEl = document.getElementById('scenario-badge');
     const descEl = document.getElementById('scenario-description');
+    const hintEl = document.getElementById('canvas-drag-hint');
+
+    if (hintEl) {
+      hintEl.textContent = scen === 'orbit'
+              ? 'Interactive: Drag the planet directly on the canvas to scrub its position'
+              : 'Interactive: Drag the particle directly on the canvas to scrub its position';
+    }
 
     if (scen === 'orbit') {
       badgeEl.textContent = 'Section 4.2 & Figure 2 • Planetary Orbits (Central Forces)';
