@@ -893,7 +893,7 @@
       thetaDeg: 112,     // Angle between r and p (degrees)
       dt: 0.45,          // Differential time step dt for Figure 1 vectors
       m: 1.00,           // Mass
-      conservedL: 1.96,  // Target conserved |L| when torqueMode === false
+      conservedL: 1.96,  // Target conserved |L| when torque is zero
       fPerp: 0.00,       // Non-central perpendicular force F_perp
       oscPhase: 0.0      // Phase for gentle oscillation of |r| when playing
     },
@@ -1111,21 +1111,24 @@
       const thetaRad = (prf.thetaDeg * Math.PI) / 180;
       const sinTheta = Math.sin(thetaRad);
 
-      if (!prf.torqueMode) {
+      const hasNonZeroTorque = prf.torqueMode && Math.abs(prf.fPerp) > 1e-3;
+
+      if (!hasNonZeroTorque) {
+        // Torque is zero (either Torque-Free mode OR Applied Torque mode with F_perp = 0.00 N):
+        // Dynamically adjust |p| so L = |r||p|sin(theta) remains strictly constant.
         prf.pMag = prf.conservedL / Math.max(0.15, prf.rMag * sinTheta);
-        prf.fPerp = 0;
+        if (!prf.torqueMode) prf.fPerp = 0;
         document.getElementById('slider-proof-p').value = Math.min(2.6, Math.max(0.5, prf.pMag)).toFixed(2);
         document.getElementById('lbl-proof-p').textContent = prf.pMag.toFixed(2);
       } else {
-        if (state.playing && effDt > 0 && Math.abs(prf.fPerp) > 1e-3) {
+        // Non-zero external torque (tau = |r| * F_perp): L changes at rate dL/dt = tau
+        if (state.playing && effDt > 0) {
           const tau = prf.rMag * prf.fPerp;
           prf.conservedL = Math.max(0.35, Math.min(3.6, prf.conservedL + tau * effDt * 0.45));
-          prf.pMag = prf.conservedL / Math.max(0.15, prf.rMag * sinTheta);
-          document.getElementById('slider-proof-p').value = Math.min(2.6, Math.max(0.5, prf.pMag)).toFixed(2);
-          document.getElementById('lbl-proof-p').textContent = prf.pMag.toFixed(2);
-        } else {
-          prf.conservedL = prf.rMag * prf.pMag * sinTheta;
         }
+        prf.pMag = prf.conservedL / Math.max(0.15, prf.rMag * sinTheta);
+        document.getElementById('slider-proof-p').value = Math.min(2.6, Math.max(0.5, prf.pMag)).toFixed(2);
+        document.getElementById('lbl-proof-p').textContent = prf.pMag.toFixed(2);
       }
 
       const rVec = {
@@ -2155,7 +2158,10 @@
     const thetaRad = (prf.thetaDeg * Math.PI) / 180;
     const sinTheta = Math.max(0.15, Math.sin(thetaRad));
 
-    if (!prf.torqueMode) {
+    const hasNonZeroTorque = prf.torqueMode && Math.abs(prf.fPerp) > 1e-3;
+
+    if (!hasNonZeroTorque) {
+      // When F_perp == 0, preserve conservedL unless the user directly scrubs |p|
       if (which === 'p') {
         prf.conservedL = prf.rMag * prf.pMag * sinTheta;
       } else {
@@ -2163,7 +2169,11 @@
         document.getElementById('slider-proof-p').value = Math.min(2.6, Math.max(0.5, prf.pMag)).toFixed(2);
       }
     } else {
-      prf.conservedL = prf.rMag * prf.pMag * sinTheta;
+      // When F_perp != 0, scrubbing any vector parameter updates the current L baseline
+      // while scrubbing dt or fperp preserves the current L value at that instant
+      if (which === 'r' || which === 'rangle' || which === 'p' || which === 'theta') {
+        prf.conservedL = prf.rMag * prf.pMag * sinTheta;
+      }
     }
 
     document.getElementById('lbl-proof-r').textContent = prf.rMag.toFixed(2);
