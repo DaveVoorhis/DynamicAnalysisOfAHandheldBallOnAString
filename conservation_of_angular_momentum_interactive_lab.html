@@ -251,7 +251,7 @@
 </header>
 
 <!-- MAIN WORKSPACE GRID -->
-<main class="flex-1 max-w-[1600px] w-full mx-auto px-4 sm:px-6 py-4 grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
+<main class="flex-1 w-full mx-auto px-4 sm:px-6 py-4 grid grid-cols-1 xl:grid-cols-12 gap-4 items-start">
 
   <!-- LEFT / CENTER COLUMN: INTERACTIVE VECTOR CANVAS + TELEMETRY CARDS + FIG. 2 COMPARISON TABLE (8 cols on XL) -->
   <div class="xl:col-span-8 flex flex-col gap-4">
@@ -395,7 +395,7 @@
             Bars show each factor normalized between its orbital <span class="font-mono text-slate-300">min</span> and <span class="font-mono text-slate-300">max</span>. Notice how <span class="text-sky-400 font-mono">|r|</span> and <span class="text-emerald-400 font-mono">|p|</span> move in opposite directions while <span class="text-rose-400 font-mono">sin(θ)</span> dips between apsides, and <span class="text-purple-300 font-mono">K<sub>rot</sub></span> varies as <span class="font-mono text-slate-300">1/|r|²</span>.
           </p>
         </div>
-        <span id="bal-apsis-note" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[11px] shrink-0 self-start sm:self-center">
+        <span id="bal-apsis-note" class="px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[11px] whitespace-nowrap shrink-0 self-start sm:self-center">
           θ ≠ 90° (Non-Apsis)
         </span>
       </div>
@@ -404,9 +404,9 @@
       <div class="grid grid-cols-1 md:grid-cols-11 gap-2 items-center font-mono">
         <!-- Variable 1: |r| -->
         <div class="md:col-span-3 bg-slate-950/90 border border-slate-800 rounded-xl p-3">
-          <div class="flex items-center justify-between text-xs mb-1">
-            <span class="text-sky-400 font-bold">Radius |r|</span>
-            <span id="bal-tag-r" class="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300">mid-orbit</span>
+          <div class="flex items-center justify-between gap-1 text-xs mb-1">
+            <span class="text-sky-400 font-bold whitespace-nowrap">Radius |r|</span>
+            <span id="bal-tag-r" class="text-[10px] px-1.5 py-0.5 rounded bg-sky-500/15 text-sky-300 whitespace-nowrap shrink-0">mid-orbit</span>
           </div>
           <div id="bal-val-r" class="text-base sm:text-lg font-bold text-sky-300">1.500</div>
           <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
@@ -423,9 +423,9 @@
 
         <!-- Variable 2: |p| -->
         <div class="md:col-span-3 bg-slate-950/90 border border-slate-800 rounded-xl p-3">
-          <div class="flex items-center justify-between text-xs mb-1">
-            <span class="text-emerald-400 font-bold">Momentum |p|</span>
-            <span id="bal-tag-p" class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300">mid-speed</span>
+          <div class="flex items-center justify-between gap-1 text-xs mb-1">
+            <span class="text-emerald-400 font-bold whitespace-nowrap">Momentum |p|</span>
+            <span id="bal-tag-p" class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 whitespace-nowrap shrink-0">mid-speed</span>
           </div>
           <div id="bal-val-p" class="text-base sm:text-lg font-bold text-emerald-300">1.200</div>
           <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
@@ -442,9 +442,9 @@
 
         <!-- Variable 3: sin(θ) -->
         <div class="md:col-span-3 bg-slate-950/90 border border-slate-800 rounded-xl p-3">
-          <div class="flex items-center justify-between text-xs mb-1">
-            <span class="text-rose-400 font-bold">sin(θ)</span>
-            <span id="bal-tag-theta" class="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-300">θ = 90.0°</span>
+          <div class="flex items-center justify-between gap-1 text-xs mb-1">
+            <span class="text-rose-400 font-bold whitespace-nowrap">sin(θ)</span>
+            <span id="bal-tag-theta" class="text-[10px] px-1.5 py-0.5 rounded bg-rose-500/15 text-rose-300 whitespace-nowrap shrink-0">θ = 90.0°</span>
           </div>
           <div id="bal-val-sin" class="text-base sm:text-lg font-bold text-rose-300">1.000</div>
           <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
@@ -464,7 +464,7 @@
             <span class="font-bold text-amber-300">Instantaneous Product:</span>
             <span id="bal-equation-str" class="ml-1 text-slate-200">|r|(1.500) × |p|(1.200) × sin(90.0°)(1.000)</span>
           </div>
-          <div class="flex items-center gap-2">
+          <div class="flex items-center gap-2 shrink-0">
             <span class="text-xs text-amber-300/90">L =</span>
             <span id="bal-val-L" class="text-base sm:text-lg font-bold text-amber-300">1.800</span>
             <span class="text-[10px] px-2 py-0.5 rounded bg-amber-400/20 text-amber-300 border border-amber-400/40 font-bold">CONSTANT</span>
@@ -472,20 +472,20 @@
         </div>
 
         <!-- Rotational Kinetic Energy K_rot = L^2 / (2 m r^2) = 1/2 I omega^2 -->
-        <div class="lg:col-span-5 bg-gradient-to-r from-purple-500/15 via-purple-500/10 to-slate-950 border border-purple-500/40 rounded-xl px-3.5 py-2 flex flex-col justify-center">
-          <div class="flex items-center justify-between gap-2">
-            <div class="text-xs text-purple-200">
+        <div class="lg:col-span-5 bg-gradient-to-r from-purple-500/15 via-purple-500/10 to-slate-950 border border-purple-500/40 rounded-xl px-3.5 py-2 flex flex-col justify-center min-w-0">
+          <div class="flex items-center justify-between gap-2 flex-nowrap">
+            <div class="text-xs text-purple-200 whitespace-nowrap truncate">
               <span class="font-bold text-purple-300">Rot. KE (K<sub>rot</sub> = ½Iω² = L²/2mr²):</span>
             </div>
-            <div class="flex items-center gap-1.5">
-              <span id="bal-val-krot" class="text-sm sm:text-base font-bold text-purple-300">0.360</span>
-              <span id="bal-tag-krot" class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/30">∝ 1/|r|²</span>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <span id="bal-val-krot" class="text-sm sm:text-base font-bold text-purple-300 whitespace-nowrap">0.360</span>
+              <span id="bal-tag-krot" class="text-[10px] px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-400/30 whitespace-nowrap shrink-0">∝ 1/|r|²</span>
             </div>
           </div>
           <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden mt-1.5">
             <div id="bal-bar-krot" class="bg-purple-400 h-full" style="width: 50%"></div>
           </div>
-          <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+          <div class="flex justify-between text-[10px] text-slate-400 mt-1 whitespace-nowrap">
             <span id="bal-min-krot">min (apo)</span>
             <span id="bal-sub-ktot" class="text-slate-300">K<sub>tot</sub> = 0.720</span>
             <span id="bal-max-krot">max (peri)</span>
@@ -1254,10 +1254,10 @@
       const apsisNoteEl = document.getElementById('bal-apsis-note');
       if (Math.abs(t.thetaDeg - 90) < 1.2) {
         apsisNoteEl.textContent = 'θ ≈ 90.0° (At Apsis: K_rot = K_tot)';
-        apsisNoteEl.className = 'px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[11px] shrink-0 self-start sm:self-center';
+        apsisNoteEl.className = 'px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-mono text-[11px] whitespace-nowrap shrink-0 self-start sm:self-center';
       } else {
         apsisNoteEl.textContent = `θ = ${t.thetaDeg.toFixed(1)}° ≠ 90° (Non-Apsis)`;
-        apsisNoteEl.className = 'px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[11px] shrink-0 self-start sm:self-center';
+        apsisNoteEl.className = 'px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 font-mono text-[11px] whitespace-nowrap shrink-0 self-start sm:self-center';
       }
 
     } else if (state.scenario === 'linear') {
