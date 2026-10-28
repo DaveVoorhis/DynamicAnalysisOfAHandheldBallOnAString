@@ -311,35 +311,6 @@
 
     <!-- INTERACTIVE 2D VECTOR & GEOMETRY CANVAS -->
     <div class="relative rounded-2xl border border-slate-800 lab-grid-bg overflow-hidden shadow-2xl">
-      <!-- Floating Vector Color Legend Top-Left -->
-      <div class="absolute top-3 left-3 z-10 flex flex-wrap gap-1.5 pointer-events-none">
-        <div class="px-2.5 py-1 rounded-lg bg-slate-900/90 backdrop-blur border border-slate-700/80 text-[11px] font-mono flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 rounded-sm bg-sky-400 inline-block"></span>
-          <span class="text-sky-300 font-bold">r</span>
-          <span class="text-slate-400">&amp; ext. r</span>
-        </div>
-        <div class="px-2.5 py-1 rounded-lg bg-slate-900/90 backdrop-blur border border-slate-700/80 text-[11px] font-mono flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 rounded-sm bg-emerald-400 inline-block"></span>
-          <span class="text-emerald-300 font-bold">p = mv</span>
-          <span class="text-slate-400">Momentum</span>
-        </div>
-        <div class="px-2.5 py-1 rounded-lg bg-slate-900/90 backdrop-blur border border-slate-700/80 text-[11px] font-mono flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 rounded-sm bg-rose-500 inline-block"></span>
-          <span class="text-rose-300 font-bold">θ</span>
-          <span class="text-slate-400">∠ (ext. r, p)</span>
-        </div>
-        <div class="px-2.5 py-1 rounded-lg bg-slate-900/90 backdrop-blur border border-slate-700/80 text-[11px] font-mono flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 rounded-sm bg-amber-400/60 border border-amber-300 inline-block"></span>
-          <span class="text-amber-300 font-bold">L = |r||p|sinθ</span>
-          <span class="text-slate-400">Parallelogram</span>
-        </div>
-        <div class="px-2.5 py-1 rounded-lg bg-slate-900/90 backdrop-blur border border-slate-700/80 text-[11px] font-mono flex items-center gap-1.5">
-          <span class="w-2.5 h-2.5 rounded-sm bg-rose-400/40 border border-rose-400 inline-block"></span>
-          <span class="text-rose-300 font-bold">dA</span>
-          <span class="text-slate-400">Swept Area</span>
-        </div>
-      </div>
-
       <!-- Floating Canvas Interaction Hint Bottom-Left -->
       <div class="absolute bottom-3 left-3 z-10 pointer-events-none">
         <div class="px-2.5 py-1 rounded-lg bg-slate-900/85 backdrop-blur border border-slate-800 text-[11px] text-slate-300 font-mono">
@@ -357,6 +328,14 @@
     <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-3 flex flex-wrap items-center justify-between gap-2">
       <span class="text-xs font-mono uppercase tracking-wider text-slate-400 px-1">Visual Overlays:</span>
       <div class="flex flex-wrap items-center gap-2">
+        <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 cursor-pointer text-xs select-none">
+          <input type="checkbox" id="chk-r" checked onchange="updateOverlays()" class="rounded text-sky-500 focus:ring-0 bg-slate-900 border-slate-600">
+          <span class="text-sky-300 font-medium">Position <span class="math-vec">r</span></span>
+        </label>
+        <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 cursor-pointer text-xs select-none">
+          <input type="checkbox" id="chk-p" checked onchange="updateOverlays()" class="rounded text-emerald-500 focus:ring-0 bg-slate-900 border-slate-600">
+          <span class="text-emerald-300 font-medium">Momentum <span class="math-vec">p</span> = <span class="math-var">m</span><span class="math-vec">v</span></span>
+        </label>
         <label class="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-slate-800/80 hover:bg-slate-800 border border-slate-700/80 cursor-pointer text-xs select-none">
           <input type="checkbox" id="chk-extr" checked onchange="updateOverlays()" class="rounded text-rose-500 focus:ring-0 bg-slate-900 border-slate-600">
           <span class="text-rose-300 font-medium">Show <span class="font-mono text-sky-300">ext. r</span> &amp; Angle θ (Fig. 2)</span>
@@ -856,6 +835,8 @@
 
     // Visual overlay toggles
     overlays: {
+      rVec: true,           // Show Position Vector r
+      pVec: true,           // Show Momentum Vector p = mv
       extR: true,           // Show dotted ext. r & Angle theta arc (Fig. 2)
       parallelogram: true,  // Show Cross-Product Parallelogram |r x p|
       swept: true,          // Show Equal-Time Swept Area Sectors (dA)
@@ -1629,8 +1610,12 @@
 
     // 7. Primary Vectors for Live Particle: Position r, Momentum p = mv, Force F, and Angle Arc theta
     const rLabel = state.scenario === 'proof' ? 'r (position)' : `r (|r|=${t.rMag.toFixed(2)})`;
-    drawVectorArrow(simCtx, O.x, O.y, P.x, P.y, '#38bdf8', 3.0, rLabel, 10, -10);
-    drawVectorArrow(simCtx, P.x, P.y, P_Tip.x, P_Tip.y, '#34d399', 3.2, `p = mv (|p|=${t.pMag.toFixed(2)})`, 12, -10);
+    if (state.overlays.rVec) {
+      drawVectorArrow(simCtx, O.x, O.y, P.x, P.y, '#38bdf8', 3.0, rLabel, 10, -10);
+    }
+    if (state.overlays.pVec) {
+      drawVectorArrow(simCtx, P.x, P.y, P_Tip.x, P_Tip.y, '#34d399', 3.2, `p = mv (|p|=${t.pMag.toFixed(2)})`, 12, -10);
+    }
 
     if (state.overlays.force && t.fMag > 1e-3) {
       const fScale = 0.50;
@@ -2189,6 +2174,8 @@
   }
 
   function updateOverlays() {
+    state.overlays.rVec = document.getElementById('chk-r').checked;
+    state.overlays.pVec = document.getElementById('chk-p').checked;
     state.overlays.extR = document.getElementById('chk-extr').checked;
     state.overlays.parallelogram = document.getElementById('chk-parallelogram').checked;
     state.overlays.swept = document.getElementById('chk-swept').checked;
